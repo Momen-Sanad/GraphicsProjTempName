@@ -171,8 +171,7 @@
   },
   "active": "cb83d415ef6ad25d",
   "lastOpenFiles": [
-    "test.sh",
-    "test.bash",
+    "CMakeLists.txt",
     "third_party/vendor/glfw",
     "third_party/vendor/glad",
     "third_party/vendor",
@@ -181,6 +180,7 @@
     "assets/textures",
     "assets/scenes",
     "assets/models",
-    "assets"
+    "assets",
+    "shaders"
   ]
 }
