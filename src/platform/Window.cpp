@@ -44,12 +44,15 @@ Window::~Window() {
     glfwTerminate();
 }
 
-bool Window::ShouldClose() const = m_Window ? glfwWindowShouldClose(m_Window) : true;
+bool Window::ShouldClose() const { return m_Window ? glfwWindowShouldClose(m_Window) : true; }
 
-void Window::PollEvents() const = glfwPollEvents();
+void Window::PollEvents() const { glfwPollEvents(); } 
 
 
-void Window::SwapBuffers() const = m_Window ? glfwSwapBuffers(m_Window) : void();
+void Window::SwapBuffers() const { 
+    if (m_Window) 
+    glfwSwapBuffers(m_Window); 
+}
 
 
 float Window::GetDeltaTime()
