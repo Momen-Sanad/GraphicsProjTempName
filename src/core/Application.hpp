@@ -8,7 +8,13 @@
 #include "core/MonoBehaviour.hpp"
 
 class Application {
+
+private:
+    Window* m_window = nullptr;
+    std::vector<std::shared_ptr<MonoBehaviour>> m_behaviours;
+    
 public:
+
     // Constructors
     explicit Application(int width, int height, const char* title);
     explicit Application(Window& window);
@@ -21,7 +27,4 @@ public:
 
     ~Application() = default;
 
-private:
-    Window* m_window = nullptr;
-    std::vector<std::shared_ptr<MonoBehaviour>> m_behaviours;
 };

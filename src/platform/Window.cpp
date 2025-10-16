@@ -3,20 +3,20 @@
 #include <stdexcept>
 
 Window::Window(int width, int height, const std::string& title) {
-    if (!glfwInit()) {
+
+    if (!glfwInit()) 
         throw std::runtime_error("GLFW initialization failed");
-    }
+    
 
     // Request an OpenGL 3.3 Core context (adjust to your needs)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
 
     m_Window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
-    if (!m_Window) {
+
+    if (!m_Window) 
+    {
         glfwTerminate();
         throw std::runtime_error("Failed to create GLFW window");
     }
@@ -25,7 +25,8 @@ Window::Window(int width, int height, const std::string& title) {
     glfwSwapInterval(1); // vsync on
 
     // Load GL function pointers using GLAD (glfwGetProcAddress provided by GLFW)
-    if (!gladLoadGL(glfwGetProcAddress)) {
+    if (!gladLoadGL(glfwGetProcAddress))
+    {
         glfwDestroyWindow(m_Window);
         glfwTerminate();
         throw std::runtime_error("Failed to initialize GLAD");
@@ -35,26 +36,24 @@ Window::Window(int width, int height, const std::string& title) {
 }
 
 Window::~Window() {
-    if (m_Window) {
+    if (m_Window) 
+    {
         glfwDestroyWindow(m_Window);
         m_Window = nullptr;
     }
     glfwTerminate();
 }
 
-bool Window::ShouldClose() const {
-    return m_Window ? glfwWindowShouldClose(m_Window) : true;
-}
+bool Window::ShouldClose() const = m_Window ? glfwWindowShouldClose(m_Window) : true;
 
-void Window::PollEvents() const {
-    glfwPollEvents();
-}
+void Window::PollEvents() const = glfwPollEvents();
 
-void Window::SwapBuffers() const {
-    if (m_Window) glfwSwapBuffers(m_Window);
-}
 
-float Window::GetDeltaTime() {
+void Window::SwapBuffers() const = m_Window ? glfwSwapBuffers(m_Window) : void();
+
+
+float Window::GetDeltaTime()
+{
     
     double now = glfwGetTime();
     double dt = now - m_lastTime;

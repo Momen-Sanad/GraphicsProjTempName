@@ -28,6 +28,7 @@ public:
     float GetDeltaTime();
 
     ~Window();
+    
     // Access to the raw GLFW window if needed
     GLFWwindow* GetNativeWindow() const { return m_Window; }
 };

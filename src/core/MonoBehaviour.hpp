@@ -28,10 +28,14 @@ public:
     virtual void OnExit() {}
     // Enable/disable the behaviour at runtime
     void SetEnabled(bool enabled) {
-        if (enabled && !m_enabled) {
+
+        if (enabled && !m_enabled) 
+        {
             m_enabled = true;
             OnEnable();
-        } else if (!enabled && m_enabled) {
+        }
+        else if (!enabled && m_enabled) 
+        {
             m_enabled = false;
             OnDisable();
         }
