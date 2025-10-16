@@ -87,7 +87,7 @@ Build a simple game engine with the following requirements:
         Materials should include pipeline state and other relevant properties (e.g., transparency).
         Implement at least:
             Material (abstract) -> TintedMaterial, TexturedMaterial.
-    
+     
     Deserialization
         Implement deserialization functions for:
             Components.
