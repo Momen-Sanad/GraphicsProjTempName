@@ -29,6 +29,11 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     src/app/*.cpp
 )
 
+# Safer if we later add folders that shouldn’t be compiled (e.g. src/tests or src/experimental).
+# & clearer for viewing
+# file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS src/*/*.cpp)
+
+
 # This creates a new executable called "OpenGLEngine" (e.g., on Windows, it will be called "OpenGLEngine.exe")
 # The executable is created by compiling the following c/c++ files and linking some libraries (which we will define later)
 add_executable(OpenGLEngine
