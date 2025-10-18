@@ -22,18 +22,20 @@ set(GLFW_USE_HYBRID_HPG ON CACHE BOOL "" FORCE)     # Use High Performance GPU i
 add_subdirectory(vendor/glfw EXCLUDE_FROM_ALL)
 
 # ==========================================================
-# ===================== OPENGL DETECTION ====================
+# ===================== OPENGL DETECTION ===================
 # ==========================================================
 # This will automatically link the system's OpenGL library (e.g. libGL.so on Linux).
 find_package(OpenGL REQUIRED)
 
 # ==========================================================
-# ================== SOURCE FILE COLLECTION =================
+# ================== SOURCE FILE COLLECTION ================
 # ==========================================================
 # This command automatically collects all .cpp files from inside src/
 # so we don’t need to list them manually every time we add a new file.
+# The new ECS architecture files are included as well.
 file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     src/core/*.cpp
+    src/ecs/*.cpp
     src/systems/*.cpp
     src/components/*.cpp
     src/assets/*.cpp
@@ -48,7 +50,7 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
 # This version is cleaner but might include unwanted folders (e.g. src/tests).
 
 # ==========================================================
-# =================== ENGINE LIBRARY CREATION ===================
+# =================== ENGINE LIBRARY CREATION ==============
 # ==========================================================
 # This creates a static library called "Engine" which contains all engine code.
 # The executable will later link against this library.
@@ -58,14 +60,15 @@ add_library(Engine STATIC
 )
 
 # ==========================================================
-# ================== INCLUDE DIRECTORIES ====================
+# ================== INCLUDE DIRECTORIES ===================
 # ==========================================================
-# This tells the compiler where to find the header files for GLFW, glad, stb, and glm.
+# This tells the compiler where to find the header files for GLFW, glad, stb, glm, and our source tree.
 # We set these as PUBLIC because consumers of the Engine library (like the OpenGLEngine executable)
 # need these include paths when compiling their translation units.
 target_include_directories(Engine
     PUBLIC
        ${CMAKE_SOURCE_DIR}/src        # so #include <Application.hpp> works
+       ${CMAKE_SOURCE_DIR}/src/ecs    # <-- Include ECS headers (EntityManager, ComponentManager, etc.)
        ${CMAKE_SOURCE_DIR}/vendor/glfw/include
        ${CMAKE_SOURCE_DIR}/vendor/glad/include
        ${CMAKE_SOURCE_DIR}/vendor/stb
@@ -73,7 +76,7 @@ target_include_directories(Engine
 )
 
 # ==========================================================
-# ===================== LINK LIBRARIES ======================
+# ===================== LINK LIBRARIES =====================
 # ==========================================================
 # Link libraries needed by the engine (GLFW and system OpenGL).
 # Mark PUBLIC so anything that links Engine sees the link requirement if necessary.
@@ -84,7 +87,7 @@ target_link_libraries(Engine
 )
 
 # ==========================================================
-# ================== COMPILER DEFINITIONS ===================
+# ================== COMPILER DEFINITIONS ==================
 # ==========================================================
 # Compilers on Windows don't like the fopen function, so we disable those warnings.
 # Equivalent to "#define _CRT_SECURE_NO_WARNINGS" at the top of each file.
@@ -95,8 +98,12 @@ target_compile_definitions(Engine PRIVATE _CRT_SECURE_NO_WARNINGS)
 # Use it in code as: std::string(SHADER_DIR) + "/main.vert"
 target_compile_definitions(Engine PRIVATE SHADER_DIR="${CMAKE_SOURCE_DIR}/shaders")
 
+# could also define other asset directories if needed later (like TEXTURE_DIR, MODEL_DIR, etc.)
+# Example:
+# target_compile_definitions(Engine PRIVATE TEXTURE_DIR="${CMAKE_SOURCE_DIR}/assets/textures")
+
 # ==========================================================
-# ============== ENABLE USEFUL COMPILER WARNINGS ============
+# ============== ENABLE USEFUL COMPILER WARNINGS ===========
 # ==========================================================
 # These warnings help catch subtle issues early during compilation.
 if (MSVC)
@@ -106,7 +113,7 @@ else()
 endif()
 
 # ==========================================================
-# ================== OUTPUT DIRECTORY SETUP =================
+# ================== OUTPUT DIRECTORY SETUP ================
 # ==========================================================
 # This tells CMake where to place the final compiled executable.
 # Example: if you're building in "build/", the output will be "build/OpenGLEngine"
@@ -115,9 +122,10 @@ set_target_properties(Engine PROPERTIES
 )
 
 # ==========================================================
-# ===================== IDE ORGANIZATION ====================
+# ===================== IDE ORGANIZATION ===================
 # ==========================================================
 # This organizes files in IDEs (like CLion or Visual Studio) for easier navigation.
+# ECS, Components, and Systems will appear neatly under the “Source Files” group.
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src PREFIX "Source Files" FILES ${ENGINE_SOURCES})
 
 # ----------------------------------------------------------
@@ -131,8 +139,20 @@ add_executable(OpenGLEngine
 # Link the Engine library into the executable.
 target_link_libraries(OpenGLEngine PRIVATE Engine)
 
+# ==========================================================
+# ============= EXECUTABLE OUTPUT DIRECTORY ================
+# ==========================================================
 # This tells CMake where to place the final compiled executable.
 # Example: if you're building in "build/", the output will be "build/OpenGLEngine"
 set_target_properties(OpenGLEngine PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 )
+
+# ==========================================================
+# ===================== FUTURE EXTENSIONS ===================
+# ==========================================================
+# If you later add:
+#  - src/editor/    -> tools for a scene editor (if we decide to make it)
+#  - src/tests/     -> unit tests using Catch2 or GoogleTest
+#  - src/physics/   -> physics components/systems   (will probably need it)
+# You can just add more GLOB_RECURSE patterns at the top to include them automatically.
