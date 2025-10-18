@@ -8,7 +8,8 @@ Window::Window(int width, int height, const std::string& title) {
         throw std::runtime_error("GLFW initialization failed");
     
 
-    // Request an OpenGL 3.3 Core context (adjust to your needs)
+    // Request an OpenGL 3.3 Core context (adjustable)
+    
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);

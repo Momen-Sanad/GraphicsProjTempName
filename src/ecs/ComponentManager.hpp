@@ -1,0 +1,1 @@
+/* Stores data for each component type. Manages adding/removing components. */

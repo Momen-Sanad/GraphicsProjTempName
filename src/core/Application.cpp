@@ -21,6 +21,17 @@ void Application::AddBehaviour(const std::shared_ptr<MonoBehaviour>& behaviour) 
 
 void Application::Run(MonoBehaviour* behaviour) {
 
+    /* implement this here: 
+        along with its dependencies in other files
+        
+    engine.Init();
+    while (!window->ShouldClose()) {
+        float dt = CalculateDeltaTime();
+        engine.Update(dt);
+        window->SwapBuffers();
+    }
+*/
+
     std::shared_ptr<MonoBehaviour> mainBehaviour(behaviour);
     m_behaviours.push_back(mainBehaviour);
     mainBehaviour->Start();
