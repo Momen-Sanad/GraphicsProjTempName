@@ -1,12 +1,16 @@
-/* example usage:
-
-// MeshRenderer.hpp
 #pragma once
-#include <string>
+#include "../ecs/Component.hpp"
+#include <glad/gl.h>
 
-struct MeshRenderer {
-    std::string meshName;
-    std::string materialName;
+class MeshRenderer : public Component {
+public:
+    void initialize(Entity* entity) override;
+    void update(float dt) override;
+
+    GLuint get_vao() const;
+    GLuint get_texture() const;
+    GLuint get_element_count() const;
+
+private:
+    GLuint vao, texture, element_count;
 };
-
-*/

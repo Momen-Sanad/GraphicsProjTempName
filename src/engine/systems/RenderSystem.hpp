@@ -1,21 +1,31 @@
-/* example usage:
+// src/engine/systems/RenderSystem.hpp
 
-#pragma once
-// these includes will be fixed in Cmake
-#include "../ecs/SystemManager.hpp"
-#include "../components/Transform.hpp"
-#include "../components/MeshRenderer.hpp"
-#include "../core/MonoBehavviour.hpp"
+#ifndef RENDER_SYSTEM_HPP
+#define RENDER_SYSTEM_HPP
 
-class RenderSystem : public System {
+#include <GL/glew.h>
+#include <vector>
+
+class RenderSystem {
 public:
-    void Update(float deltaTime) override {
-        for (auto const& entity : entities) {
-            auto& transform = gCoordinator.GetComponent<Transform>(entity);
-            auto& mesh      = gCoordinator.GetComponent<MeshRenderer>(entity);
-            // Call OpenGL rendering logic here
-            DrawMesh(mesh, transforma);
-        }
-    }
+    // Constructor and Destructor
+    RenderSystem();
+    ~RenderSystem();
+
+    // Add a function to initialize the system
+    void Init();
+    
+    // Render function that will be called in the main game loop
+    void Render();
+    
+    // Function to clear the screen
+    void ClearScreen();
+    
+private:
+    GLuint shaderProgram;  // The current shader program
+    GLuint vao;            // Vertex Array Object for the scene's objects
+    GLuint vbo;            // Vertex Buffer Object for the vertices
+    GLuint ebo;            // Element Buffer Object for the indices
 };
-*/
+
+#endif // RENDER_SYSTEM_HPP

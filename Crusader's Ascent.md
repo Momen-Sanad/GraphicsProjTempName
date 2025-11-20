@@ -1,0 +1,90 @@
+2.5D game dungeon crawler
+
+- theme
+	- time era
+		- medieval -> better overall
+		- futuristic -> easier 
+		- current (x)
+	- weapons:
+		- ranged (double handed)
+			- bow
+			- throwing knives ( maybe a side weapon )
+			- crossbow
+			- slingshot
+		- melee
+			- medium melee (1 handed)
+				- sword shorter range
+				- spear longer range  slower atk spd
+				- shield (parry + block)
+			- short melee (two handed (must))
+				- daggers
+				- double axe
+			- heavy melee
+				- mace
+				- chained mace
+				-  two handed axe
+				- broadsword
+				- two handed spear
+				- great shield + spiked (block + attack NO PARRY)(lowers damage taken)
+	- mobs
+		- mini-boss
+			- dragon
+			- great mage
+				- arch wizard
+				- fancy skele wizard
+			- giant skele (summons light skele)
+		- brute (high hp has a shield)
+			- armored cursader with a shield and 1 handed mace
+			- armored cursader with a shield and 1 handed sword
+		- heavy enemy (high hp high dmg 2 handed-weapon)
+			- cursader 2 handed spear
+			- cursader broadsword
+			- cursader with 2 handed axe
+		- light enemy (low dmg low hp)
+			- hounds
+			- skele hounds (summoned)
+			- light cursaders (daggers, sword, axe, mace)
+		- ranged enemy
+			- skele archer (summoned)
+			- skele mage (only summoned by arch mage)
+			- human mage
+			- human archer
+			- turrets 
+		- traps
+			- poison trap
+			- fire trap
+			- freeze
+			- root trap
+			- just damage traps
+- goal
+	- traverse as much as u can
+- controls
+	- move
+		- arrow keys 
+	- atk
+		- light atk, heavy atk (Z, X)
+	- evade
+		- dash (space)
+	- block
+		- just block "D" (optional timed parry)
+	- throwables
+		- press g to throw dagger or smth
+	- magic (optional)
+	- interact
+		- press E to interact
+- progression
+	- each 2 cleared levels is 1 boon
+	- three doors per room
+		- mini-boss room is unavoidable
+			- no options for blacksmith or healing
+		- each door is either
+			- level (mobs)
+			- blacksmith + travelling merchant
+			- heal (medic)
+
+	- design
+		- a rogue guy like ghost of tsushima hired by templars to assasinate a cursader president like richard lionheart or something
+		- go to his mansion (100 levels)
+		- each level has three stairs (mystery(either mini-boss, fight, merchant, heal), fight (either fight or mini-boss), (a random choice between a fight, mini-boss, merchant, heal))
+		- game_level % 10 == 0 means a mini-boss always (1 flight of stairs)
+		- 
