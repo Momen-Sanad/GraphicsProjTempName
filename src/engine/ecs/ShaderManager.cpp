@@ -3,49 +3,62 @@
 #include <sstream>
 #include <iostream>
 
-ShaderManager& ShaderManager::get_instance() {
-    static ShaderManager instance;
-    return instance;
+GLuint ShaderManager::loadShader(const std::string& filePath, GLenum shaderType) {
+    std::ifstream shaderFile(filePath);
+    if (!shaderFile.is_open()) {
+        std::cerr << "Failed to open shader file: " << filePath << std::endl;
+        return 0;
+    }
+
+    std::stringstream shaderStream;
+    shaderStream << shaderFile.rdbuf();
+    std::string shaderCode = shaderStream.str();
+    const char* shaderSource = shaderCode.c_str();
+
+    GLuint shader = glCreateShader(shaderType);
+    glShaderSource(shader, 1, &shaderSource, nullptr);
+    glCompileShader(shader);
+
+    int success;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
+        std::cerr << "Shader compilation failed: " << infoLog << std::endl;
+        glDeleteShader(shader);
+        return 0;
+    }
+
+    return shader;
 }
 
-GLuint ShaderManager::load_shader(const std::string& vertex_path, const std::string& fragment_path) {
-    // Load vertex and fragment shader source code
-    std::ifstream vertex_file(vertex_path);
-    std::ifstream fragment_file(fragment_path);
+GLuint ShaderManager::loadProgram(const std::string& vsPath, const std::string& fsPath) {
+    std::string programKey = vsPath + fsPath;
+    if (shaderPrograms.find(programKey) != shaderPrograms.end()) {
+        return shaderPrograms[programKey];
+    }
 
-    std::stringstream vertex_stream, fragment_stream;
-    vertex_stream << vertex_file.rdbuf();
-    fragment_stream << fragment_file.rdbuf();
+    GLuint vertexShader = loadShader(vsPath, GL_VERTEX_SHADER);
+    GLuint fragmentShader = loadShader(fsPath, GL_FRAGMENT_SHADER);
 
-    std::string vertex_code = vertex_stream.str();
-    std::string fragment_code = fragment_stream.str();
+    GLuint program = glCreateProgram();
+    glAttachShader(program, vertexShader);
+    glAttachShader(program, fragmentShader);
+    glLinkProgram(program);
 
-    const char* vertex_shader_code = vertex_code.c_str();
-    const char* fragment_shader_code = fragment_code.c_str();
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 
-    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex_shader, 1, &vertex_shader_code, nullptr);
-    glCompileShader(vertex_shader);
+    int success;
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success) {
+        char infoLog[512];
+        glGetProgramInfoLog(program, 512, nullptr, infoLog);
+        std::cerr << "Program linking failed: " << infoLog << std::endl;
+        glDeleteProgram(program);
+        return 0;
+    }
 
-    GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment_shader, 1, &fragment_shader_code, nullptr);
-    glCompileShader(fragment_shader);
-
-    GLuint shader_program = glCreateProgram();
-    glAttachShader(shader_program, vertex_shader);
-    glAttachShader(shader_program, fragment_shader);
-    glLinkProgram(shader_program);
-
-    // Cache shader program
-    shader_programs[vertex_path + fragment_path] = shader_program;
-
-    // Cleanup
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
-
-    return shader_program;
-}
-
-GLuint ShaderManager::get_shader_program(const std::string& name) {
-    return shader_programs[name];
+    shaderPrograms[programKey] = program;
+    return program;
 }

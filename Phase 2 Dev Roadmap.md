@@ -63,7 +63,7 @@ Goal: Entities, components, and systems fully functional.
 
 ---
 
-## **Milestone 2 - Transform System **
+## **Milestone 2 - Transform System**
 
 Goal: world matrices update correctly.
 

@@ -1,48 +1,41 @@
-#include <iostream>
-#include <engine/core/Application.hpp>
-#include <engine/gl/ShaderManager.hpp>
-#include <engine/systems/RenderSystem.hpp>
-
-// Your custom MonoBehaviour behavior
-class MyGame : public MonoBehaviour {
-private:
-    GLuint shaderProgram;
-    GLuint vao;
-
-public:
-    void Start() override {
-        std::cout << "MyGame::Start() - one-time initialization" << std::endl;
-
-        ShaderManager shaderManager;
-        GLuint vert = shaderManager.LoadShader("triangle.vert", GL_VERTEX_SHADER);
-        GLuint frag = shaderManager.LoadShader("triangle.frag", GL_FRAGMENT_SHADER);
-        shaderProgram = shaderManager.LinkProgram(vert, frag);
-
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-    }
-
-    void Update(float dt) override {
-        glClearColor(0.1f, 0.15f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        
-        glUseProgram(shaderProgram);
-        glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-    }
-
-    void OnExit() override {
-        std::cout << "MyGame::OnExit() - cleanup" << std::endl;
-        glDeleteVertexArrays(1, &vao);
-        glDeleteProgram(shaderProgram);
-    }
-};
+#include <glad/gl.h>
+#include "engine/systems/RenderSystem.hpp"
+#include <GLFW/glfw3.h>
+#include <glm.hpp>
+#include "engine/components/Camera.hpp"
+#include "engine/components/MeshRenderer.hpp"
 
 int main() {
-    Application app(800, 600, "OpenGL Engine");
+    // Initialize GLFW and OpenGL (as before)
+    if (!glfwInit()) {
+        return -1;
+    }
 
-    // Run the game with our custom MonoBehaviour behavior
-    app.Run(new MyGame());
+    GLFWwindow* window = glfwCreateWindow(800, 600, "3D Engine", nullptr, nullptr);
+    if (!window) {
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
+    // Set up ECS components
+    Camera camera(glm::vec3(5.0f, 5.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    MeshRenderer meshRenderer("path/to/mesh.obj", "path/to/material.mat");
+
+    RenderSystem renderSystem;
+
+    // Main loop
+    while (!glfwWindowShouldClose(window)) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Update camera and rendering system
+        renderSystem.render(camera, meshRenderer);
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
     return 0;
 }

@@ -1,16 +1,16 @@
-#pragma once
-#include "../ecs/Component.hpp"
-#include <glad/gl.h>
+#ifndef MESH_RENDERER_HPP
+#define MESH_RENDERER_HPP
 
-class MeshRenderer : public Component {
-public:
-    void initialize(Entity* entity) override;
-    void update(float dt) override;
+#include <glm.hpp>
+#include <string>
 
-    GLuint get_vao() const;
-    GLuint get_texture() const;
-    GLuint get_element_count() const;
+struct MeshRenderer {
+    std::string meshFile;
+    std::string materialFile;
+    GLuint shaderProgram;
 
-private:
-    GLuint vao, texture, element_count;
+    MeshRenderer(const std::string& mesh, const std::string& material)
+        : meshFile(mesh), materialFile(material), shaderProgram(0) {}
 };
+
+#endif // MESH_RENDERER_HPP
