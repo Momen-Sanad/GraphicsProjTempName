@@ -306,32 +306,115 @@ Final blow animation:
 
 # Logo
 
-### **Icon**
+## **1. Core Icon (Main Symbol)**
 
-- A crusader helmet, but:
+A **crusader helmet** that visually communicates “cursed ghost knight”:
+
+- **Hollow, glowing white eye sockets**  
+    -> shows he’s no longer human
     
-    - Hollow eye sockets (glowing faint white)
+- **Helmet top dissolving into spectral smoke**  
+    -> ghostly, cursed, ethereal
+    
+- **A jagged, blood-red cross carved on the forehead**  
+    -> the symbol of his broken holy mission
+    
+- **Fine cracks running down the faceplate**  
+    -> represents corruption + his undead condition
+    
+- **A faint shadow of the knight’s armor below the helmet**  
+    -> fades into ash (no full body needed)
+    
+
+This icon becomes the **identity of the game**.
+
+---
+
+# **2. Shape Language**
+
+**“Ghost of Tsushima mask + Crusader knight helm + Dark Souls curse aesthetic.”**
+
+- Curved smoke trails from the helmet edges
+    
+- Small ash particles drifting downward
+    
+- Cross glow: _faint red -> darker toward edges_
+    
+
+The cross slightly **asymmetric**, like painted in anger.
+
+---
+
+# **3. Typography**
+
+### **Font Style**
+
+- Gothic Serif
+    
+- Slight erosion on edges
+    
+- Strong medieval identity
+    
+- Letters tall and slightly narrow
+    
+- Some letters extended:
+    
+    - The **R** in CURSED with a sharp downward hook
         
-    - The top of the helmet fades into _ghostly mist_
+    - The **D** in CURSED cracked
         
-    - A faint red cross carved in the forehead
+    - The **C** in CURSADE slightly split
         
-- A long vertical line under the helmet → symbolizes the “march/descent”
+---
+
+# **4. Color Palette**
+
+### **Primary**
+
+- **Ash grey (#B0B0B0)** — ghostly armor
+    
+- **Blood red (#7A0A0A or #8B0000)** — cursed cross
+    
+- **Bone white (#F7F7F7)** — ghost glow in eyes
+    
+- **Black / Charcoal (#0A0A0A)** — background
     
 
-### **Typography**
+### **Effect Use**
 
-- Clean gothic, stretched horizontally
+- Light inner glow on the cross
     
-- Letters spaced out like a Souls game title
+- Very subtle red reflection under the letters
     
-- The “S” in Spectral curls like smoke
+- Faint fog/mist behind the helmet
     
 
-### **Colors**
+---
 
-- **White → fading to ash smoke**
-    
-- **Small blood-red Cross accent**
-    
-- **Midnight grey background**
+# **5. Compositional Layout**
+
+###**Text Overlay on Icon**
+
+For dramatic effect:
+
+```
+[Helmet ghost fade behind]
+CURSED
+CURSADE
+```
+
+Icon is large, text is centered on top with glowing outline.
+
+---
+
+# **6. Visual Motifs (Optional Enhancements)**
+
+### **A. Spectral cracks**
+
+Faint glowing cracks on the helmet -> ties to “cursed.”
+
+### **B. Red Ash Drift**
+
+Particles drifting upward -> symbolizes the curse consuming him.
+
+---
