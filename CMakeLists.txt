@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 project(OpenGLEngine VERSION 0.1.0)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # ==========================================================
 # =================== C++ CONFIGURATION ====================
 # ==========================================================
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 option(ENGINE_BUILD_SHARED "Build Engine as a shared library instead of static" OFF)
 option(ENGINE_BUILD_EXAMPLES "Build example apps (src/app)" ON)
 option(ENGINE_ENABLE_TESTS "Enable building tests (tests/)" OFF)
@@ -23,32 +23,27 @@ set(GLFW_USE_HYBRID_HPG ON CACHE BOOL "" FORCE)
 # ==========================================================
 # =================== THIRD-PARTY LIBS =====================
 # ==========================================================
+
 # ---------- GLFW ----------
 add_subdirectory(vendor/glfw EXCLUDE_FROM_ALL)
 
 # ---------- GLAD ----------
-# GLAD is typically just a single C file with headers; we compile it manually.
+# glad is typically just a single C file with headers; we compile it manually.
 set(GLAD_SOURCES ${CMAKE_SOURCE_DIR}/vendor/glad/src/gl.c)
 add_library(glad STATIC ${GLAD_SOURCES})
 target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/vendor/glad/include)
 
 # ---------- GLM ----------
-# Robust GLM handling:
-# If GLM has its own CMakeLists.txt, let it register targets (best).
-# Otherwise, fall back to manually adding the include directory.
-if (EXISTS "${CMAKE_SOURCE_DIR}/vendor/glm/CMakeLists.txt")
-    add_subdirectory(vendor/glm EXCLUDE_FROM_ALL)
-endif()
+# GLM is header-only, so no target needed, just add include dir.
+include_directories(${CMAKE_SOURCE_DIR}/vendor/glm)
 
 # ---------- stb ----------
-# stb is header-only, so we don't need to compile it, just add the include directory.
-# (Added below inside Engine include dirs)
+# stb is also header-only.
+include_directories(${CMAKE_SOURCE_DIR}/vendor/stb)
 
 # ==========================================================
 # =================== OPENGL DETECTION =====================
 # ==========================================================
-# Explicitly set OpenGL preference to avoid conflicts
-set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 
 # ==========================================================
@@ -75,38 +70,31 @@ else()
     add_library(Engine STATIC ${ENGINE_SOURCES})
 endif()
 
-# Now that the Engine target is created, set the include directories for it
-target_include_directories(Engine PUBLIC
-    ${CMAKE_SOURCE_DIR}/src                     # internal headers
-    ${CMAKE_SOURCE_DIR}/src/include             # public engine.hpp
-    ${CMAKE_SOURCE_DIR}/vendor/glfw/include
-    ${CMAKE_SOURCE_DIR}/vendor/glad/include
-    ${CMAKE_SOURCE_DIR}/vendor/stb
+target_include_directories(Engine
+    PUBLIC
+        ${CMAKE_SOURCE_DIR}/src                     # internal headers
+        ${CMAKE_SOURCE_DIR}/src/include             # public engine.hpp
+        ${CMAKE_SOURCE_DIR}/vendor/glfw/include
+        ${CMAKE_SOURCE_DIR}/vendor/glad/include
+        ${CMAKE_SOURCE_DIR}/vendor/glm
+        ${CMAKE_SOURCE_DIR}/vendor/stb
 )
 
-# Proper GLM include handling:
-# If GLM exports a CMake target, link it.
-# Otherwise, include the header folder directly (failsafe).
-if (TARGET glm::glm)
-    target_link_libraries(Engine PUBLIC glm::glm)
-elseif (TARGET glm)
-    target_link_libraries(Engine PUBLIC glm)
-else()
-    # Fallback path for header-only GLM
-    target_include_directories(Engine PUBLIC ${CMAKE_SOURCE_DIR}/vendor/glm)
-endif()
+target_link_libraries(Engine
+    PUBLIC
+        glfw
+        glad
+        ${OPENGL_gl_LIBRARY}
+)
 
-# ==========================================================
-# =============== LINKING DEPENDENCIES =====================
-# ==========================================================
-target_link_libraries(Engine PUBLIC
-    glfw
-    glad
-    ${OPENGL_gl_LIBRARY}
+target_compile_definitions(Engine PRIVATE
+    _CRT_SECURE_NO_WARNINGS
+    SHADER_DIR="${CMAKE_SOURCE_DIR}/shaders"
+    ASSET_DIR="${CMAKE_SOURCE_DIR}/assets"
 )
 
 # ==========================================================
-# =============== COMPILER WARNINGS & PROPERTIES ============
+# ============== COMPILER WARNINGS & PROPERTIES ============
 # ==========================================================
 if (MSVC)
     target_compile_options(Engine PRIVATE /W4)
@@ -114,7 +102,6 @@ else()
     target_compile_options(Engine PRIVATE -Wall -Wextra -pedantic)
 endif()
 
-# Set output directories for the generated binaries
 set_target_properties(Engine PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -134,6 +121,7 @@ if (ENGINE_BUILD_EXAMPLES)
     set_target_properties(OpenGLEngine PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
     )
+
 endif()
 
 # ==========================================================

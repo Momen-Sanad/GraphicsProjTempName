@@ -85,8 +85,6 @@ Goal: world matrices update correctly.
 - (Optional) world AABB compute
     
 
-Again, **NO** frustum culling, **NO** animation - only transforms.
-
 ---
 
 ## **Milestone 3 - OpenGL Context + Minimal Rendering**
@@ -239,3 +237,16 @@ This is optional - add only if needed. (probably not)
 Goal: stability.
 
 ---
+
+# Recommended Libraries
+
+	GLFW
+	OpenAL
+	glad
+	glm
+	json
+	reactphysics3d
+	stb
+	tiny_obj_loader
+	spdlog
+	fmt
