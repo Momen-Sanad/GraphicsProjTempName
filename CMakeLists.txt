@@ -28,18 +28,18 @@ set(GLFW_USE_HYBRID_HPG ON CACHE BOOL "" FORCE)
 add_subdirectory(vendor/glfw EXCLUDE_FROM_ALL)
 
 # ---------- GLAD ----------
-# glad is typically just a single C file with headers; we compile it manually.
-set(GLAD_SOURCES ${CMAKE_SOURCE_DIR}/vendor/glad/src/gl.c)
+set(GLAD_SOURCES ${CMAKE_SOURCE_DIR}/vendor/glad/src/glad.c)
 add_library(glad STATIC ${GLAD_SOURCES})
 target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/vendor/glad/include)
 
 # ---------- GLM ----------
-# GLM is header-only, so no target needed, just add include dir.
 include_directories(${CMAKE_SOURCE_DIR}/vendor/glm)
 
 # ---------- stb ----------
-# stb is also header-only.
 include_directories(${CMAKE_SOURCE_DIR}/vendor/stb)
+
+# ---------- tiny_obj_loader ----------
+include_directories(${CMAKE_SOURCE_DIR}/vendor)
 
 # ==========================================================
 # =================== OPENGL DETECTION =====================
@@ -121,7 +121,6 @@ if (ENGINE_BUILD_EXAMPLES)
     set_target_properties(OpenGLEngine PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
     )
-
 endif()
 
 # ==========================================================
