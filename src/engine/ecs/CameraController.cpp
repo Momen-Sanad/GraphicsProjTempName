@@ -1,11 +1,21 @@
 #include "CameraController.hpp"
+#include <glm/gtc/constants.hpp>
+#include <glm/gtc/quaternion.hpp>
 
-CameraController::CameraController(GLFWwindow* window, Camera* camera)
-    : window(window), camera(camera), mouse_sensitivity(0.01f),
-      normal_movement_speed(1.0f), run_movement_speed(5.0f), enabled(false), pitch(0.0f), yaw(0.0f) {}
+void CameraController::setup(GLFWwindow* window, Camera* camera) {
+    this->window = window;
+    this->camera = camera;
+    enabled = false;
 
-void CameraController::update(float deltaTime) {
-    // Handle mouse look
+    glm::vec3 dir = glm::normalize(camera->direction);
+    pitch = glm::asin(dir.y);
+    yaw   = glm::atan(-dir.z, dir.x);
+}
+
+void CameraController::update(float dt) {
+    if (!window || !camera) return;
+
+    // Mouse button toggles control mode
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         if (!enabled) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -19,48 +29,44 @@ void CameraController::update(float deltaTime) {
         }
     }
 
-    if (!enabled) return; // If mouse is not captured, we skip the update.
+    if (!enabled) return;
 
-    // Calculate mouse movement delta
-    glm::dvec2 curr_mouse_position;
-    glfwGetCursorPos(window, &curr_mouse_position.x, &curr_mouse_position.y);
-    glm::vec2 delta_mouse_position = glm::vec2(curr_mouse_position - last_mouse_position);
-    last_mouse_position = curr_mouse_position;
+    // Mouse movement
+    glm::dvec2 curr_mouse;
+    glfwGetCursorPos(window, &curr_mouse.x, &curr_mouse.y);
+    glm::vec2 delta_mouse = glm::vec2(curr_mouse - last_mouse_position);
+    last_mouse_position = curr_mouse;
 
-    // Update pitch and yaw based on mouse movement
-    pitch -= delta_mouse_position.y * mouse_sensitivity;
-    yaw -= delta_mouse_position.x * mouse_sensitivity;
+    pitch -= delta_mouse.y * mouse_sensitivity;
+    yaw   -= delta_mouse.x * mouse_sensitivity;
 
-    // Clamp pitch to prevent flipping
-    pitch = glm::clamp(pitch, -glm::pi<float>() * 0.49f, glm::pi<float>() * 0.49f);
+    pitch = glm::clamp(pitch, -glm::half_pi<float>() * 0.98f, glm::half_pi<float>() * 0.98f);
+    yaw   = glm::mod(yaw, glm::two_pi<float>());
 
-    // Update camera direction based on pitch and yaw
-    update_camera_direction();
-
-    // Handle keyboard movement (WASD + Shift for running)
-    glm::vec3 move_dir(0.0f);
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) move_dir += camera->direction;
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) move_dir -= camera->direction;
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) move_dir -= glm::normalize(glm::cross(camera->direction, camera->up));
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) move_dir += glm::normalize(glm::cross(camera->direction, camera->up));
-
-    // Adjust speed if Shift is held (run speed)
-    float movement_speed = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) ? run_movement_speed : normal_movement_speed;
-
-    if (glm::length(move_dir) > 0.0f) {
-        move_dir = glm::normalize(move_dir);
-        camera->position += move_dir * movement_speed * deltaTime;
-    }
-
-    // Optional: lock the cursor position (for seamless camera control)
-    glfwSetCursorPos(window, last_mouse_x, last_mouse_y);
-}
-
-void CameraController::update_camera_direction() {
-    // Recompute the camera's direction based on the pitch and yaw
+    // Update direction vector
     camera->direction = glm::vec3(
         glm::cos(pitch) * glm::cos(yaw),
         glm::sin(pitch),
         glm::cos(pitch) * -glm::sin(yaw)
     );
+
+    // Movement
+    glm::vec3 right = glm::normalize(glm::cross(camera->direction, camera->up));
+    glm::vec3 movement(0.0f);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) movement += camera->direction;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) movement -= camera->direction;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) movement += right;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) movement -= right;
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) movement += camera->up;
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) movement -= camera->up;
+
+    if (movement != glm::vec3(0.0f)) {
+        movement = glm::normalize(movement);
+        float speed = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+                        ? run_movement_speed
+                        : normal_movement_speed;
+
+        camera->position += movement * speed * dt;
+    }
 }

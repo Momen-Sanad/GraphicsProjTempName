@@ -1,24 +1,74 @@
 #pragma once
-#ifndef ENTITY
-#define ENTITY
 #include <vector>
+#include <memory>
+#include <algorithm>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-class Component;
+#include "../components/MeshRenderer.hpp"
+#include "../assets/Material.hpp"
 
 class Entity {
+private:
+    Entity* parent = nullptr;
+    std::vector<Entity*> children;
+
+    glm::vec3 position = glm::vec3(0.0f);
+    glm::quat rotation = glm::quat(1.0f, 0.f, 0.f, 0.f);
+    glm::vec3 scale    = glm::vec3(1.0f);
+
+    MeshRenderer* mesh = nullptr;
+    Material* material = nullptr;
+
 public:
-    glm::vec3 position;
-    glm::quat rotation;
-    glm::vec3 scale;
+    Entity() = default;
+    ~Entity();
 
-    std::vector<Component*> components;
+    // Prevent copying
+    Entity(const Entity&) = delete;
+    Entity& operator=(const Entity&) = delete;
 
-    Entity() : position(0.0f), rotation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)), scale(1.0f) {}
+    // Allow moving
+    Entity(Entity&&) = default;
+    Entity& operator=(Entity&&) = default;
 
-    void add_component(Component* component);
-    void update(float deltaTime);
-    void render();
+    // -------------------------------
+    // Transform accessors
+    // -------------------------------
+    void setPosition(const glm::vec3& p)  { position = p; }
+    void setRotation(const glm::quat& q)  { rotation = q; }
+    void setScale(const glm::vec3& s)     { scale = s; }
+
+    glm::vec3 getPosition() const { return position; }
+    glm::quat getRotation() const { return rotation; }
+    glm::vec3 getScale()    const { return scale; }
+
+    // -------------------------------
+    // Hierarchy management
+    // -------------------------------
+    void setParent(Entity* newParent);
+    Entity* getParent() const { return parent; }
+
+    const std::vector<Entity*>& getChildren() const { return children; }
+
+    // -------------------------------
+    // Rendering data
+    // -------------------------------
+    void setMesh(MeshRenderer* m) { mesh = m; }
+    void setMaterial(Material* mat) { material = mat; }
+
+    MeshRenderer* getMesh()     const { return mesh; }
+    Material*     getMaterial() const { return material; }
+
+    // -------------------------------
+    // Transformation
+    // -------------------------------
+    glm::mat4 getLocalMatrix() const;
+    glm::mat4 getWorldMatrix() const;
+
+    // -------------------------------
+    // Draw this entity and children
+    // -------------------------------
+    void draw(const glm::mat4& viewProj);
 };
-#endif

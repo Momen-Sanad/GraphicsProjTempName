@@ -1,26 +1,29 @@
-#pragma once
-#include "../components/Camera.hpp"
-#include <glm/gtc/quaternion.hpp>
+#ifndef CAMERA_CONTROLLER_HPP
+#define CAMERA_CONTROLLER_HPP
+
+#include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
+#include "../components/Camera.hpp"
 
 class CameraController {
 public:
-    GLFWwindow* window;
-    Camera* camera;
+    float mouse_sensitivity      = 0.01f;
+    float normal_movement_speed  = 1.0f;
+    float run_movement_speed     = 5.0f;
 
-    float mouse_sensitivity;
-    float normal_movement_speed;
-    float run_movement_speed;
+    CameraController() = default;
 
-    float last_mouse_x = 0.0f;
-    float last_mouse_y = 0.0f;
-
-    CameraController(GLFWwindow* window, Camera* camera);
-    void update(float deltaTime);
+    void setup(GLFWwindow* window, Camera* camera);
+    void update(float delta_time);
 
 private:
-    bool enabled;
-    float pitch, yaw;
-    glm::dvec2 last_mouse_position;
-    void update_camera_direction();
+    GLFWwindow* window = nullptr;
+    Camera* camera     = nullptr;
+
+    bool enabled = false;
+    glm::dvec2 last_mouse_position = {0, 0};
+    float pitch = 0.0f;
+    float yaw   = 0.0f;
 };
+
+#endif

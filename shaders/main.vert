@@ -7,7 +7,7 @@ layout(location = 1) in vec4 color;
 
 // This variable "color" is of a type called "Varyings". Varyings will be passed from the vertex shader to the fragment shader.
 // We are collecting all the varyings (currently, the color only) into what is called "Interface Block" for the sake of organization.
-out Varyings { // Note: the name "Varying" this line is something we decided. We can use any name as long as the fragment shader uses the same name for this block.
+out Varyings { // Note: the name "Varying" this line is something we decided. We can use any name as long as the fragmenr shader uses the same name for this block.
     vec4 color;
 } vs_out;
 

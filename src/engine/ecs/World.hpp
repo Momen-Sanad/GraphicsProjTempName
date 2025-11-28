@@ -1,19 +1,27 @@
-#pragma once
-#ifndef WORLD
-#define WORLD 
+#ifndef WORLD_HPP
+#define WORLD_HPP
+
 #include <vector>
 #include "Entity.hpp"
-#include <algorithm>
 #include "../components/Camera.hpp"
 
 class World {
-    public:
-    Camera* camera;
-    std::vector<Entity*> entities;
-    
+public:
+    World();
+    ~World();
+
+    // --- Entity Management ---
     Entity* add_entity();
     void remove_entity(Entity* entity);
-    void update(float deltaTime);
-    void render();
+    void clear();
+
+    // --- Accessors ---
+    const std::vector<Entity*>& get_entities() const { return entities; }
+    Camera& get_camera() { return camera; }
+
+private:
+    std::vector<Entity*> entities;
+    Camera camera;
 };
+
 #endif

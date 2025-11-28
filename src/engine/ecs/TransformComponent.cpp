@@ -40,6 +40,6 @@ void TransformComponent::rotate(const glm::vec3& axis, float angle) {
     rotation = glm::rotate(rotation, angle, axis);
 }
 
-void TransformComponent::scale(const glm::vec3& scaleFactor) {
+void TransformComponent::set_scale(const glm::vec3& scaleFactor) {
     scale *= scaleFactor;  // Scale each axis by the provided factor
 }

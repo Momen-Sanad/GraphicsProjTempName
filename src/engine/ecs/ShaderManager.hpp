@@ -1,13 +1,21 @@
 #pragma once
-#ifndef SHADERMANAGER
-#define SHADERMANAGER
-#include <glad/glad.h>
+#include <memory>
 #include <string>
 #include <unordered_map>
+#include "../gl/Shader.hpp"
 
 class ShaderManager {
+private:
+    std::unordered_map<std::string, std::shared_ptr<Shader>> shaders;
+
 public:
-    GLuint load_shader(const std::string& path, GLenum shader_type);
-    GLuint create_program(const std::string& vertex_shader_path, const std::string& fragment_shader_path);
+    ShaderManager() = default;
+
+    // Loads and caches a shader
+    std::shared_ptr<Shader> loadShader(const std::string& name,
+                                       const std::string& vsPath,
+                                       const std::string& fsPath);
+
+    // Retrieve a loaded shader
+    std::shared_ptr<Shader> get(const std::string& name) const;
 };
-#endif
