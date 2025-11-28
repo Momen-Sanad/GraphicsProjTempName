@@ -145,7 +145,17 @@
 - **Deps / stubs:** AssetManager can be stubbed to return test assets.
     
 - **Related classes / seq:** `RenderSystem`, `MeshRenderer`, `Camera`, `PostProcessingPass`. (game loop)
-    
+
+### T2.6 - SkySphere / Skybox Support  
+
+- **Acceptance:** Scene format supports `sky` config (texture + shader); renderer draws sky sphere/box behind geometry correctly (depth test/state) and it is included in sorting (opaque > sky > transparent).
+
+### T2.7 - Lighting & LitMaterial (Phase 3)  
+
+- **Acceptance:** `Light` component exists (directional/point/spot), `LitMaterial` exists and loads albedo/specular/roughness/AO/emission textures, forward renderer collects lights per-frame and lighting shader(s) combine contributions so that multiple lights affect objects; sample scene demonstrates 2+ lights on one mesh producing expected shading differences.
+
+### T2.8 - Sampler abstraction & material sampler config  
+**Acceptance:** `Sampler` or sampler settings are loadable from scene (filtering, wrap), textures/materials respect sampler settings at bind time.
 
 ---
 
@@ -185,7 +195,7 @@
     
 - **Deliverables:** `SceneDeserializer.hpp/cpp`, `assets/scenes/sample_scene.json`, schema doc.
     
-- **Acceptance:** Given sample JSON, `SceneDeserializer` creates entities in `World` and attaches components.
+- **Acceptance:** Given sample JSON, `SceneDeserializer` creates entities in `World` and attaches components. parsing materials (including pipeline state: culling, depth test, blending, color/depth masks), linking materials to entities, and ensuring `MaterialManager` creates Material objects accordingly.`AssetManager` (singleton) exists, shares assets (same mesh/texture pointer) across entities.
     
 - **Related classes / seq:** `SceneDeserializer`, `ComponentManager`, `AssetManager`. (scene loading)
     
@@ -250,7 +260,7 @@
     
 - **Deliverables:** `PostProcessingPass.hpp/cpp`, sample shader, example config.
     
-- **Acceptance:** RenderSystem can call `apply()` and the pass executes.
+- **Acceptance:** RenderSystem can call `apply()` and the pass executes. RenderSystem renders to an FBO, then applies configured post-processing passes (chain) and outputs to screen.
     
 - **Deps / stubs:** Use `Framebuffer`/`Texture` from Track2.
     
