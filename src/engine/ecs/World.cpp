@@ -1,57 +1,25 @@
 #include "World.hpp"
 
-// ------------------------------------------------------
-// Constructor / Destructor
-// ------------------------------------------------------
+World::World() = default;
 
-World::World() {
-    // You can place default world setup here (optional)
+Entity* World::createEntityWithParams(Entity* parent,
+                                      const glm::vec3& position,
+                                      const glm::quat& rotation,
+                                      const glm::vec3& scale,
+                                      MeshRenderer* mesh,
+                                      Material* material)
+{
+    return manager.createEntityWithParams(parent, position, rotation, scale, mesh, material);
 }
-
-World::~World() {
-    clear();
-}
-
-// ------------------------------------------------------
-// Add an Entity
-// ------------------------------------------------------
 
 Entity* World::add_entity() {
-    Entity* e = new Entity();
-    entities.push_back(e);
-    return e;
+    return manager.createEntity(); // default root entity
 }
 
-// ------------------------------------------------------
-// Remove Entity safely
-// ------------------------------------------------------
-
-void World::remove_entity(Entity* entity) {
-    if (!entity) return;
-
-    // Fix children relationships BEFORE erasing
-    for (Entity* e : entities) {
-        if (e->getParent() == entity)
-            e->setParent(entity->getParent());
-    }
-
-    // Find and erase
-    for (auto it = entities.begin(); it != entities.end(); ++it) {
-        if (*it == entity) {
-            delete entity;
-            entities.erase(it);
-            return;
-        }
-    }
+void World::removeEntity(Entity* entity) {
+    manager.destroyEntity(entity);
 }
-
-// ------------------------------------------------------
-// Clear entire world
-// ------------------------------------------------------
 
 void World::clear() {
-    for (Entity* e : entities)
-        delete e;
-
-    entities.clear();
+    manager.clear(); // destroy all entities inside EntityManager
 }

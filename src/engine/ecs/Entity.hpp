@@ -44,6 +44,9 @@ public:
     glm::quat getRotation() const { return rotation; }
     glm::vec3 getScale()    const { return scale; }
 
+    // convenience: apply an incremental rotation (delta quaternion)
+    void rotateBy(const glm::quat& dq) { rotation = dq * rotation; }
+
     // -------------------------------
     // Hierarchy management
     // -------------------------------

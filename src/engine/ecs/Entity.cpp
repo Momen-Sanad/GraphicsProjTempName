@@ -1,7 +1,8 @@
 #include "Entity.hpp"
+#include <cstdio>   // for debug prints if you need them
 
 // ------------------------------------------------------------
-// Destructor → does NOT delete children (EntityManager owns them)
+// Destructor -> does NOT delete children (EntityManager owns them)
 // ------------------------------------------------------------
 Entity::~Entity() {
     // detach from parent
@@ -20,7 +21,7 @@ Entity::~Entity() {
 void Entity::setParent(Entity* newParent) {
     if (parent == newParent) return;
 
-    // remove from old parent
+    // remove from old parent if exists
     if (parent) {
         auto& siblings = parent->children;
         siblings.erase(std::remove(siblings.begin(), siblings.end(), this), siblings.end());
@@ -28,8 +29,11 @@ void Entity::setParent(Entity* newParent) {
 
     parent = newParent;
 
-    if (newParent)
-        newParent->children.push_back(this);
+    if (parent) {
+        // avoid duplicates
+        if (std::find(parent->children.begin(), parent->children.end(), this) == parent->children.end())
+            parent->children.push_back(this);
+    }
 }
 
 // ------------------------------------------------------------
@@ -53,23 +57,39 @@ glm::mat4 Entity::getWorldMatrix() const {
 }
 
 // ------------------------------------------------------------
-// Draw entity
+// Draw entity (uses Material's uniform accessor to set MVP)
 // ------------------------------------------------------------
 void Entity::draw(const glm::mat4& viewProj) {
     if (material && mesh) {
+        // Let the material bind the shader and common uniforms
         material->setup();
 
+        // Compute world matrix + MVP
         glm::mat4 M  = getWorldMatrix();
         glm::mat4 MVP = viewProj * M;
 
-        GLint loc = material->getShader()->getUniformLocation("uMVP");
+        // Use Material's public method to get uniform location if available.
+        // Many of your files use "MVP" as the uniform name in main.cpp — use that.
+        GLint loc = -1;
+        // Try Material's public uniform getter if it exists
+        // (we assume Material exposes getUniform(const std::string&) -> GLint)
+        // If not present, you can fallback to accessing shader's uniform (less preferred).
+        try {
+            loc = material->getUniform("MVP");
+        } catch(...) {
+            // fallback: try shader directly if your Material exposes it
+            if (material->getShader()) {
+                loc = material->getShader()->getUniformLocation("MVP");
+            }
+        }
+
         if (loc != -1)
             glUniformMatrix4fv(loc, 1, GL_FALSE, &MVP[0][0]);
 
         mesh->draw();
     }
 
-    // Draw children
+    // Draw children recursively
     for (Entity* c : children)
         c->draw(viewProj);
 }

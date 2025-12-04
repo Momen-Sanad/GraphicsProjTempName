@@ -39,10 +39,11 @@ int main() {
         return 1;
     }
 
-    // Create materials (TintedMaterial is the material we defined earlier)
+    // ---------------------------
+    // Create materials
+    // ---------------------------
     TintedMaterial blue, brown, green, yellow;
 
-    // Use shared_ptr shader (ShaderManager returned a shared_ptr)
     blue.setShader(mainShader);
     blue.tint  = glm::vec4(0.2f, 0.4f, 1.0f, 1.0f);
 
@@ -54,6 +55,7 @@ int main() {
 
     yellow.setShader(mainShader);
     yellow.tint = glm::vec4(1.0f, 1.0f, 0.3f, 1.0f);
+
 
     // ---------------------------
     // Mesh Setup (cube vertex/index data)
@@ -99,7 +101,21 @@ int main() {
         16,17,18, 18,19,16,
         20,21,22, 22,23,20
     };
-
+    
+    /*
+     * make an abstraction to satisfy the following:
+     * give cube coordinates to spawn at (x, y, z)
+     * give cube scale
+     * give cube rotation
+     * then the engine figures out the indices and vertices on its own
+     * instead of physically writing them out
+     * make the user able to create X amount of standard objects
+     * like cylinder, cube, sphere, etc..
+     * then the user can modify scale,rotation, coordinates
+     * don't allow the user to create custom objects like before
+     * 
+     * */
+    
     MeshData cubeData(vertices, indices);
     MeshRenderer cube;
     cube.upload(cubeData);
@@ -113,53 +129,64 @@ int main() {
     world.get_camera().position  = glm::vec3(10.f, 5.f, 10.f);
     world.get_camera().direction = glm::normalize(glm::vec3(-1.f, 0.f, -1.f));
     world.get_camera().up        = glm::vec3(0.f, 1.f, 0.f);
-    world.get_camera().fov      = glm::radians(60.0f);
-    world.get_camera().near     = 0.1f;
-    world.get_camera().far      = 100.0f;
+    world.get_camera().fov       = glm::radians(60.0f);
+    world.get_camera().near      = 0.1f;
+    world.get_camera().far       = 100.0f;
 
     // ---------------------------
-    // Scene graph (use setters)
+    //       Scene graph
     // ---------------------------
-    Entity* root = world.add_entity();
+    Entity* root = world.createEntityWithParams(nullptr);
 
-    Entity* water = world.add_entity();
-    water->setScale({10.f, 1.f, 10.f});
-    water->setMesh(&cube);
-    water->setMaterial(&blue);
-    water->setParent(root);
+    // Water plane
+    Entity* water = world.createEntityWithParams(
+        root,                    // parent
+        {0.f, 0.f, 0.f},         // position
+        glm::quat(),             // rotation
+        {10.f, 1.f, 10.f},       // scale
+        &cube,                   // mesh
+        &blue                    // material
+    );
 
-    Entity* island = world.add_entity();
-    island->setParent(root);
+    // Island (empty entity, parent of sand & tree)
+    Entity* island = world.createEntityWithParams(root);
 
-    Entity* sand = world.add_entity();
-    sand->setPosition({0.f, 0.5f, 0.f});
-    sand->setScale({2.f, 1.f, 2.f});
-    sand->setMesh(&cube);
-    sand->setMaterial(&yellow);
-    sand->setParent(island);
+    // Sand on the island
+    Entity* sand = world.createEntityWithParams(
+        island,
+        {0.f, 0.5f, 0.f},
+        glm::quat(),
+        {2.f, 1.f, 2.f},
+        &cube,
+        &yellow
+    );
 
-    Entity* tree = world.add_entity();
-    tree->setParent(island);
+    // Tree base
+    Entity* tree = world.createEntityWithParams(island);
 
-    Entity* tree_trunk = world.add_entity();
-    tree_trunk->setPosition({0.f, 0.f, 0.f});
-    tree_trunk->setScale({0.5f, 5.f, 0.5f});
-    tree_trunk->setMesh(&cube);
-    tree_trunk->setMaterial(&brown);
-    tree_trunk->setParent(tree);
+    // Tree trunk
+    Entity* tree_trunk = world.createEntityWithParams(
+        tree,
+        {0.f, 0.f, 0.f},
+        glm::quat(),
+        {0.5f, 5.f, 0.5f},
+        &cube,
+        &brown
+    );
 
+    // Tree leaves
     for (int i = 0; i < 4; i++) {
-        Entity* leaf = world.add_entity();
-        leaf->setPosition({0.f, 5.f, 0.f});
-
         glm::quat rotY = glm::angleAxis(1.5f * i + 0.7f, glm::vec3(0.f, 1.f, 0.f));
         glm::quat rotZ = glm::angleAxis(0.7f, glm::vec3(0.f, 0.f, 1.f));
-        leaf->setRotation(rotY * rotZ);
 
-        leaf->setScale({0.5f, 2.f, 0.5f});
-        leaf->setMesh(&cube);
-        leaf->setMaterial(&green);
-        leaf->setParent(tree);
+        world.createEntityWithParams(
+            tree,
+            {0.f, 5.f, 0.f},
+            rotY * rotZ,
+            {0.5f, 2.f, 0.5f},
+            &cube,
+            &green
+        );
     }
 
     // ---------------------------
@@ -170,6 +197,11 @@ int main() {
 
 
     float last_time = 0.0f; // store previous frame time
+    // printf("island has %zu children\n", island->getChildren().size());
+    // for (Entity* c : island->getChildren()) {
+    //     printf("child %p parent=%p\n", (void*)c, (void*)c->getParent());
+    // }
+    
     // ---------------------------
     // Main Loop
     // ---------------------------
@@ -183,8 +215,12 @@ int main() {
 
         // animate water scale (use setter) and rotate island using getters/setters:
         water->setScale({10.f, 1.0f + 0.1f * glm::sin(time), 10.f});
-        island->setRotation(glm::angleAxis(delta_time, glm::vec3(0.f,1.f,0)) * island->getRotation());
-        
+        float rot_speed = glm::radians(30.f); // 30 deg/sec
+        water->setRotation(glm::angleAxis(rot_speed * delta_time, glm::vec3(0.f,1.f,0)) * water->getRotation());
+
+        // for (Entity* leaf : treeLeaves) {
+        //     leaf->setRotation(glm::angleAxis(time*1.5f, glm::vec3(0.f,1.f,0)) * leaf->getRotation());
+        // }
         
         controller.update(delta_time);
         
@@ -198,20 +234,8 @@ int main() {
         
         glm::mat4 VP = world.get_camera().get_view_projection_matrix(glm::vec2((float)w, (float)h));
 
-        for (Entity* e : world.get_entities()) {
-            MeshRenderer* m = e->getMesh();
-            Material* mat   = e->getMaterial();
-            if (!m || !mat) continue;
-
-            mat->setup();
-
-            glm::mat4 M = e->getWorldMatrix(); // world model matrix
-            glm::mat4 MVP = VP * M;
-
-            GLint loc = mat->getUniform("MVP");
-            if (loc != -1) glUniformMatrix4fv(loc, 1, GL_FALSE, &MVP[0][0]);
-
-            m->draw();
+        for (Entity* root : world.getEntityManager().getRoots()) {
+            world.getEntityManager().renderEntityRecursive(root, VP);
         }
 
         window.swap_buffers();

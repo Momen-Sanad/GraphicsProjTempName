@@ -5,8 +5,9 @@
 void TransformComponent::update(Entity& entity, float deltaTime) {
     // You could apply automatic movement or other transformations over time here.
     // This is an example where we could move the entity along the x-axis:
-    position.x += 1.0f * deltaTime;  // Example movement along x-axis
-
+    glm::quat rot = entity.getRotation();
+    rot = glm::rotate(rot, glm::radians(30.f) * deltaTime, glm::vec3(0.f, 1.f, 0.f));
+    entity.setRotation(rot);
     // If you had rotation or scaling logic here, you could apply it as well.
     // For example, you could rotate the entity around the y-axis over time:
     // rotate(glm::vec3(0.0f, 1.0f, 0.0f), glm::radians(30.0f) * deltaTime); // Rotate 30 degrees per second
