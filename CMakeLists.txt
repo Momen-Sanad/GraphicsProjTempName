@@ -78,6 +78,7 @@ target_include_directories(Engine
         ${CMAKE_SOURCE_DIR}/vendor/glad/include
         ${CMAKE_SOURCE_DIR}/vendor/glm
         ${CMAKE_SOURCE_DIR}/vendor/stb
+        ${CMAKE_SOURCE_DIR}/vendor/tinyobjloader
 )
 
 target_link_libraries(Engine
@@ -142,6 +143,20 @@ if (ENGINE_ENABLE_TESTS)
     add_test(NAME EngineTests COMMAND EngineTests)
 endif()
 
+# ==========================================================
+# =============== UNIT TEST: texture_Mesh_test =============
+# ==========================================================
+add_executable(TextureMeshTest tests/texture_Mesh_test.cpp)
+
+target_link_libraries(TextureMeshTest PRIVATE Engine)
+
+set_target_properties(TextureMeshTest PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
+)
+
+target_compile_definitions(TextureMeshTest PRIVATE
+    TEST_ASSET_DIR="${CMAKE_SOURCE_DIR}/tests/loading_files"
+)
 
 # ==========================================================
 # ================= Extra helpful CMake hints ==============
