@@ -13,12 +13,10 @@ Texture* TextureLoader::load(const std::string& path, GLenum min_filter, GLenum 
     if (it != texture_cache.end())
         return it->second;
 
-
     // Load image data
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* data;
-    data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+    stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 
     if (!data)
     {

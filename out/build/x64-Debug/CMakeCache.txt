@@ -126,7 +126,7 @@ CMAKE_INSTALL_MANDIR:PATH=
 CMAKE_INSTALL_OLDINCLUDEDIR:PATH=/usr/include
 
 //No help, variable specified on the command line.
-CMAKE_INSTALL_PREFIX:PATH=C:/Users/asus/Source/Repos/GraphicsProjTempName/out/install/x64-Debug
+CMAKE_INSTALL_PREFIX:PATH=C:/Users/asus/source/repos/GraphicsProjTempName/out/install/x64-Debug
 
 //Run-time variable data (LOCALSTATEDIR/run)
 CMAKE_INSTALL_RUNSTATEDIR:PATH=
@@ -515,5 +515,5 @@ OPENGL_gl_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: OPENGL_glu_LIBRARY
 OPENGL_glu_LIBRARY-ADVANCED:INTERNAL=1
 //CMAKE_INSTALL_PREFIX during last run
-_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=C:/Users/asus/Source/Repos/GraphicsProjTempName/out/install/x64-Debug
+_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=C:/Users/asus/source/repos/GraphicsProjTempName/out/install/x64-Debug
 

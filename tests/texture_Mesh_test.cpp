@@ -430,9 +430,6 @@ GLuint setupShader()
             // Mix texture with vertex color
             vec4 baseColor = mix(texColor, vertexColor, 0.3);
             FragColor = baseColor * vec4(vec3(light), 1.0);
-            
-            // Add gamma correction
-            FragColor.rgb = pow(FragColor.rgb, vec3(1.0/2.2));
         }
     )";
 

@@ -2,7 +2,7 @@
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "C:/Users/asus/Source/Repos/GraphicsProjTempName/out/install/x64-Debug")
+  set(CMAKE_INSTALL_PREFIX "C:/Users/asus/source/repos/GraphicsProjTempName/out/install/x64-Debug")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
