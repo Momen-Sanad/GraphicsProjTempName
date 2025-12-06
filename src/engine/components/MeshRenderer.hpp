@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 // ------------------------------------------------------------
 // Color & Vertex Structures
@@ -76,4 +77,11 @@ public:
     void upload(const MeshData& data);
     void draw() const;
     void destroy();
+
+
+    // static factory functions
+    static MeshRenderer createCube();
+    static MeshRenderer createPlane();
+    static MeshRenderer createSphere(int segments = 32, int rings = 16);
+    static MeshRenderer createCylinder(int segments = 32);
 };

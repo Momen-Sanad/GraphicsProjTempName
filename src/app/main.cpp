@@ -1,9 +1,16 @@
+//gl stuff
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <iostream>
 
+//imgui stuff
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+
+//custom stuff
 #include "../engine/platform/Window.hpp"
 #include "../engine/gl/GLContext.hpp"
 #include "../engine/ecs/World.hpp"
@@ -11,10 +18,28 @@
 #include "../engine/ecs/ShaderManager.hpp"
 #include "../engine/assets/MaterialManager.hpp"
 #include "../engine/components/MeshRenderer.hpp"
-
+#include "../engine/utils/Im_GUI_Inspector.hpp"
 // Window size
 #define WINDOW_W 1280
 #define WINDOW_H 720
+
+
+/* 
+ * #TODO
+ * do something about all this gl stuff (also apply anistrpoic filtering 16x )
+ * probably in GLContext.cpp /.hpp
+ * do the frame scheduler
+ * need pipelineState.hpp probably for the frame scheduler and coordinator
+ * turn the superloop into unity's Update()
+ * optional: logger
+ * rana should do react3dphysics
+ * soliman should do textures and obj loading
+ * need to do scenes and scene manager
+ * decide what to do with these files:
+ * system manager, system.hpp, component, asset manager,
+ * renderSystem, TransformSystem <- we already have "TransformComponent"
+ * 
+ */
 
 int main() {
 
@@ -28,12 +53,30 @@ int main() {
     GLContext::enable_default_render_settings();
 
     // ---------------------------
+    // ImGui Initialization
+    // ---------------------------
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
+    ImGui::StyleColorsDark();
+
+    // Init backends
+    ImGui_ImplGlfw_InitForOpenGL(window.get_handle(), true);
+    ImGui_ImplOpenGL3_Init("#version 330");  // matches GL context
+
+    // ---------------------------
     // Load Shader
     // ---------------------------
     ShaderManager shaderManager;
+    // auto mainShader = shaderManager.loadShader("main",
+    //     "../shaders/main.vert",
+    //     "../shaders/main.frag"
+    // );
     auto mainShader = shaderManager.loadShader("main",
-        "../shaders/main.vert",
-        "../shaders/main.frag"
+        "../shaders/blackToWhite.vert",
+        "../shaders/blackToWhite.frag"
     );
     if (!mainShader) {
         fprintf(stderr, "Failed to load main shader\n");
@@ -51,60 +94,63 @@ int main() {
     brown.setShader(mainShader);
     brown.tint = glm::vec4(0.5f, 0.2f, 0.1f, 1.0f);
 
+    yellow.setShader(mainShader);
+    yellow.tint = glm::vec4(1.0f, 1.0f, 0.3f, 1.0f);
+
     green.setShader(mainShader);
     green.tint = glm::vec4(0.4f, 1.0f, 0.2f, 1.0f);
 
-    yellow.setShader(mainShader);
-    yellow.tint = glm::vec4(1.0f, 1.0f, 0.3f, 1.0f);
 
     // ---------------------------
     // Mesh Setup (cube vertex/index data)
     // ---------------------------
-    std::vector<Vertex> vertices = {
-        // Front
-        {{ 0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-        {{-0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-        {{-0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-        {{ 0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-        // Back
-        {{-0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-        {{ 0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-        {{ 0.5f, 0.0f, -0.5f}, {0,0,0,255}},
-        {{-0.5f, 0.0f, -0.5f}, {0,0,0,255}},
-        // Top
-        {{-0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-        {{ 0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-        {{ 0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-        {{-0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-        // Bottom
-        {{ 0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-        {{-0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-        {{-0.5f, 0.0f, -0.5f}, {0,0,0,255}},
-        {{ 0.5f, 0.0f, -0.5f}, {0,0,0,255}},
-        // Right
-        {{ 0.5f, 0.0f, -0.5f}, {0,0,0,255}},
-        {{ 0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-        {{ 0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-        {{ 0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-        // Left
-        {{-0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-        {{-0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-        {{-0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-        {{-0.5f, 0.0f, -0.5f}, {0,0,0,255}}
-    };
+    // std::vector<Vertex> vertices = {
+    //     // Front
+    //     {{ 0.5f, 1.0f, 0.5f}, {255,255,255,255}},
+    //     {{-0.5f, 1.0f, 0.5f}, {255,255,255,255}},
+    //     {{-0.5f, 0.0f, 0.5f}, {0,0,0,255}},
+    //     {{ 0.5f, 0.0f, 0.5f}, {0,0,0,255}},
+    //     // Back
+    //     {{-0.5f, 1.0f, -0.5f}, {255,255,255,255}},
+    //     {{ 0.5f, 1.0f, -0.5f}, {255,255,255,255}},
+    //     {{ 0.5f, 0.0f, -0.5f}, {0,0,0,255}},
+    //     {{-0.5f, 0.0f, -0.5f}, {0,0,0,255}},
+    //     // Top
+    //     {{-0.5f, 1.0f, 0.5f}, {255,255,255,255}},
+    //     {{ 0.5f, 1.0f, 0.5f}, {255,255,255,255}},
+    //     {{ 0.5f, 1.0f, -0.5f}, {255,255,255,255}},
+    //     {{-0.5f, 1.0f, -0.5f}, {255,255,255,255}},
+    //     // Bottom
+    //     {{ 0.5f, 0.0f, 0.5f}, {0,0,0,255}},
+    //     {{-0.5f, 0.0f, 0.5f}, {0,0,0,255}},
+    //     {{-0.5f, 0.0f, -0.5f}, {0,0,0,255}},
+    //     {{ 0.5f, 0.0f, -0.5f}, {0,0,0,255}},
+    //     // Right
+    //     {{ 0.5f, 0.0f, -0.5f}, {0,0,0,255}},
+    //     {{ 0.5f, 1.0f, -0.5f}, {255,255,255,255}},
+    //     {{ 0.5f, 1.0f, 0.5f}, {255,255,255,255}},
+    //     {{ 0.5f, 0.0f, 0.5f}, {0,0,0,255}},
+    //     // Left
+    //     {{-0.5f, 0.0f, 0.5f}, {0,0,0,255}},
+    //     {{-0.5f, 1.0f, 0.5f}, {255,255,255,255}},
+    //     {{-0.5f, 1.0f, -0.5f}, {255,255,255,255}},
+    //     {{-0.5f, 0.0f, -0.5f}, {0,0,0,255}}
+    // };
 
-    std::vector<uint16_t> indices = {
-        0,1,2, 2,3,0,
-        4,5,6, 6,7,4,
-        8,9,10, 10,11,8,
-        12,13,14, 14,15,12,
-        16,17,18, 18,19,16,
-        20,21,22, 22,23,20
-    };
+    // std::vector<uint16_t> indices = {
+    //     0,1,2, 2,3,0,
+    //     4,5,6, 6,7,4,
+    //     8,9,10, 10,11,8,
+    //     12,13,14, 14,15,12,
+    //     16,17,18, 18,19,16,
+    //     20,21,22, 22,23,20
+    // };
     
-    MeshData cubeData(vertices, indices);
-    MeshRenderer cube;
-    cube.upload(cubeData);
+    // MeshData cubeData(vertices, indices);
+    // MeshRenderer cube;
+    // cube.upload(cubeData);
+
+    MeshRenderer cube = MeshRenderer::createCube();
 
     // ---------------------------
     // World + Camera Setup
@@ -117,6 +163,11 @@ int main() {
     world.get_camera().fov       = glm::radians(60.0f);
     world.get_camera().near      = 0.1f;
     world.get_camera().far       = 100.0f;
+
+    // float aspect = (float)windowWidth / (float)windowHeight;
+
+    // world.get_camera().projection =
+    // glm::perspective(world.get_camera().fov, aspect, world.get_camera().near, world.get_camera().far);
 
     // ---------------------------
     // Scene graph
@@ -140,27 +191,42 @@ int main() {
 
     // Sand on the island
     Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
+    // Entity* testcube = world.createEntityWithParams(island, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &cube, &yellow);
 
     // Tree base
     Entity* tree = world.createEntityWithParams(island);
 
     // Tree trunk
-    Entity* tree_trunk = world.createEntityWithParams(tree, {0.f, 0.f, 0.f}, glm::quat(), {0.5f, 5.f, 0.5f}, &cube, &brown);
+    Entity* tree_trunk = world.createEntityWithParams(tree, {0.f, 2.5f, 0.f}, glm::quat(), {0.5f, 5.f, 0.5f}, &cube, &brown);
 
     // Tree leaves
+    float trunkTopY = 2.5f + 2.5f;   // = 5.0f
+
+    // Leaves (height = 2 so half-height = 1)
+    float leafHalf = 1.0f;
+    float leafCenterY = trunkTopY + leafHalf;  // ensures leaf BASE touches trunk TOP
+
+    glm::vec3 leafOffsets[4] = {
+        { 0.f, 0.f, 0.5f },   // leaf 0
+        { 0.f, 0.f, 0.75f },   // leaf 1
+        { 0.f, 0.f, 2.5f },   // leaf 2
+        { 0.f, 0.f, -2.5f }   // leaf 3
+    };
+
     for (int i = 0; i < 4; i++) {
         glm::quat rotY = glm::angleAxis(1.5f * i + 0.7f, glm::vec3(0.f, 1.f, 0.f));
         glm::quat rotZ = glm::angleAxis(0.7f, glm::vec3(0.f, 0.f, 1.f));
 
         world.createEntityWithParams(
             tree,
-            {0.f, 5.f, 0.f},
+            {leafOffsets[i].x, leafCenterY + leafOffsets[i].y, leafOffsets[i].z},           
             rotY * rotZ,
             {0.5f, 2.f, 0.5f},
             &cube,
             &green
         );
     }
+
 
     // ---------------------------
     // Camera controller
@@ -173,6 +239,8 @@ int main() {
     float last_time = static_cast<float>(glfwGetTime());
     float last_fps_time = last_time;
     int frameCount = 0;
+
+    // glm::vec3 ui_island_pos = island->getPosition();
 
     // ---------------------------
     // Main Loop
@@ -212,8 +280,10 @@ int main() {
         // Animate water scale and rotate island
         water->setScale({10.f, 1.0f + 0.1f * glm::sin(time), 10.f});
         float rot_speed = glm::radians(30.f); // 30 deg/sec
-        glm::quat delta_rot = glm::angleAxis(rot_speed * delta_time, glm::vec3(0.f, 1.f, 0));
-        island->setRotation(delta_rot * island_rotation); // accumulate rotation
+
+        glm::quat delta_rot = glm::angleAxis(rot_speed * delta_time, glm::vec3(0.f,1.f,0));
+        island->setRotation(delta_rot * island_rotation);
+
 
         // Update controller and rendering
         controller.update(delta_time);
@@ -226,12 +296,44 @@ int main() {
         glClearDepth(1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 VP = world.get_camera().get_view_projection_matrix(glm::vec2((float)w, (float)h));
+        int width, height;
+        glfwGetFramebufferSize(window.get_handle(), &width, &height);
+
+        glm::mat4 VP = world.get_camera().get_view_projection_matrix(
+            glm::vec2(width, height)
+        );
 
         // Render all entities
         for (Entity* root : world.getEntityManager().getRoots()) {
             world.getEntityManager().renderEntityRecursive(root, VP);
         }
+
+        // ==========================
+        // ImGui New Frame
+        // ==========================
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // --------------------------
+        // Example UI Window
+        // --------------------------
+        ImGui::Begin("Hello ImGui");
+        ImGui::Text("This is working!");
+        
+        // if (ImGui::SliderFloat("Island X", &island_position.x, -10.0f, 10.0f)) {
+        //     island->setPosition(island_position);
+        // }        
+        ImGuiHelpers::ShowTransformInspector("Selected", island);
+        
+        ImGui::End();
+
+        // ==========================
+        // Render ImGui
+        // ==========================
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 
         // Swap buffers for the next frame
         window.swap_buffers();
@@ -242,6 +344,11 @@ int main() {
     // Cleanup
     cube.destroy();
     // mainShader.destroy();
+
+    // ImGui cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     return 0;
 }

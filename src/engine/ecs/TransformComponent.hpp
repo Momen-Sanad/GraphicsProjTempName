@@ -22,13 +22,13 @@ public:
 
     // Transform operations
     void translate(const glm::vec3& translation);
-    void rotate(const glm::vec3& axis, float angle);
+    void rotate   (const glm::vec3& axis, float angle);
     void set_scale(const glm::vec3& scaleFactor);
 
     // Getter methods for the transform
     const glm::vec3& get_position() const { return position; }
     const glm::quat& get_rotation() const { return rotation; }
-    const glm::vec3& get_scale() const { return scale; }
+    const glm::vec3& get_scale()    const { return scale; }
 };
 
 #endif

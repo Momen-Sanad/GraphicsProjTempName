@@ -16,7 +16,7 @@ void CameraController::update(float dt) {
     if (!window || !camera) return;
 
     // Mouse button toggles control mode
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
         if (!enabled) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             glfwGetCursorPos(window, &last_mouse_position.x, &last_mouse_position.y);

@@ -41,6 +41,34 @@ include_directories(${CMAKE_SOURCE_DIR}/vendor/stb)
 # ---------- tiny_obj_loader ----------
 include_directories(${CMAKE_SOURCE_DIR}/vendor)
 
+# ---------- ImGui ----------
+set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/vendor/imgui)
+
+set(IMGUI_SOURCES
+    ${IMGUI_DIR}/imgui.cpp
+    ${IMGUI_DIR}/imgui_draw.cpp
+    ${IMGUI_DIR}/imgui_tables.cpp
+    ${IMGUI_DIR}/imgui_widgets.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+    ${IMGUI_DIR}/backends/imgui_impl_opengl3.cpp
+)
+
+add_library(imgui STATIC ${IMGUI_SOURCES})
+
+target_include_directories(imgui PUBLIC
+    ${IMGUI_DIR}
+    ${IMGUI_DIR}/backends
+    ${CMAKE_SOURCE_DIR}/vendor/glfw/include   # ← Add this
+)
+
+# Link GLFW + OpenGL (needed by backends)
+target_link_libraries(imgui PUBLIC
+    glfw
+    ${OPENGL_gl_LIBRARY}
+)
+
+
+
 # ==========================================================
 # =================== OPENGL DETECTION =====================
 # ==========================================================
@@ -84,6 +112,7 @@ target_link_libraries(Engine
     PUBLIC
         glfw
         glad
+        imgui
         ${OPENGL_gl_LIBRARY}
 )
 
