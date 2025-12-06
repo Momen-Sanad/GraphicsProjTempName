@@ -47,9 +47,27 @@ public:
     MeshRenderer();
     ~MeshRenderer();
 
+
+    /*
+     * deletes the copy constructor, which means you cannot create a new MeshRenderer object by copying an existing one.
+     * This prevents the class from being copied, ensuring that two objects 
+     * don’t accidentally share the same resources or state.
+    */
+
     // No copying
     MeshRenderer(const MeshRenderer&) = delete;
     MeshRenderer& operator=(const MeshRenderer&) = delete;
+    
+    
+    /*
+     *is the move constructor. It allows one MeshRenderer object to be moved to another, instead of copied.
+     *This is important for performance because it transfers ownership of resources
+     *(like memory or GPU buffers) rather than duplicating them.
+     *
+     *noexcept part indicates that this operation does not throw exceptions, 
+     *which is often used for optimization 
+     *for containers like std::vector to safely move elements
+    */
 
     // Move support
     MeshRenderer(MeshRenderer&& other) noexcept;

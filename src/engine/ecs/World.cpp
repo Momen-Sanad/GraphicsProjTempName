@@ -9,7 +9,22 @@ Entity* World::createEntityWithParams(Entity* parent,
                                       MeshRenderer* mesh,
                                       Material* material)
 {
-    return manager.createEntityWithParams(parent, position, rotation, scale, mesh, material);
+    Entity* e = manager.createEntityWithParams(
+        parent,
+        position,
+        glm::quat(1,0,0,0),   // Always pass identity to avoid creating invalid quats
+        scale,
+        mesh,
+        material
+    );
+
+    if (glm::length(rotation) > 0.0001f) {
+        e->setRotation(rotation);
+    }
+
+    return e;
+
+    // return manager.createEntityWithParams(parent, position, rotation, scale, mesh, material);
 }
 
 Entity* World::add_entity() {

@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <iostream>
 
 #include "../engine/platform/Window.hpp"
 #include "../engine/gl/GLContext.hpp"
@@ -56,7 +57,6 @@ int main() {
     yellow.setShader(mainShader);
     yellow.tint = glm::vec4(1.0f, 1.0f, 0.3f, 1.0f);
 
-
     // ---------------------------
     // Mesh Setup (cube vertex/index data)
     // ---------------------------
@@ -102,20 +102,6 @@ int main() {
         20,21,22, 22,23,20
     };
     
-    /*
-     * make an abstraction to satisfy the following:
-     * give cube coordinates to spawn at (x, y, z)
-     * give cube scale
-     * give cube rotation
-     * then the engine figures out the indices and vertices on its own
-     * instead of physically writing them out
-     * make the user able to create X amount of standard objects
-     * like cylinder, cube, sphere, etc..
-     * then the user can modify scale,rotation, coordinates
-     * don't allow the user to create custom objects like before
-     * 
-     * */
-    
     MeshData cubeData(vertices, indices);
     MeshRenderer cube;
     cube.upload(cubeData);
@@ -125,7 +111,6 @@ int main() {
     // ---------------------------
     World world;
 
-    // configure world camera directly (Camera has public members in your build)
     world.get_camera().position  = glm::vec3(10.f, 5.f, 10.f);
     world.get_camera().direction = glm::normalize(glm::vec3(-1.f, 0.f, -1.f));
     world.get_camera().up        = glm::vec3(0.f, 1.f, 0.f);
@@ -134,45 +119,33 @@ int main() {
     world.get_camera().far       = 100.0f;
 
     // ---------------------------
-    //       Scene graph
+    // Scene graph
     // ---------------------------
     Entity* root = world.createEntityWithParams(nullptr);
 
     // Water plane
     Entity* water = world.createEntityWithParams(
-        root,                    // parent
-        {0.f, 0.f, 0.f},         // position
-        glm::quat(),             // rotation
-        {10.f, 1.f, 10.f},       // scale
-        &cube,                   // mesh
-        &blue                    // material
+        root, {0.f, 0.f, 0.f}, glm::quat(), {10.f, 1.f, 10.f}, &cube, &blue
     );
 
     // Island (empty entity, parent of sand & tree)
     Entity* island = world.createEntityWithParams(root);
 
+    {
+        //debugging only
+        glm::quat island_rotation = island->getRotation();
+        std::cout << "Island rotation: " << island_rotation.x << ", " << island_rotation.y << ", " << island_rotation.z << ", " << island_rotation.w << std::endl;
+
+    }
+
     // Sand on the island
-    Entity* sand = world.createEntityWithParams(
-        island,
-        {0.f, 0.5f, 0.f},
-        glm::quat(),
-        {2.f, 1.f, 2.f},
-        &cube,
-        &yellow
-    );
+    Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
 
     // Tree base
     Entity* tree = world.createEntityWithParams(island);
 
     // Tree trunk
-    Entity* tree_trunk = world.createEntityWithParams(
-        tree,
-        {0.f, 0.f, 0.f},
-        glm::quat(),
-        {0.5f, 5.f, 0.5f},
-        &cube,
-        &brown
-    );
+    Entity* tree_trunk = world.createEntityWithParams(tree, {0.f, 0.f, 0.f}, glm::quat(), {0.5f, 5.f, 0.5f}, &cube, &brown);
 
     // Tree leaves
     for (int i = 0; i < 4; i++) {
@@ -196,12 +169,11 @@ int main() {
     controller.setup(window.get_handle(), &world.get_camera());
 
 
-    float last_time = 0.0f; // store previous frame time
-    // printf("island has %zu children\n", island->getChildren().size());
-    // for (Entity* c : island->getChildren()) {
-    //     printf("child %p parent=%p\n", (void*)c, (void*)c->getParent());
-    // }
-    
+    // FPS Tracking
+    float last_time = static_cast<float>(glfwGetTime());
+    float last_fps_time = last_time;
+    int frameCount = 0;
+
     // ---------------------------
     // Main Loop
     // ---------------------------
@@ -209,37 +181,63 @@ int main() {
         window.poll_events();
 
         float time = static_cast<float>(glfwGetTime());
-        float delta_time = time - last_time;  // calculate frame delta
-        last_time = time;
-        
+        float delta_time = time - last_time;
+        last_time = time;                 // update immediately after delta is computed
+        frameCount++;
 
-        // animate water scale (use setter) and rotate island using getters/setters:
+
+        glm::vec3 island_position = island->getPosition();
+        glm::quat island_rotation = island->getRotation();
+
+        // Check if 1 second has passed (based on previous `last_time`)
+        if (time - last_fps_time >= 1.0f) {
+            // Print island's position and rotation every frame
+            std::cout << "Island position: " << island_position.x << ", " << island_position.y << ", " << island_position.z << std::endl;
+            std::cout << "Island rotation: " << island_rotation.x << ", " << island_rotation.y << ", " << island_rotation.z << ", " << island_rotation.w << std::endl;
+
+            // Print world matrix every frame in a more readable format
+            glm::mat4 M = island->getWorldMatrix();
+            std::cout << "Island world matrix: \n";
+            for (int i = 0; i < 4; i++) {
+                std::cout << "| " << M[i][0] << " " << M[i][1] << " " << M[i][2] << " " << M[i][3] << " |\n";
+            }
+
+            // Print FPS
+            printf("FPS: %d\n", frameCount);
+            frameCount = 0;  // Reset frame count after FPS print
+            // Reset last_time after printing FPS
+            last_fps_time = time;
+        }
+
+        // Animate water scale and rotate island
         water->setScale({10.f, 1.0f + 0.1f * glm::sin(time), 10.f});
         float rot_speed = glm::radians(30.f); // 30 deg/sec
-        water->setRotation(glm::angleAxis(rot_speed * delta_time, glm::vec3(0.f,1.f,0)) * water->getRotation());
+        glm::quat delta_rot = glm::angleAxis(rot_speed * delta_time, glm::vec3(0.f, 1.f, 0));
+        island->setRotation(delta_rot * island_rotation); // accumulate rotation
 
-        // for (Entity* leaf : treeLeaves) {
-        //     leaf->setRotation(glm::angleAxis(time*1.5f, glm::vec3(0.f,1.f,0)) * leaf->getRotation());
-        // }
-        
+        // Update controller and rendering
         controller.update(delta_time);
-        
+
+        // Rendering setup
         int w, h;
         window.get_framebuffer_size(w, h);
-        
         glViewport(0, 0, w, h);
         glClearColor(0.90f, 0.95f, 1.0f, 1.0f);
         glClearDepth(1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
+
         glm::mat4 VP = world.get_camera().get_view_projection_matrix(glm::vec2((float)w, (float)h));
 
+        // Render all entities
         for (Entity* root : world.getEntityManager().getRoots()) {
             world.getEntityManager().renderEntityRecursive(root, VP);
         }
 
+        // Swap buffers for the next frame
         window.swap_buffers();
     }
+
+
 
     // Cleanup
     cube.destroy();
