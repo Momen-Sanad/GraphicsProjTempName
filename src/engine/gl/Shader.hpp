@@ -1,7 +1,10 @@
 #pragma once
+#ifndef GLAD_INCLUDED
+#define GLAD_INCLUDED
+#include <glad/glad.h>
+#endif
 #include <string>
 #include <unordered_map>
-#include <glad/glad.h>
 
 class Shader {
 private:

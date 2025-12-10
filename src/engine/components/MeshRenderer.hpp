@@ -1,87 +1,43 @@
 #pragma once
-#include <vector>
-#include <cstdint>
+
+#ifndef GLAD_INCLUDED
+#define GLAD_INCLUDED
 #include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
+#endif
 
-// ------------------------------------------------------------
-// Color & Vertex Structures
-// ------------------------------------------------------------
-struct Color {
-    uint8_t r, g, b, a;
-};
-
-struct Vertex {
-    glm::vec3 position;
-    Color color;
-};
-
-// ------------------------------------------------------------
-// CPU-side mesh data (no OpenGL here)
-// ------------------------------------------------------------
-class MeshData {
-public:
-    std::vector<Vertex> vertices;
-    std::vector<uint16_t> indices;
-
-    MeshData() = default;
-
-    MeshData(std::vector<Vertex> v, std::vector<uint16_t> i)
-        : vertices(std::move(v)), indices(std::move(i)) {}
-
-    size_t vertexCount() const { return vertices.size(); }
-    size_t indexCount()  const { return indices.size(); }
-};
+#include "../gl/Mesh.hpp"
+#include <cstring>
+// #include <glm/gtc/constants.hpp>
 
 // ------------------------------------------------------------
 // GPU-side mesh (VAO + VBO + EBO)
 // ------------------------------------------------------------
 class MeshRenderer {
 private:
-    GLuint vao = 0;
-    GLuint vbo = 0;
-    GLuint ebo = 0;
-    GLsizei count = 0;
+    GLuint vao    = 0; // Vertex Array Object
+    GLuint vbo    = 0; // Vertex Buffer Object
+    GLuint ebo    = 0; // Element Buffer Object
+    GLsizei count = 0; // Number of elements to render
 
 public:
     MeshRenderer();
     ~MeshRenderer();
 
-
-    /*
-     * deletes the copy constructor, which means you cannot create a new MeshRenderer object by copying an existing one.
-     * This prevents the class from being copied, ensuring that two objects 
-     * don’t accidentally share the same resources or state.
-    */
-
-    // No copying
+    // Prevent copying of MeshRenderer objects to avoid accidental resource sharing.
     MeshRenderer(const MeshRenderer&) = delete;
     MeshRenderer& operator=(const MeshRenderer&) = delete;
-    
-    
-    /*
-     *is the move constructor. It allows one MeshRenderer object to be moved to another, instead of copied.
-     *This is important for performance because it transfers ownership of resources
-     *(like memory or GPU buffers) rather than duplicating them.
-     *
-     *noexcept part indicates that this operation does not throw exceptions, 
-     *which is often used for optimization 
-     *for containers like std::vector to safely move elements
-    */
 
-    // Move support
+    // Move constructor and move assignment operator.
+    // Allows efficient transfer of resources without unnecessary copies.
     MeshRenderer(MeshRenderer&& other) noexcept;
     MeshRenderer& operator=(MeshRenderer&& other) noexcept;
 
-    void upload(const MeshData& data);
+    // Upload mesh data to the GPU (VBO, EBO).
+    void upload(const Mesh& mesh);  // Use the proper Mesh type here.
+
+    // Render the mesh using the bound VAO/VBO/EBO.
     void draw() const;
+
+    // Clean up OpenGL resources (VAO, VBO, EBO).
     void destroy();
-
-
-    // static factory functions
-    static MeshRenderer createCube();
-    static MeshRenderer createPlane();
-    static MeshRenderer createSphere(int segments = 32, int rings = 16);
-    static MeshRenderer createCylinder(int segments = 32);
 };

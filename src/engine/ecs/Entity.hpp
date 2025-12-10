@@ -1,13 +1,17 @@
 #pragma once
-#include <vector>
-#include <memory>
-#include <algorithm>
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
-#include "../components/MeshRenderer.hpp"
+#ifndef GLAD_INCLUDED
+#define GLAD_INCLUDED
+#include <glad/glad.h>
+#endif
+
 #include "../assets/Material.hpp"
+#include "../components/MeshRenderer.hpp"
+#include <glm/gtc/quaternion.hpp>
+// #include <glm/gtc/matrix_transform.hpp>
+#include <algorithm>
+
+
 
 class Entity {
 private:

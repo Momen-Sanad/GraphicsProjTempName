@@ -1,8 +1,10 @@
 #pragma once
-#include <memory>
-#include <string>
+#ifndef GLAD_INCLUDED
+#define GLAD_INCLUDED
 #include <glad/glad.h>
+#endif
 #include "../gl/Shader.hpp"
+#include <memory>
 
 class Material {
 protected:

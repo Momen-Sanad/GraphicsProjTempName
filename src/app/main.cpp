@@ -18,6 +18,7 @@
 #include "../engine/ecs/ShaderManager.hpp"
 #include "../engine/assets/MaterialManager.hpp"
 #include "../engine/components/MeshRenderer.hpp"
+#include "../engine/gl/Mesh.hpp"
 #include "../engine/utils/Im_GUI_Inspector.hpp"
 // Window size
 #define WINDOW_W 1280
@@ -150,7 +151,14 @@ int main() {
     // MeshRenderer cube;
     // cube.upload(cubeData);
 
-    MeshRenderer cube = MeshRenderer::createCube();
+    Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));  // Centered cube with size 1.0f
+
+    // Create a MeshRenderer to upload and render the cube
+    MeshRenderer cube;
+
+    // Upload the mesh data to the GPU
+    cube.upload(cubeMesh);  // Make sure that cubeMesh is properly set with vertices and indices.
+
 
     // ---------------------------
     // World + Camera Setup

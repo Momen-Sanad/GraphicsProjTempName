@@ -1,5 +1,4 @@
 #include "Entity.hpp"
-#include <cstdio>   // for debug prints if you need them
 
 // ------------------------------------------------------------
 // Destructor -> does NOT delete children (EntityManager owns them)
