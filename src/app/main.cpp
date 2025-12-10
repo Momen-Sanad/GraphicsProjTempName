@@ -123,11 +123,20 @@ int main() {
     // ---------------------------
 
 
-    std::string texturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
-    std::cout << "Attempting to load texture: " << texturePath << std::endl;
+    // std::string MoonTexturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
+    // std::cout << "Attempting to load texture: " << MoonTexturePath << std::endl;
 
-    // Test 1: Texture Loading
-    Texture* texture = TextureLoader::load(texturePath);
+    // // Test 1: Texture Loading
+    // Texture* MoonTexture = TextureLoader::load(MoonTexturePath);
+
+    // std::string HouseOBJ = std::string(MODELS_DIR) + "/house/house.obj";
+    // std::cout << "Attempting to load obj: " << HouseOBJ << std::endl;
+
+    
+    // MoonTexture->bind(0);
+
+
+
     // ---------------------------
     // Mesh Setup (cube vertex/index data)
     // ---------------------------
