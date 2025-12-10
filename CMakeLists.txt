@@ -116,7 +116,7 @@ target_link_libraries(Engine
         ${OPENGL_gl_LIBRARY}
 )
 
-target_compile_definitions(Engine PRIVATE
+target_compile_definitions(Engine PUBLIC
     _CRT_SECURE_NO_WARNINGS
     SHADER_DIR="${CMAKE_SOURCE_DIR}/shaders"
     ASSET_DIR="${CMAKE_SOURCE_DIR}/assets"

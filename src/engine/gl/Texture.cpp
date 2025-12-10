@@ -42,8 +42,6 @@ void Texture::create(int width, int height, const unsigned char* data, GLenum fo
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
-
     glGenerateMipmap(GL_TEXTURE_2D);
 
     // Anisotropic filtering for better quality
@@ -51,6 +49,7 @@ void Texture::create(int width, int height, const unsigned char* data, GLenum fo
     glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &max_anisotropy);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, max_anisotropy);
 
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Texture::set_filters(GLenum min_filter, GLenum mag_filter)

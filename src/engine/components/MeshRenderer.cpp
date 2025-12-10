@@ -72,6 +72,18 @@ void MeshRenderer::upload(const Mesh& data) {
         (void*)offsetof(Vertex, color)
     );
 
+    /*
+	I added this part to support texture coordinates in the mesh.
+    */
+
+    // Vertex attribute 2 -> texture coordinates
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(
+        2, 2, GL_FLOAT, GL_FALSE,
+        sizeof(Vertex),
+        (void*)offsetof(Vertex, tex_coord)
+    );
+
     // ------------------------
     // EBO
     // ------------------------

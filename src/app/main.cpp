@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <iostream>
+#include <string>
 
 //imgui stuff
 #include "imgui.h"
@@ -21,14 +22,23 @@
 #include "../engine/gl/Mesh.hpp"
 #include "../engine/utils/Im_GUI_Inspector.hpp"
 #include "../engine/assets/MeshLoader.hpp"
+#include "../engine/assets/TexturedMaterial.hpp"
 
 
 #include "../engine/assets/TextureLoader.hpp"
 // Window size
 #define WINDOW_W 1280
 #define WINDOW_H 720
+#ifdef ASSET_DIR
+#define MODELS_DIR ASSET_DIR "/models"
+#define TEXTURES_DIR ASSET_DIR "/textures"
+#else
 #define MODELS_DIR "../../assets/models"
 #define TEXTURES_DIR "../../assets/textures"
+#endif
+#ifndef SHADER_DIR
+#define SHADER_DIR "../../shaders"
+#endif
 
 /* 
  * #TODO
@@ -93,9 +103,14 @@ int main() {
     //     "../shaders/main.frag"
     // );
     auto mainShader = shaderManager.loadShader("main",
-        "../shaders/blackToWhite.vert",
-        "../shaders/blackToWhite.frag"
+        std::string(SHADER_DIR) + "/blackToWhite.vert",
+        std::string(SHADER_DIR) + "/blackToWhite.frag"
     );
+    auto houseShader = shaderManager.loadShader("textured",
+        std::string(SHADER_DIR) + "/textured.vert",
+        std::string(SHADER_DIR) + "/textured.frag"
+    );
+
     if (!mainShader) {
         fprintf(stderr, "Failed to load main shader\n");
         return 1;
@@ -123,18 +138,18 @@ int main() {
     // ---------------------------
 
 
-    // std::string MoonTexturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
-    // std::cout << "Attempting to load texture: " << MoonTexturePath << std::endl;
+    /* std::string MoonTexturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
+     std::cout << "Attempting to load texture: " << MoonTexturePath << std::endl;*/
 
-    // // Test 1: Texture Loading
-    // Texture* MoonTexture = TextureLoader::load(MoonTexturePath);
+     // Test 1: Texture Loading
+     //auto MoonTexture = TextureLoader::load(MoonTexturePath);
 
-    // std::string HouseOBJ = std::string(MODELS_DIR) + "/house/house.obj";
-    // std::cout << "Attempting to load obj: " << HouseOBJ << std::endl;
+     std::string HouseText = std::string(TEXTURES_DIR) + "/house/house.jpeg";
+     Texture* HouseTexture = TextureLoader::load(HouseText);
+     std::cout << "Attempting to load texture: " << HouseText << std::endl;
 
-    
-    // MoonTexture->bind(0);
-
+     // Material for house
+     TexturedMaterial houseMaterial(houseShader, HouseTexture);
 
 
     // ---------------------------
@@ -195,11 +210,11 @@ int main() {
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));  // Centered cube with size 1.0f
 
     // Create a MeshRenderer to upload and render the cube
-    MeshRenderer cube;
+    MeshRenderer cube, house;
 
     // Upload the mesh data to the GPU
     cube.upload(cubeMesh);  // Make sure that cubeMesh is properly set with vertices and indices.
-
+	house.upload(*loadedMesh);
 
     // ---------------------------
     // World + Camera Setup
@@ -241,7 +256,8 @@ int main() {
     // Sand on the island
     Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
     // Entity* testcube = world.createEntityWithParams(island, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &cube, &yellow);
-
+    Entity* testhouse = world.createEntityWithParams(island, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMaterial);
+    
     // Tree base
     Entity* tree = world.createEntityWithParams(island);
 
