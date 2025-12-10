@@ -33,7 +33,7 @@ class Mesh
 private:
     std::vector<Vertex> verticies;  // Vertex data
     std::vector<uint16_t> indices;  // Index data
-    size_t count;                  // Number of elements to draw
+    size_t count;                   // Number of elements to draw
 
 public:
     // Constructors

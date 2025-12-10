@@ -20,10 +20,15 @@
 #include "../engine/components/MeshRenderer.hpp"
 #include "../engine/gl/Mesh.hpp"
 #include "../engine/utils/Im_GUI_Inspector.hpp"
+#include "../engine/assets/MeshLoader.hpp"
+
+
+#include "../engine/assets/TextureLoader.hpp"
 // Window size
 #define WINDOW_W 1280
 #define WINDOW_H 720
-
+#define MODELS_DIR "../../assets/models"
+#define TEXTURES_DIR "../../assets/textures"
 
 /* 
  * #TODO
@@ -41,6 +46,18 @@
  * renderSystem, TransformSystem <- we already have "TransformComponent"
  * 
  */
+
+ /*
+    std::string meshPath = std::string(TEST_ASSET_DIR) + "/house/house.obj";
+    std::cout << "Attempting to load mesh: " << meshPath << std::endl;
+
+    Mesh* loadedMesh = MeshLoader::load(meshPath.c_str());
+    std::string texturePath = std::string(TEST_ASSET_DIR) + "/moon.jpg";
+    std::cout << "Attempting to load texture: " << texturePath << std::endl;
+
+    // Test 1: Texture Loading
+    Texture* texture = TextureLoader::load(texturePath);
+*/
 
 int main() {
 
@@ -101,7 +118,16 @@ int main() {
     green.setShader(mainShader);
     green.tint = glm::vec4(0.4f, 1.0f, 0.2f, 1.0f);
 
+        // ---------------------------
+    // Create Textures
+    // ---------------------------
 
+
+    std::string texturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
+    std::cout << "Attempting to load texture: " << texturePath << std::endl;
+
+    // Test 1: Texture Loading
+    Texture* texture = TextureLoader::load(texturePath);
     // ---------------------------
     // Mesh Setup (cube vertex/index data)
     // ---------------------------
@@ -151,6 +177,12 @@ int main() {
     // MeshRenderer cube;
     // cube.upload(cubeData);
 
+    //loading mesh from obj
+    std::string meshPath = std::string(MODELS_DIR) + "/house/house.obj";
+    std::cout << "Attempting to load mesh: " << meshPath << std::endl;
+    Mesh* loadedMesh = MeshLoader::load(meshPath.c_str());
+
+    // creating primitive mesh
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));  // Centered cube with size 1.0f
 
     // Create a MeshRenderer to upload and render the cube
