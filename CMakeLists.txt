@@ -87,6 +87,7 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/engine/scripting/*.cpp
     ${CMAKE_SOURCE_DIR}/src/engine/systems/*.cpp
     ${CMAKE_SOURCE_DIR}/src/engine/utils/*.cpp
+    ${CMAKE_SOURCE_DIR}/src/engine/scene/*.cpp
 )
 
 # ==========================================================
@@ -104,6 +105,7 @@ target_include_directories(Engine
         ${CMAKE_SOURCE_DIR}/src/include             # public engine.hpp
         ${CMAKE_SOURCE_DIR}/vendor/glfw/include
         ${CMAKE_SOURCE_DIR}/vendor/glad/include
+        ${CMAKE_SOURCE_DIR}/vendor/json/single_include
         ${CMAKE_SOURCE_DIR}/vendor/glm
         ${CMAKE_SOURCE_DIR}/vendor/stb
 )
