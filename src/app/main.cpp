@@ -256,7 +256,7 @@ int main() {
     // Sand on the island
     Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
     // Entity* testcube = world.createEntityWithParams(island, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &cube, &yellow);
-    Entity* testhouse = world.createEntityWithParams(island, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMaterial);
+    Entity* testhouse = world.createEntityWithParams(root, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMaterial);
     
     // Tree base
     Entity* tree = world.createEntityWithParams(island);
