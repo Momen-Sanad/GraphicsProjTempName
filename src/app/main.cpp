@@ -157,16 +157,6 @@ int main() {
     //house glass material
     TexturedMaterial GlassMaterial(houseMixedShader, GlassTexture);
 
-
-
-    // create a sampler for sky texturing (for now till it's actually made in the file)
-    GLuint skySampler = 0;
-    glGenSamplers(1, &skySampler);
-    glSamplerParameteri(skySampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glSamplerParameteri(skySampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glSamplerParameteri(skySampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glSamplerParameteri(skySampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
     
     //loading mesh from obj
     std::string meshPath = std::string(MODELS_DIR) + "/house/house.obj";
@@ -198,14 +188,14 @@ int main() {
     world.get_camera().direction = glm::normalize(glm::vec3(-1.f, 0.f, -1.f));
     world.get_camera().up        = glm::vec3(0.f, 1.f, 0.f);
     world.get_camera().fov       = glm::radians(60.0f);
-    world.get_camera().near      = 0.1f;
-    world.get_camera().far       = 100.0f;
+    world.get_camera().near      = 0.1f;            // view-frustum culling
+    world.get_camera().far       = 100.0f;          // view-frustum culling
 
     // ---------------------------
     // Scene graph
     // ---------------------------
     Entity* root = world.createEntityWithParams(nullptr);
-
+    
     // Water plane
     Entity* water = world.createEntityWithParams(
         root, {0.f, 0.f, 0.f}, glm::quat(), {10.f, 1.f, 10.f}, &cube, &blue
@@ -222,7 +212,13 @@ int main() {
     }
 
     // Sand on the island
-    Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
+    Entity* sand = world.createEntityWithParams(island,
+    {0.f, 0.5f, 0.f},
+    glm::quat(),
+    {2.f, 1.f, 2.f},
+    &cube,
+    &yellow);
+
     Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
     
     {
@@ -357,8 +353,8 @@ int main() {
         int w, h;
         window.get_framebuffer_size(w, h);
         glViewport(0, 0, w, h);
-        glClearColor(0.90f, 0.95f, 1.0f, 1.0f);
-        glClearDepth(1.0f);
+        glClearColor(0.90f, 0.95f, 1.0f, 1.0f); // -> replaced by the sky box anyways
+        glClearDepth(1.0f);                     // depth buffer -> anything futher than 1.0 is cleared (culling)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         int width, height;
@@ -437,7 +433,8 @@ int main() {
         ImGui::Begin("Hello ImGui");
         ImGui::Text("This is working!");
         
-        ImGuiHelpers::ShowTransformInspector("Selected", island);
+        // ImGuiHelpers::ShowTransformInspector("Selected", island);
+        ImGuiHelpers::ShowTransformInspector("Selected", testhouse);
         
         ImGui::End();
 
@@ -456,6 +453,10 @@ int main() {
 
     // Cleanup
     cube.destroy();
+    house.destroy();
+    glass.destroy();
+    skyRenderer.destroy();              
+
     // mainShader.destroy();
 
     // ImGui cleanup

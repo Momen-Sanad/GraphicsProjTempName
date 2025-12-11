@@ -1,6 +1,6 @@
 #pragma once
 
-#include "engine/physics/PhysicsTypes.hpp"
+#include "PhysicsTypes.hpp"
 
 namespace gproj::physics {
 
