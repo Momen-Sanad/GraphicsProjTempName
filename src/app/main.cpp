@@ -26,6 +26,7 @@
 
 
 #include "../engine/assets/TextureLoader.hpp"
+#include "../engine/scene/SceneManager.hpp"
 // Window size
 #define WINDOW_W 1280
 #define WINDOW_H 720
@@ -221,7 +222,20 @@ int main() {
     // ---------------------------
     World world;
 
-    world.get_camera().position  = glm::vec3(10.f, 5.f, 10.f);
+    // ---------------------------
+    // Scene Manager Setup
+    // ---------------------------
+    SceneManager sceneManager(&world, &shaderManager);
+    
+    // Try to load scene from file, fallback to manual setup if it fails
+    bool sceneLoaded = sceneManager.loadScene("assets/scenes/example.json");
+    
+    if (!sceneLoaded) {
+        std::cout << "Failed to load scene: " << sceneManager.getLastError() << std::endl;
+        std::cout << "Using manual scene setup..." << std::endl;
+        
+        // Fallback to original manual setup
+        world.get_camera().position  = glm::vec3(10.f, 5.f, 10.f);
     world.get_camera().direction = glm::normalize(glm::vec3(-1.f, 0.f, -1.f));
     world.get_camera().up        = glm::vec3(0.f, 1.f, 0.f);
     world.get_camera().fov       = glm::radians(60.0f);
@@ -292,6 +306,14 @@ int main() {
         );
     }
 
+
+    } // End of manual scene setup fallback
+    
+    // Set up camera defaults if not set by scene
+    world.get_camera().up = glm::vec3(0.f, 1.f, 0.f);
+    world.get_camera().fov = glm::radians(60.0f);
+    world.get_camera().near = 0.1f;
+    world.get_camera().far = 100.0f;
 
     // ---------------------------
     // Camera controller

@@ -1,0 +1,46 @@
+{
+  "name": "Example Scene",
+  "settings": {
+    "clearColor": [0.2, 0.3, 0.4, 1.0],
+    "cameraPosition": [10.0, 5.0, 10.0],
+    "cameraDirection": [-1.0, 0.0, -1.0]
+  },
+  "entities": [
+    {
+      "name": "Water",
+      "position": [0.0, 0.0, 0.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "scale": [10.0, 1.0, 10.0],
+      "tint": [0.2, 0.4, 1.0, 1.0]
+    },
+    {
+      "name": "Island",
+      "position": [0.0, 0.0, 0.0],
+      "rotation": [0.0, 0.0, 0.0]
+    },
+    {
+      "name": "Sand",
+      "parent": "Island",
+      "position": [0.0, 0.5, 0.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "scale": [2.0, 1.0, 2.0],
+      "tint": [1.0, 1.0, 0.3, 1.0]
+    },
+    {
+      "name": "TreeTrunk",
+      "parent": "Island",
+      "position": [0.0, 2.5, 0.0],
+      "rotation": [0.0, 0.0, 0.0],
+      "scale": [0.5, 5.0, 0.5],
+      "tint": [0.5, 0.2, 0.1, 1.0]
+    },
+    {
+      "name": "RotatingCube",
+      "parent": "Island",
+      "position": [2.0, 1.0, 0.0],
+      "rotation": [45.0, 30.0, 0.0],
+      "scale": [1.0, 1.0, 1.0],
+      "tint": [1.0, 0.5, 0.2, 1.0]
+    }
+  ]
+}
