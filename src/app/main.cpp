@@ -98,10 +98,7 @@ int main() {
     // Load Shader
     // ---------------------------
     ShaderManager shaderManager;
-    // auto mainShader = shaderManager.loadShader("main",
-    //     "../shaders/main.vert",
-    //     "../shaders/main.frag"
-    // );
+
     auto mainShader = shaderManager.loadShader("main",
         std::string(SHADER_DIR) + "/blackToWhite.vert",
         std::string(SHADER_DIR) + "/blackToWhite.frag"
@@ -143,19 +140,28 @@ int main() {
     // ---------------------------
 
     // Texture Loading
-     std::string MoonTexturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
-     auto MoonTexture = TextureLoader::load(MoonTexturePath);
-     std::cout << "Attempting to load texture: " << MoonTexturePath << std::endl;
+    std::string MoonTexturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
+    auto MoonTexture = TextureLoader::load(MoonTexturePath);
+    std::cout << "Attempting to load texture: " << MoonTexturePath << std::endl;
 
-     std::string HouseText = std::string(TEXTURES_DIR) + "/house/house.jpeg";
-     Texture* HouseTexture = TextureLoader::load(HouseText);
-     std::cout << "Attempting to load texture: " << HouseText << std::endl;
+    std::string HouseText = std::string(TEXTURES_DIR) + "/house/house.jpeg";
+    Texture* HouseTexture = TextureLoader::load(HouseText);
+    std::cout << "Attempting to load texture: " << HouseText << std::endl;
 
-     // Material for house
-     TexturedMaterial houseMaterial(houseShader, HouseTexture);
+    std::string GlassText = std::string(TEXTURES_DIR) + "/house/glass.png";
+    Texture* GlassTexture = TextureLoader::load(GlassText);
+    std::cout << "Attempting to load texture: " << GlassText << std::endl;
 
-	 TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
-     houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);
+    // Material for house
+    TexturedMaterial houseMaterial(houseShader, HouseTexture);
+	TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
+    houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);
+
+    //house glass material
+    
+    TexturedMaterial GlassMaterial(houseMixedShader, GlassTexture);
+
+
 
     // ---------------------------
     // Mesh Setup (cube vertex/index data)
@@ -214,12 +220,15 @@ int main() {
     // creating primitive mesh
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));  // Centered cube with size 1.0f
 
+    Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
+
     // Create a MeshRenderer to upload and render the cube
-    MeshRenderer cube, house;
+    MeshRenderer cube, house, glass;
 
     // Upload the mesh data to the GPU
     cube.upload(cubeMesh);  // Make sure that cubeMesh is properly set with vertices and indices.
 	house.upload(*loadedMesh);
+	glass.upload(glass_mesh);
 
     // ---------------------------
     // World + Camera Setup
@@ -261,8 +270,50 @@ int main() {
     // Sand on the island
     Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
     // Entity* testcube = world.createEntityWithParams(island, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &cube, &yellow);
-    Entity* testhouse = world.createEntityWithParams(root, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
+    Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
     
+    // Let us add some windows to the house
+    // create windows as children of the house using LOCAL coordinates (relative to testhouse)
+    {
+        // Window 1 (relative offset on house local space)
+        Entity* window1 = world.createEntityWithParams(
+            testhouse,
+            // local position relative to testhouse (not world coords!)
+            { 2.0f, 1.5f, 0.0f },
+            // rotation using angleAxis
+            glm::angleAxis(glm::half_pi<float>() * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f)), 
+            // scale
+            { 2.0f, 1.0f, 1.0f },
+            &glass,
+            &GlassMaterial
+        );
+    }
+
+    {
+        // Window 2
+        Entity* window2 = world.createEntityWithParams(
+            testhouse,
+            { -0.2f, 2.0f, -2.75f }, // local
+            glm::angleAxis(glm::half_pi<float>() * 0.5f, glm::vec3(1.0f, 0.0f, 0.0f)),
+            { 1.0f, 1.0f, 1.5f },
+            &glass,
+            &GlassMaterial
+        );
+    }
+
+    {
+        // Window 3
+        Entity* window3 = world.createEntityWithParams(
+            testhouse,
+            { -3.55f, 2.0f, 0.55f }, // local
+            glm::angleAxis(-glm::half_pi<float>() * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f)),
+            { 1.5f, 1.0f, 1.0f },
+            &glass,
+            &GlassMaterial
+        );
+    }
+
+
     // Tree base
     Entity* tree = world.createEntityWithParams(island);
 
@@ -278,7 +329,7 @@ int main() {
 
     glm::vec3 leafOffsets[4] = {
         { 0.f, 0.f, 0.5f },   // leaf 0
-        { 0.f, 0.f, 0.75f },   // leaf 1
+        { 0.f, 0.f, 0.75f },  // leaf 1
         { 0.f, 0.f, 2.5f },   // leaf 2
         { 0.f, 0.f, -2.5f }   // leaf 3
     };
@@ -309,8 +360,6 @@ int main() {
     float last_time = static_cast<float>(glfwGetTime());
     float last_fps_time = last_time;
     int frameCount = 0;
-
-    // glm::vec3 ui_island_pos = island->getPosition();
 
     // ---------------------------
     // Main Loop
