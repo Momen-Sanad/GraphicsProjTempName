@@ -29,4 +29,12 @@ public:
     string name;
     vector<EntityData> entities;
     SceneSettings settings;
+
+    // Utility methods
+    EntityData* findEntity(const string& name);
+    void addEntity(const EntityData& entity);
+    void removeEntity(const string& name);
+    bool hasEntity(const string& name) const;
+    size_t getEntityCount() const;
+    void clear();
 };
