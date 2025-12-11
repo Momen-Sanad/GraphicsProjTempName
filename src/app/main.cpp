@@ -111,6 +111,11 @@ int main() {
         std::string(SHADER_DIR) + "/textured.frag"
     );
 
+    auto houseMixedShader = shaderManager.loadShader("blended",
+        std::string(SHADER_DIR) + "/blended.vert",
+        std::string(SHADER_DIR) + "/blended.frag"
+    );
+
     if (!mainShader) {
         fprintf(stderr, "Failed to load main shader\n");
         return 1;
@@ -137,12 +142,10 @@ int main() {
     // Create Textures
     // ---------------------------
 
-
-    /* std::string MoonTexturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
-     std::cout << "Attempting to load texture: " << MoonTexturePath << std::endl;*/
-
-     // Test 1: Texture Loading
-     //auto MoonTexture = TextureLoader::load(MoonTexturePath);
+    // Texture Loading
+     std::string MoonTexturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
+     auto MoonTexture = TextureLoader::load(MoonTexturePath);
+     std::cout << "Attempting to load texture: " << MoonTexturePath << std::endl;
 
      std::string HouseText = std::string(TEXTURES_DIR) + "/house/house.jpeg";
      Texture* HouseTexture = TextureLoader::load(HouseText);
@@ -151,6 +154,8 @@ int main() {
      // Material for house
      TexturedMaterial houseMaterial(houseShader, HouseTexture);
 
+	 TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
+     houseMixedMaterial.addTextureLayer(MoonTexture, 1,BlendMode::Lerp, 0.5f);
 
     // ---------------------------
     // Mesh Setup (cube vertex/index data)
@@ -256,7 +261,7 @@ int main() {
     // Sand on the island
     Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
     // Entity* testcube = world.createEntityWithParams(island, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &cube, &yellow);
-    Entity* testhouse = world.createEntityWithParams(root, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMaterial);
+    Entity* testhouse = world.createEntityWithParams(root, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
     
     // Tree base
     Entity* tree = world.createEntityWithParams(island);

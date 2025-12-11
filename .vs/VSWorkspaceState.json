@@ -17,6 +17,6 @@
     "\\src\\engine\\ecs",
     "\\vendor"
   ],
-  "SelectedNode": "\\README.md",
+  "SelectedNode": "\\src\\engine\\components\\MeshRenderer.cpp",
   "PreviewInSolutionExplorer": false
 }

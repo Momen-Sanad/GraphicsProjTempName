@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\components\\MeshRenderer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\components\\MeshRenderer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\app\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -19,68 +15,16 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\assets\\TexturedMaterial.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TintedMaterial.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\assets\\TintedMaterial.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\CMakeLists.txt||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:CMakeLists.txt||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\MeshLoader.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\assets\\MeshLoader.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TextureLoader.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\assets\\TextureLoader.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\textured.vert||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:shaders\\textured.vert||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blackToWhite.vert||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:shaders\\blackToWhite.vert||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\textured.frag||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:shaders\\textured.frag||{8B382828-6202-11D1-8870-0000F87579D2}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\MaterialManager.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\assets\\MaterialManager.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\MaterialManager.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\assets\\MaterialManager.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\Material.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\assets\\Material.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\ecs\\World.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\ecs\\World.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Texture.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\gl\\Texture.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TextureLoader.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\assets\\TextureLoader.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\PipelineState.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\assets\\PipelineState.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Mesh.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\gl\\Mesh.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Texture.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\gl\\Texture.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.vert||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:shaders\\blended.vert||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.frag||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:shaders\\blended.frag||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -104,270 +48,88 @@
         },
         {
           "DockedWidth": 92,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "main.cpp",
+              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\app\\main.cpp",
+              "RelativeDocumentMoniker": "src\\app\\main.cpp",
+              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\app\\main.cpp",
+              "RelativeToolTip": "src\\app\\main.cpp",
+              "ViewState": "AgIAAHsAAAAAAAAAAAAAAK0AAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-12-11T18:28:29.632Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "blended.frag",
+              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.frag",
+              "RelativeDocumentMoniker": "shaders\\blended.frag",
+              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.frag",
+              "RelativeToolTip": "shaders\\blended.frag",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-12-11T18:23:52.709Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "blended.vert",
+              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.vert",
+              "RelativeDocumentMoniker": "shaders\\blended.vert",
+              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.vert",
+              "RelativeToolTip": "shaders\\blended.vert",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-12-11T18:23:06.832Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Texture.hpp",
+              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Texture.hpp",
+              "RelativeDocumentMoniker": "src\\engine\\gl\\Texture.hpp",
+              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Texture.hpp",
+              "RelativeToolTip": "src\\engine\\gl\\Texture.hpp",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAUwCgAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-12-11T17:55:24.642Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TexturedMaterial.cpp",
+              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TexturedMaterial.cpp",
+              "RelativeDocumentMoniker": "src\\engine\\assets\\TexturedMaterial.cpp",
+              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TexturedMaterial.cpp",
+              "RelativeToolTip": "src\\engine\\assets\\TexturedMaterial.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-12-11T17:12:41.703Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{40ea2e6b-2121-4bb8-a43e-c83c04b51041}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "MeshRenderer.cpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\components\\MeshRenderer.cpp",
-              "RelativeDocumentMoniker": "src\\engine\\components\\MeshRenderer.cpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\components\\MeshRenderer.cpp",
-              "RelativeToolTip": "src\\engine\\components\\MeshRenderer.cpp",
-              "ViewState": "AgIAADgAAAAAAAAAAAAAAEUAAAAoAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-10T13:15:17.808Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "MeshLoader.cpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\MeshLoader.cpp",
-              "RelativeDocumentMoniker": "src\\engine\\assets\\MeshLoader.cpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\MeshLoader.cpp",
-              "RelativeToolTip": "src\\engine\\assets\\MeshLoader.cpp",
-              "ViewState": "AgIAAJIAAAAAAAAAAAAuwJoAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-10T12:26:18.469Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "blackToWhite.vert",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blackToWhite.vert",
-              "RelativeDocumentMoniker": "shaders\\blackToWhite.vert",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blackToWhite.vert",
-              "RelativeToolTip": "shaders\\blackToWhite.vert",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-12-10T11:46:00.733Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "textured.frag",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\textured.frag",
-              "RelativeDocumentMoniker": "shaders\\textured.frag",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\textured.frag",
-              "RelativeToolTip": "shaders\\textured.frag",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-12-10T11:43:10.216Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "textured.vert",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\textured.vert",
-              "RelativeDocumentMoniker": "shaders\\textured.vert",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\textured.vert",
-              "RelativeToolTip": "shaders\\textured.vert",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-12-10T11:42:43.393Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "TexturedMaterial.cpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TexturedMaterial.cpp",
-              "RelativeDocumentMoniker": "src\\engine\\assets\\TexturedMaterial.cpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TexturedMaterial.cpp",
-              "RelativeToolTip": "src\\engine\\assets\\TexturedMaterial.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-10T11:26:25.793Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "MaterialManager.cpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\MaterialManager.cpp",
-              "RelativeDocumentMoniker": "src\\engine\\assets\\MaterialManager.cpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\MaterialManager.cpp",
-              "RelativeToolTip": "src\\engine\\assets\\MaterialManager.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-10T11:24:00.744Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "MaterialManager.hpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\MaterialManager.hpp",
-              "RelativeDocumentMoniker": "src\\engine\\assets\\MaterialManager.hpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\MaterialManager.hpp",
-              "RelativeToolTip": "src\\engine\\assets\\MaterialManager.hpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-10T11:23:37.526Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "World.cpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\ecs\\World.cpp",
-              "RelativeDocumentMoniker": "src\\engine\\ecs\\World.cpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\ecs\\World.cpp",
-              "RelativeToolTip": "src\\engine\\ecs\\World.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-10T11:17:26.839Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "main.cpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\app\\main.cpp",
-              "RelativeDocumentMoniker": "src\\app\\main.cpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\app\\main.cpp",
-              "RelativeToolTip": "src\\app\\main.cpp",
-              "ViewState": "AgIAAHYBAAAAAAAAAAAAAF0AAAAGAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-10T11:17:02.038Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "Texture.cpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Texture.cpp",
-              "RelativeDocumentMoniker": "src\\engine\\gl\\Texture.cpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Texture.cpp",
-              "RelativeToolTip": "src\\engine\\gl\\Texture.cpp",
-              "ViewState": "AgIAAEIAAAAAAAAAAAAwwE0AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-10T11:16:06.849Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "Material.hpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\Material.hpp",
-              "RelativeDocumentMoniker": "src\\engine\\assets\\Material.hpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\Material.hpp",
-              "RelativeToolTip": "src\\engine\\assets\\Material.hpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAWAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-10T11:12:45.363Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
               "Title": "TexturedMaterial.hpp",
               "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TexturedMaterial.hpp",
               "RelativeDocumentMoniker": "src\\engine\\assets\\TexturedMaterial.hpp",
               "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TexturedMaterial.hpp",
               "RelativeToolTip": "src\\engine\\assets\\TexturedMaterial.hpp",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAwwBsAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAABcAAAAAAAAAAAAUwCIAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-10T11:12:24.608Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "TextureLoader.hpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TextureLoader.hpp",
-              "RelativeDocumentMoniker": "src\\engine\\assets\\TextureLoader.hpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TextureLoader.hpp",
-              "RelativeToolTip": "src\\engine\\assets\\TextureLoader.hpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-10T11:12:22.154Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "TintedMaterial.hpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TintedMaterial.hpp",
-              "RelativeDocumentMoniker": "src\\engine\\assets\\TintedMaterial.hpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TintedMaterial.hpp",
-              "RelativeToolTip": "src\\engine\\assets\\TintedMaterial.hpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAXAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-10T11:12:14.2Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "TextureLoader.cpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TextureLoader.cpp",
-              "RelativeDocumentMoniker": "src\\engine\\assets\\TextureLoader.cpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TextureLoader.cpp",
-              "RelativeToolTip": "src\\engine\\assets\\TextureLoader.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2025-12-10T11:12:09.658Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "PipelineState.hpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\PipelineState.hpp",
-              "RelativeDocumentMoniker": "src\\engine\\assets\\PipelineState.hpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\PipelineState.hpp",
-              "RelativeToolTip": "src\\engine\\assets\\PipelineState.hpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-10T11:12:07.31Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "Mesh.hpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Mesh.hpp",
-              "RelativeDocumentMoniker": "src\\engine\\gl\\Mesh.hpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Mesh.hpp",
-              "RelativeToolTip": "src\\engine\\gl\\Mesh.hpp",
-              "ViewState": "AgIAACoAAAAAAAAAAAAUwEEAAAA8AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-10T11:10:02.781Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
-              "Title": "Texture.hpp",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Texture.hpp",
-              "RelativeDocumentMoniker": "src\\engine\\gl\\Texture.hpp",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Texture.hpp",
-              "RelativeToolTip": "src\\engine\\gl\\Texture.hpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-12-10T11:09:51.839Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "CMakeLists.txt",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\CMakeLists.txt",
-              "RelativeDocumentMoniker": "CMakeLists.txt",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\CMakeLists.txt",
-              "RelativeToolTip": "CMakeLists.txt",
-              "ViewState": "AgIAAI8AAAAAAAAAAAAuwJkAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003109|",
-              "WhenOpened": "2025-12-10T11:09:36.266Z",
+              "WhenOpened": "2025-12-11T17:12:05.834Z",
               "EditorCaption": ""
             },
             {
