@@ -138,7 +138,7 @@ int main() {
     green.setShader(mainShader);
     green.tint = glm::vec4(0.4f, 1.0f, 0.2f, 1.0f);
 
-        // ---------------------------
+    // ---------------------------
     // Create Textures
     // ---------------------------
 
@@ -155,7 +155,7 @@ int main() {
      TexturedMaterial houseMaterial(houseShader, HouseTexture);
 
 	 TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
-     houseMixedMaterial.addTextureLayer(MoonTexture, 1,BlendMode::Lerp, 0.5f);
+     houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);
 
     // ---------------------------
     // Mesh Setup (cube vertex/index data)

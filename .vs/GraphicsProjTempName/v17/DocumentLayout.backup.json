@@ -7,6 +7,26 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\app\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\scene\\SceneDeserializer.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\scene\\SceneDeserializer.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\scene\\SceneManager.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\scene\\SceneManager.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\systems\\SimplePhysicsBackend.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\systems\\SimplePhysicsBackend.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\scene\\SceneDeserializer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\scene\\SceneDeserializer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\systems\\PhysicsSystem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\systems\\PhysicsSystem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TexturedMaterial.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\assets\\TexturedMaterial.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -15,16 +35,16 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\assets\\TexturedMaterial.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Texture.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\gl\\Texture.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.vert||{8B382828-6202-11D1-8870-0000F87579D2}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:shaders\\blended.vert||{8B382828-6202-11D1-8870-0000F87579D2}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.frag||{8B382828-6202-11D1-8870-0000F87579D2}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:shaders\\blended.frag||{8B382828-6202-11D1-8870-0000F87579D2}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\textured.frag||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:shaders\\textured.frag||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Texture.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\engine\\gl\\Texture.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -48,8 +68,86 @@
         },
         {
           "DockedWidth": 92,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 6,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "SceneManager.cpp",
+              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\scene\\SceneManager.cpp",
+              "RelativeDocumentMoniker": "src\\engine\\scene\\SceneManager.cpp",
+              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\scene\\SceneManager.cpp",
+              "RelativeToolTip": "src\\engine\\scene\\SceneManager.cpp",
+              "ViewState": "AgIAAHsAAAAAAAAAAAAuwIUAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-12-11T20:16:56.045Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SimplePhysicsBackend.cpp",
+              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\systems\\SimplePhysicsBackend.cpp",
+              "RelativeDocumentMoniker": "src\\engine\\systems\\SimplePhysicsBackend.cpp",
+              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\systems\\SimplePhysicsBackend.cpp",
+              "RelativeToolTip": "src\\engine\\systems\\SimplePhysicsBackend.cpp",
+              "ViewState": "AgIAAEIAAAAAAAAAAAAuwFIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-12-11T20:16:44.77Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SceneDeserializer.hpp",
+              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\scene\\SceneDeserializer.hpp",
+              "RelativeDocumentMoniker": "src\\engine\\scene\\SceneDeserializer.hpp",
+              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\scene\\SceneDeserializer.hpp",
+              "RelativeToolTip": "src\\engine\\scene\\SceneDeserializer.hpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2025-12-11T20:16:36.549Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "SceneDeserializer.cpp",
+              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\scene\\SceneDeserializer.cpp",
+              "RelativeDocumentMoniker": "src\\engine\\scene\\SceneDeserializer.cpp",
+              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\scene\\SceneDeserializer.cpp",
+              "RelativeToolTip": "src\\engine\\scene\\SceneDeserializer.cpp",
+              "ViewState": "AgIAAFYAAAAAAAAAAAAuwGYAAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-12-11T20:16:13.595Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "PhysicsSystem.cpp",
+              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\systems\\PhysicsSystem.cpp",
+              "RelativeDocumentMoniker": "src\\engine\\systems\\PhysicsSystem.cpp",
+              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\systems\\PhysicsSystem.cpp",
+              "RelativeToolTip": "src\\engine\\systems\\PhysicsSystem.cpp",
+              "ViewState": "AgIAAFAAAAAAAAAAAAAuwGAAAAADAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-12-11T20:15:02.16Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "textured.frag",
+              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\textured.frag",
+              "RelativeDocumentMoniker": "shaders\\textured.frag",
+              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\textured.frag",
+              "RelativeToolTip": "shaders\\textured.frag",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-12-11T19:17:20.694Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -58,40 +156,27 @@
               "RelativeDocumentMoniker": "src\\app\\main.cpp",
               "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\app\\main.cpp",
               "RelativeToolTip": "src\\app\\main.cpp",
-              "ViewState": "AgIAAJwAAAAAAAAAAAAAAJgAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEQAAAAAAAAAAAAYwGAAAAAiAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-12-11T18:28:29.632Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "blended.frag",
-              "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.frag",
-              "RelativeDocumentMoniker": "shaders\\blended.frag",
-              "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.frag",
-              "RelativeToolTip": "shaders\\blended.frag",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
-              "WhenOpened": "2025-12-11T18:23:52.709Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 8,
               "Title": "blended.vert",
               "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.vert",
               "RelativeDocumentMoniker": "shaders\\blended.vert",
               "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\shaders\\blended.vert",
               "RelativeToolTip": "shaders\\blended.vert",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-12-11T18:23:06.832Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 10,
               "Title": "Texture.hpp",
               "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\gl\\Texture.hpp",
               "RelativeDocumentMoniker": "src\\engine\\gl\\Texture.hpp",
@@ -104,13 +189,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 6,
               "Title": "TexturedMaterial.cpp",
               "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TexturedMaterial.cpp",
               "RelativeDocumentMoniker": "src\\engine\\assets\\TexturedMaterial.cpp",
               "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TexturedMaterial.cpp",
               "RelativeToolTip": "src\\engine\\assets\\TexturedMaterial.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-12-11T17:12:41.703Z",
               "EditorCaption": ""
@@ -121,13 +206,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 7,
               "Title": "TexturedMaterial.hpp",
               "DocumentMoniker": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TexturedMaterial.hpp",
               "RelativeDocumentMoniker": "src\\engine\\assets\\TexturedMaterial.hpp",
               "ToolTip": "C:\\Users\\asus\\source\\repos\\GraphicsProjTempName\\src\\engine\\assets\\TexturedMaterial.hpp",
               "RelativeToolTip": "src\\engine\\assets\\TexturedMaterial.hpp",
-              "ViewState": "AgIAABcAAAAAAAAAAAAUwCIAAAAUAAAAAAAAAA==",
+              "ViewState": "AgIAABQAAAAAAAAAAAAowCIAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2025-12-11T17:12:05.834Z",
               "EditorCaption": ""

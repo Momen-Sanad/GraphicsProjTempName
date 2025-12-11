@@ -152,7 +152,7 @@ void TexturedMaterial::setup()
         if (weightsLocation != -1)
             glUniform1fv(weightsLocation, static_cast<GLsizei>(weights.size()), weights.data());
 
-        // **NEW: Set blend modes**
+        // Set blend modes
         std::vector<GLint> blendModes;
         for (const auto& layer : textureLayers)
             blendModes.push_back(static_cast<GLint>(layer.blendMode));
