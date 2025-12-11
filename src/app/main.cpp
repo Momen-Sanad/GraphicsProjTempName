@@ -57,18 +57,6 @@
  * 
  */
 
- /*
-    std::string meshPath = std::string(TEST_ASSET_DIR) + "/house/house.obj";
-    std::cout << "Attempting to load mesh: " << meshPath << std::endl;
-
-    Mesh* loadedMesh = MeshLoader::load(meshPath.c_str());
-    std::string texturePath = std::string(TEST_ASSET_DIR) + "/moon.jpg";
-    std::cout << "Attempting to load texture: " << texturePath << std::endl;
-
-    // Test 1: Texture Loading
-    Texture* texture = TextureLoader::load(texturePath);
-*/
-
 int main() {
 
     // ---------------------------
@@ -98,10 +86,7 @@ int main() {
     // Load Shader
     // ---------------------------
     ShaderManager shaderManager;
-    // auto mainShader = shaderManager.loadShader("main",
-    //     "../shaders/main.vert",
-    //     "../shaders/main.frag"
-    // );
+
     auto mainShader = shaderManager.loadShader("main",
         std::string(SHADER_DIR) + "/blackToWhite.vert",
         std::string(SHADER_DIR) + "/blackToWhite.frag"
@@ -138,73 +123,24 @@ int main() {
     green.setShader(mainShader);
     green.tint = glm::vec4(0.4f, 1.0f, 0.2f, 1.0f);
 
-        // ---------------------------
+    // ---------------------------
     // Create Textures
     // ---------------------------
 
     // Texture Loading
-     std::string MoonTexturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
-     auto MoonTexture = TextureLoader::load(MoonTexturePath);
-     std::cout << "Attempting to load texture: " << MoonTexturePath << std::endl;
+    std::string MoonTexturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
+    auto MoonTexture = TextureLoader::load(MoonTexturePath);
+    std::cout << "Attempting to load texture: " << MoonTexturePath << std::endl;
 
-     std::string HouseText = std::string(TEXTURES_DIR) + "/house/house.jpeg";
-     Texture* HouseTexture = TextureLoader::load(HouseText);
-     std::cout << "Attempting to load texture: " << HouseText << std::endl;
+    std::string HouseText = std::string(TEXTURES_DIR) + "/house/house.jpeg";
+    Texture* HouseTexture = TextureLoader::load(HouseText);
+    std::cout << "Attempting to load texture: " << HouseText << std::endl;
 
-     // Material for house
-     TexturedMaterial houseMaterial(houseShader, HouseTexture);
+    // Material for house
+    TexturedMaterial houseMaterial(houseShader, HouseTexture);
 
-	 TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
-     houseMixedMaterial.addTextureLayer(MoonTexture, 1,BlendMode::Lerp, 0.5f);
-
-    // ---------------------------
-    // Mesh Setup (cube vertex/index data)
-    // ---------------------------
-    // std::vector<Vertex> vertices = {
-    //     // Front
-    //     {{ 0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-    //     {{-0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-    //     {{-0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-    //     {{ 0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-    //     // Back
-    //     {{-0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-    //     {{ 0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-    //     {{ 0.5f, 0.0f, -0.5f}, {0,0,0,255}},
-    //     {{-0.5f, 0.0f, -0.5f}, {0,0,0,255}},
-    //     // Top
-    //     {{-0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-    //     {{ 0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-    //     {{ 0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-    //     {{-0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-    //     // Bottom
-    //     {{ 0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-    //     {{-0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-    //     {{-0.5f, 0.0f, -0.5f}, {0,0,0,255}},
-    //     {{ 0.5f, 0.0f, -0.5f}, {0,0,0,255}},
-    //     // Right
-    //     {{ 0.5f, 0.0f, -0.5f}, {0,0,0,255}},
-    //     {{ 0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-    //     {{ 0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-    //     {{ 0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-    //     // Left
-    //     {{-0.5f, 0.0f, 0.5f}, {0,0,0,255}},
-    //     {{-0.5f, 1.0f, 0.5f}, {255,255,255,255}},
-    //     {{-0.5f, 1.0f, -0.5f}, {255,255,255,255}},
-    //     {{-0.5f, 0.0f, -0.5f}, {0,0,0,255}}
-    // };
-
-    // std::vector<uint16_t> indices = {
-    //     0,1,2, 2,3,0,
-    //     4,5,6, 6,7,4,
-    //     8,9,10, 10,11,8,
-    //     12,13,14, 14,15,12,
-    //     16,17,18, 18,19,16,
-    //     20,21,22, 22,23,20
-    // };
-    
-    // MeshData cubeData(vertices, indices);
-    // MeshRenderer cube;
-    // cube.upload(cubeData);
+	TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
+    houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);
 
     //loading mesh from obj
     std::string meshPath = std::string(MODELS_DIR) + "/house/house.obj";
@@ -232,11 +168,6 @@ int main() {
     world.get_camera().fov       = glm::radians(60.0f);
     world.get_camera().near      = 0.1f;
     world.get_camera().far       = 100.0f;
-
-    // float aspect = (float)windowWidth / (float)windowHeight;
-
-    // world.get_camera().projection =
-    // glm::perspective(world.get_camera().fov, aspect, world.get_camera().near, world.get_camera().far);
 
     // ---------------------------
     // Scene graph
@@ -269,18 +200,11 @@ int main() {
     // Tree trunk
     Entity* tree_trunk = world.createEntityWithParams(tree, {0.f, 2.5f, 0.f}, glm::quat(), {0.5f, 5.f, 0.5f}, &cube, &brown);
 
-    // Tree leaves
-    float trunkTopY = 2.5f + 2.5f;   // = 5.0f
-
-    // Leaves (height = 2 so half-height = 1)
-    float leafHalf = 1.0f;
-    float leafCenterY = trunkTopY + leafHalf;  // ensures leaf BASE touches trunk TOP
-
     glm::vec3 leafOffsets[4] = {
-        { 0.f, 0.f, 0.5f },   // leaf 0
-        { 0.f, 0.f, 0.75f },   // leaf 1
-        { 0.f, 0.f, 2.5f },   // leaf 2
-        { 0.f, 0.f, -2.5f }   // leaf 3
+        { 0.0f, 0.0f, 0.50f },  // leaf 0
+        { 0.0f, 0.0f, 0.75f },  // leaf 1
+        { 0.0f, 0.0f, 2.50f },  // leaf 2
+        { 0.0f, 0.0f, -2.5f }   // leaf 3
     };
 
     for (int i = 0; i < 4; i++) {
@@ -289,7 +213,7 @@ int main() {
 
         world.createEntityWithParams(
             tree,
-            {leafOffsets[i].x, leafCenterY + leafOffsets[i].y, leafOffsets[i].z},           
+            {leafOffsets[i].x, 6 + leafOffsets[i].y, leafOffsets[i].z},           
             rotY * rotZ,
             {0.5f, 2.f, 0.5f},
             &cube,

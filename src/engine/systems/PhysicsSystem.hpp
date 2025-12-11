@@ -15,7 +15,7 @@ class PhysicsSystem {
 private:
 
     EntityManager&   m_entityManager;
-    IPhysicsBackend& m_backend;
+    PhysicsBackend& m_backend;
 
     // Map each entity to its physics body
     std::unordered_map<Entity*, PhysicsBodyId> m_entityToBody;
@@ -25,7 +25,7 @@ private:
 
 public:
     
-    PhysicsSystem(EntityManager& entityManager, IPhysicsBackend& backend);
+    PhysicsSystem(EntityManager& entityManager, PhysicsBackend& backend);
 
     void initialize();
     void shutdown();
@@ -45,8 +45,8 @@ public:
     void syncEntityToPhysics(Entity* entity);
     void syncPhysicsToEntity(Entity* entity);
 
-    void syncEntityTransformToPhysics(Entity* entity, PhysicsBodyId bodyId);
-    void syncPhysicsToEntityTransform(Entity* entity, PhysicsBodyId bodyId);
+    // void syncEntityTransformToPhysics(Entity* entity, PhysicsBodyId bodyId);
+    // void syncPhysicsToEntityTransform(Entity* entity, PhysicsBodyId bodyId);
 
 };
 

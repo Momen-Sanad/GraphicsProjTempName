@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <glm/glm.hpp>
 
-#include "engine/physics/IPhysicsBackend.hpp"
+#include "PhysicsBackend.hpp"
 
 namespace gproj::physics {
 
@@ -16,7 +16,7 @@ struct SimpleBodyState {
     bool enabled{true};
 };
 
-class SimplePhysicsBackend final : public IPhysicsBackend {
+class SimplePhysicsBackend final : public PhysicsBackend {
 public:
     SimplePhysicsBackend();
     ~SimplePhysicsBackend() override;

@@ -1,5 +1,4 @@
 #include "SceneDeserializer.hpp"
-#include <json/single_include/nlohmann/json.hpp>
 #include <fstream>
 #include <iostream>
 
@@ -62,10 +61,6 @@ unique_ptr<Scene> SceneDeserializer::loadFromFile(const string& filePath) {
                 if (entityJson.contains("tint")) {
                     entity.tint = parseFloatArray(entityJson["tint"], 4);
                 }
-                
-                // should add textures
-                // maybe all variables of textures like tinted material
-                // and/or textured material and so on
                 
                 scene->entities.push_back(move(entity));
             }

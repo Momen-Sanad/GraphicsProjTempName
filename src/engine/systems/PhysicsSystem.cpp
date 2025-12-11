@@ -1,11 +1,11 @@
-#include "engine/physics/PhysicsSystem.hpp"
+#include "PhysicsSystem.hpp"
 #include "engine/ecs/EntityManager.hpp"
 #include "engine/ecs/Entity.hpp"
 
 namespace gproj::physics {
 
 PhysicsSystem::PhysicsSystem(EntityManager& entityManager,
-                             IPhysicsBackend& backend)
+                             PhysicsBackend& backend)
     : m_entityManager(entityManager)
     , m_backend(backend) {}
 
