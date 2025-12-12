@@ -1,17 +1,23 @@
 #include "EntityManager.hpp"
-#include <algorithm>
 
 // ------------------------------------------------------------
 // Create entity and store it
 // ------------------------------------------------------------
 Entity* EntityManager::createEntity() {
+    // Create a new unique entity and add it to the entities list
     entities.push_back(std::make_unique<Entity>());
+    
+    // Get a raw pointer to the entity
     Entity* e = entities.back().get();
-    roots.push_back(e); // default -> root entity
-    return e;
+
+    // Add the new entity to the roots list by default
+    roots.push_back(e); // Default behavior: the entity is considered a root entity
+    return e;           // Return the raw pointer to the newly created entity
 }
 
-//overloaded creator (factory)
+// ------------------------------------------------------------
+// Overloaded creator (factory method)
+// ------------------------------------------------------------
 Entity* EntityManager::createEntityWithParams(
     Entity* parent,
     const glm::vec3& position,
@@ -20,28 +26,31 @@ Entity* EntityManager::createEntityWithParams(
     MeshRenderer* mesh,
     Material* material
 ) {
-    // Call the original zero-argument function
+    // Call the original zero-argument entity creation function
     Entity* e = createEntity(); 
 
-    // Set transforms
+    // Set the entity's transform (position, rotation, and scale)
     e->setPosition(position);
     e->setRotation(rotation);
     e->setScale(scale);
 
-    // Set mesh/material
+    // Assign the mesh and material to the entity
     e->setMesh(mesh);
     e->setMaterial(material);
 
-    // Set parent (removes from roots if parent != nullptr)
-    if (parent){
-        e->setParent(parent);
+    // Set the parent of the entity, and remove it from the roots list if it has a parent
+    if (parent) {
+        e->setParent(parent);  // Set the parent entity
+        // Remove from roots list if the entity is no longer a root
         roots.erase(std::remove(roots.begin(), roots.end(), e), roots.end());
     }
     
-    return e;
+    return e;  // Return the newly created entity
 }
 
-
+// ------------------------------------------------------------
+// Create a default cube (helper function, factory)
+// ------------------------------------------------------------
 Entity* createCube(
     EntityManager& manager,
     Entity* parent,
@@ -51,6 +60,7 @@ Entity* createCube(
     MeshRenderer* mesh,
     Material* material
 ) {
+    // Create a cube entity using the factory function with parameters
     return manager.createEntityWithParams(parent, pos, rot, scale, mesh, material);
 }
 
@@ -58,19 +68,20 @@ Entity* createCube(
 // Remove entity and unparent it
 // ------------------------------------------------------------
 void EntityManager::destroyEntity(Entity* entity) {
-    if (!entity) return;
+    if (!entity) return;  // If entity is null, nothing to destroy
 
-    // Remove from root list if present
+    // Remove from the root list if the entity is in it
     roots.erase(std::remove(roots.begin(), roots.end(), entity), roots.end());
 
-    // Remove from parent if needed
+    // Unset the parent of the entity (if it has one)
     if (entity->getParent())
         entity->setParent(nullptr);
 
-    // Remove all childrens' parent references
+    // Unset the parent references for all of the entity's children
     for (Entity* child : entity->getChildren())
         child->setParent(nullptr);
 
+    // Remove the entity from the list of managed entities
     entities.erase(
         std::remove_if(
             entities.begin(),
@@ -81,37 +92,50 @@ void EntityManager::destroyEntity(Entity* entity) {
     );
 }
 
+// ------------------------------------------------------------
+// Clear all entities and reset the root list
+// ------------------------------------------------------------
 void EntityManager::clear() {
-    entities.clear();
-    roots.clear();
+    entities.clear();  // Remove all entities
+    roots.clear();     // Remove all root entities
 }
 
 // ------------------------------------------------------------
-// Draw all root-level entities (children auto-draw recursively)
+// Draw all root-level entities (children will be drawn recursively)
 // ------------------------------------------------------------
 void EntityManager::drawAll(const glm::mat4& viewProj) {
+    // Iterate through each root entity and draw it
     for (Entity* e : roots)
         e->draw(viewProj);
 }
 
+// ------------------------------------------------------------
+// Render a single entity recursively (including children)
+// ------------------------------------------------------------
 void EntityManager::renderEntityRecursive(Entity* e, const glm::mat4& VP) {
-    if (!e) return;
+    if (!e) return;  // Return if the entity is null
 
-    if (MeshRenderer* m   = e->getMesh()) {
+    // Check if the entity has a mesh
+    if (MeshRenderer* m = e->getMesh()) {
+        // Check if the entity has a material
         if (Material* mat = e->getMaterial()) {
-            mat->setup();
+            mat->setup();  // Set up the material (binds the shader and sets uniforms)
 
+            // Compute the world matrix and MVP (Model-View-Projection) matrix
             glm::mat4 M = e->getWorldMatrix();
             glm::mat4 MVP = VP * M;
 
+            // Try to get the MVP uniform location from the material
             GLint loc = mat->getUniform("MVP");
-            if (loc != -1) glUniformMatrix4fv(loc, 1, GL_FALSE, &MVP[0][0]);
+            if (loc != -1)
+                glUniformMatrix4fv(loc, 1, GL_FALSE, &MVP[0][0]);  // Set the MVP uniform
 
-            m->draw();
+            m->draw();  // Draw the mesh
         }
     }
 
+    // Recursively render all child entities
     for (Entity* child : e->getChildren()) {
-        EntityManager::renderEntityRecursive(child, VP);
+        EntityManager::renderEntityRecursive(child, VP);  // Recursive call for each child
     }
 }

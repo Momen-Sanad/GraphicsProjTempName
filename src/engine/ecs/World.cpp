@@ -1,7 +1,13 @@
 #include "World.hpp"
 
-World::World() = default;
+// ------------------------------------------------------------
+// Constructor for World class (default constructor)
+// ------------------------------------------------------------
+World::World() = default;  // Uses default constructor
 
+// ------------------------------------------------------------
+// Create an entity with specified parameters
+// ------------------------------------------------------------
 Entity* World::createEntityWithParams(Entity* parent,
                                       const glm::vec3& position,
                                       const glm::quat& rotation,
@@ -9,32 +15,41 @@ Entity* World::createEntityWithParams(Entity* parent,
                                       MeshRenderer* mesh,
                                       Material* material)
 {
+    // Use the EntityManager to create an entity with the specified parameters
     Entity* e = manager.createEntityWithParams(
-        parent,
-        position,
-        glm::quat(1,0,0,0),   // Always pass identity to avoid creating invalid quats
-        scale,
-        mesh,
-        material
+        parent,  // Set the parent entity (can be nullptr)
+        position,  // Position of the entity in world space
+        glm::quat(1,0,0,0),  // Always pass identity quaternion (no rotation) as a default
+        scale,  // Scale of the entity
+        mesh,  // MeshRenderer to be used with this entity
+        material  // Material to be applied to the entity
     );
 
+    // If the provided rotation is significant (non-zero), set it to the entity
     if (glm::length(rotation) > 0.0001f) {
-        e->setRotation(rotation);
+        e->setRotation(rotation);  // Apply the given rotation to the entity
     }
 
-    return e;
-
-    // return manager.createEntityWithParams(parent, position, rotation, scale, mesh, material);
+    return e;  // Return the newly created entity
 }
 
+// ------------------------------------------------------------
+// Add a new entity to the world (default root entity)
+// ------------------------------------------------------------
 Entity* World::add_entity() {
-    return manager.createEntity(); // default root entity
+    return manager.createEntity();  // Creates a default root entity
 }
 
+// ------------------------------------------------------------
+// Remove an entity from the world
+// ------------------------------------------------------------
 void World::removeEntity(Entity* entity) {
-    manager.destroyEntity(entity);
+    manager.destroyEntity(entity);  // Delegate the removal of the entity to the EntityManager
 }
 
+// ------------------------------------------------------------
+// Clear all entities in the world (destroy all entities)
+// ------------------------------------------------------------
 void World::clear() {
-    manager.clear(); // destroy all entities inside EntityManager
+    manager.clear();  // Calls the EntityManager to clear all entities
 }

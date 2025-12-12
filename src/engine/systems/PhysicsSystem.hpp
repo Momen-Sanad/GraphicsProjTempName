@@ -45,12 +45,6 @@ public:
     void syncEntityToPhysics(Entity* entity);
     void syncPhysicsToEntity(Entity* entity);
 
-<<<<<<< HEAD
-    // void syncEntityTransformToPhysics(Entity* entity, PhysicsBodyId bodyId);
-    // void syncPhysicsToEntityTransform(Entity* entity, PhysicsBodyId bodyId);
-
-=======
->>>>>>> temp
 };
 
 }

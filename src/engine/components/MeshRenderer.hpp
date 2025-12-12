@@ -7,7 +7,6 @@
 
 #include "../gl/Mesh.hpp"
 #include <cstring>
-// #include <glm/gtc/constants.hpp>
 
 // ------------------------------------------------------------
 // GPU-side mesh (VAO + VBO + EBO)

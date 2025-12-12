@@ -1,23 +1,13 @@
 #include "PhysicsSystem.hpp"
-<<<<<<< HEAD
-#include "engine/ecs/EntityManager.hpp"
-#include "engine/ecs/Entity.hpp"
-=======
 #include "../ecs/EntityManager.hpp"
 #include "../ecs/Entity.hpp"
->>>>>>> temp
 
 namespace gproj::physics {
 
 PhysicsSystem::PhysicsSystem(EntityManager& entityManager,
                              PhysicsBackend& backend)
-<<<<<<< HEAD
-    : m_entityManager(entityManager)
-    , m_backend(backend) {}
-=======
    : m_entityManager(entityManager)
    , m_backend(backend) {}
->>>>>>> temp
 
 void PhysicsSystem::initialize() {
    m_backend.initialize();

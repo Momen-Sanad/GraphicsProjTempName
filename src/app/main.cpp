@@ -1,4 +1,4 @@
-//gl stuff
+// GL and GLFW related headers
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -6,12 +6,12 @@
 #include <iostream>
 #include <string>
 
-//imgui stuff
+// ImGui related headers (for GUI)
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
-//custom stuff
+// Custom headers for engine-related functionality
 #include "../engine/platform/Window.hpp"
 #include "../engine/gl/GLContext.hpp"
 #include "../engine/ecs/World.hpp"
@@ -23,12 +23,13 @@
 #include "../engine/utils/Im_GUI_Inspector.hpp"
 #include "../engine/assets/MeshLoader.hpp"
 #include "../engine/assets/TexturedMaterial.hpp"
-
-
 #include "../engine/assets/TextureLoader.hpp"
-// Window size
+
+// Window size definition
 #define WINDOW_W 1280
 #define WINDOW_H 720
+
+// Asset directories definition, fallback to relative paths if not provided
 #ifdef ASSET_DIR
 #define MODELS_DIR ASSET_DIR "/models"
 #define TEXTURES_DIR ASSET_DIR "/textures"
@@ -42,19 +43,9 @@
 
 /* 
  * #TODO
- * do something about all this gl stuff (also apply anistrpoic filtering 16x ) DONE
- * probably in GLContext.cpp /.hpp
- * do the frame scheduler
- * need pipelineState.hpp probably for the frame scheduler and coordinator
- * turn the superloop into unity's Update()
- * optional: logger
- * rana should do react3dphysics    DONE
- * soliman should do textures and obj loading DONE
- * need to do scenes and scene manager DONE
- * decide what to do with these files:
- * system manager, system.hpp, component, asset manager,
- * renderSystem, TransformSystem <- we already have "TransformComponent"
- * 
+ * Several tasks are listed here for the game engine development pipeline.
+ * Including shader work, physics, texture loading, and scene management.
+ * Some tasks have already been completed as indicated (e.g. physics and textures).
  */
 
 int main() {
@@ -62,31 +53,34 @@ int main() {
     // ---------------------------
     // Window + GL Context Setup
     // ---------------------------
+    // Initialize the window with specified width, height, and title.
     Window window(WINDOW_W, WINDOW_H, "Hello World");
-    if (!window.get_handle()) return 1;
+    if (!window.get_handle()) return 1;  // If window creation failed, exit.
 
-    if (!GLContext::init()) return 1;
-    GLContext::enable_default_render_settings();
+    // Initialize OpenGL context and enable default settings.
+    if (!GLContext::init()) return 1;  // If GL context initialization fails, exit.
+    GLContext::enable_default_render_settings();  // Enable default render settings.
 
     // ---------------------------
     // ImGui Initialization
     // ---------------------------
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    IMGUI_CHECKVERSION();  // Check if ImGui version matches.
+    ImGui::CreateContext();  // Create ImGui context.
+    ImGuiIO& io = ImGui::GetIO();  // Get IO configuration.
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable keyboard navigation for ImGui.
 
-    ImGui::StyleColorsDark();
+    ImGui::StyleColorsDark();  // Set ImGui style to dark mode.
 
-    // Init backends
-    ImGui_ImplGlfw_InitForOpenGL(window.get_handle(), true);
-    ImGui_ImplOpenGL3_Init("#version 330");  // matches GL context
+    // Initialize ImGui backends for GLFW and OpenGL
+    ImGui_ImplGlfw_InitForOpenGL(window.get_handle(), true);  // Initialize GLFW backend.
+    ImGui_ImplOpenGL3_Init("#version 330");  // Initialize OpenGL3 backend.
 
     // ---------------------------
-    // Load Shader
+    // Load Shaders
     // ---------------------------
     ShaderManager shaderManager;
 
+    // Load the shaders from files (vertex and fragment shaders)
     auto mainShader = shaderManager.loadShader("main",
         std::string(SHADER_DIR) + "/blackToWhite.vert",
         std::string(SHADER_DIR) + "/blackToWhite.frag"
@@ -95,7 +89,6 @@ int main() {
         std::string(SHADER_DIR) + "/textured.vert",
         std::string(SHADER_DIR) + "/textured.frag"
     );
-
     auto houseMixedShader = shaderManager.loadShader("blended",
         std::string(SHADER_DIR) + "/blended.vert",
         std::string(SHADER_DIR) + "/blended.frag"
@@ -103,31 +96,32 @@ int main() {
 
     if (!mainShader) {
         fprintf(stderr, "Failed to load main shader\n");
-        return 1;
+        return 1;  // Exit if shader loading fails.
     }
 
     // ---------------------------
-    // Create materials
+    // Create Materials
     // ---------------------------
+    // Create some colored materials with different tint values.
     TintedMaterial blue, brown, green, yellow;
 
     blue.setShader(mainShader);
-    blue.tint  = glm::vec4(0.2f, 0.4f, 1.0f, 1.0f);
+    blue.tint  = glm::vec4(0.2f, 0.4f, 1.0f, 1.0f);  // Blue tint
 
     brown.setShader(mainShader);
-    brown.tint = glm::vec4(0.5f, 0.2f, 0.1f, 1.0f);
+    brown.tint = glm::vec4(0.5f, 0.2f, 0.1f, 1.0f);  // Brown tint
 
     yellow.setShader(mainShader);
-    yellow.tint = glm::vec4(1.0f, 1.0f, 0.3f, 1.0f);
+    yellow.tint = glm::vec4(1.0f, 1.0f, 0.3f, 1.0f);  // Yellow tint
 
     green.setShader(mainShader);
-    green.tint = glm::vec4(0.4f, 1.0f, 0.2f, 1.0f);
+    green.tint = glm::vec4(0.4f, 1.0f, 0.2f, 1.0f);  // Green tint
 
     // ---------------------------
     // Create Textures
     // ---------------------------
 
-    // Texture Loading
+    // Load textures from specified paths.
     std::string MoonTexturePath = std::string(TEXTURES_DIR) + "/moon.jpg";
     auto MoonTexture = TextureLoader::load(MoonTexturePath);
     std::cout << "Attempting to load texture: " << MoonTexturePath << std::endl;
@@ -136,13 +130,6 @@ int main() {
     Texture* HouseTexture = TextureLoader::load(HouseText);
     std::cout << "Attempting to load texture: " << HouseText << std::endl;
 
-<<<<<<< HEAD
-    // Material for house
-    TexturedMaterial houseMaterial(houseShader, HouseTexture);
-
-	TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
-    houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);
-=======
     std::string GlassText = std::string(TEXTURES_DIR) + "/house/glass.png";
     Texture* GlassTexture = TextureLoader::load(GlassText);
     std::cout << "Attempting to load texture: " << GlassText << std::endl;
@@ -153,161 +140,127 @@ int main() {
         std::cerr << "Warning: failed to load sky texture: " << SkyText << " (sky will be blank)\n";
     }
 
-    // Material for house
+    // Material setup for house, blending textures.
     TexturedMaterial houseMaterial(houseShader, HouseTexture);
-	TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
-    houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);
-    
+    TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
+    houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);  // Add blended texture
+
     TexturedMaterial skyMaterial(houseShader, SkyTexture);
     skyMaterial.setShader(houseShader);
->>>>>>> temp
 
-    //house glass material
+    // House glass material
     TexturedMaterial GlassMaterial(houseMixedShader, GlassTexture);
 
-    
-    //loading mesh from obj
+    // Load mesh from .obj file
     std::string meshPath = std::string(MODELS_DIR) + "/house/house.obj";
     std::cout << "Attempting to load mesh: " << meshPath << std::endl;
     Mesh* loadedMesh = MeshLoader::load(meshPath.c_str());
 
-    // creating primitive mesh
-    Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));  // Centered cube with size 1.0f
-
+    // Create some primitive meshes (cube, glass plane, sky sphere)
+    Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
-
     Mesh skySphere = Mesh::create_sphere();
 
-    // Create a MeshRenderer to upload and render the cube
-    MeshRenderer cube, house, glass, skyRenderer;              
-    
-    // Upload the mesh data to the GPU
+    // Create MeshRenderers to upload and render these meshes
+    MeshRenderer cube, house, glass, skyRenderer;
+
+    // Upload mesh data to the GPU
     cube.upload(cubeMesh);
-	house.upload(*loadedMesh);
-	glass.upload(glass_mesh);
+    house.upload(*loadedMesh);
+    glass.upload(glass_mesh);
     skyRenderer.upload(skySphere);
 
     // ---------------------------
     // World + Camera Setup
     // ---------------------------
+    // Setup the world and camera configuration
     World world;
 
     world.get_camera().position  = glm::vec3(10.f, 5.f, 10.f);
     world.get_camera().direction = glm::normalize(glm::vec3(-1.f, 0.f, -1.f));
     world.get_camera().up        = glm::vec3(0.f, 1.f, 0.f);
-    world.get_camera().fov       = glm::radians(60.0f);
-<<<<<<< HEAD
-    world.get_camera().near      = 0.1f;
-    world.get_camera().far       = 100.0f;
-=======
-    world.get_camera().near      = 0.1f;            // view-frustum culling
-    world.get_camera().far       = 100.0f;          // view-frustum culling
->>>>>>> temp
+    world.get_camera().fov       = glm::radians(60.0f);  // Field of view
+    world.get_camera().near      = 0.1f;  // Near clipping plane
+    world.get_camera().far       = 100.0f;  // Far clipping plane
 
     // ---------------------------
-    // Scene graph
+    // Scene Graph (Entity Creation)
     // ---------------------------
+    // Root entity for the scene
     Entity* root = world.createEntityWithParams(nullptr);
-    
-    // Water plane
-    Entity* water = world.createEntityWithParams(
-        root, {0.f, 0.f, 0.f}, glm::quat(), {10.f, 1.f, 10.f}, &cube, &blue
-    );
 
-    // Island (empty entity, parent of sand & tree)
+    // Create entities for water, island, sand, tree, house, windows, etc.
+    Entity* water = world.createEntityWithParams(root, {0.f, 0.f, 0.f}, glm::quat(), {10.f, 1.f, 10.f}, &cube, &blue);
+
+    // Create island as a parent entity for sand and tree entities
     Entity* island = world.createEntityWithParams(root);
 
+    // Debugging: Print island rotation
     {
-        //debugging only
         glm::quat island_rotation = island->getRotation();
         std::cout << "Island rotation: " << island_rotation.x << ", " << island_rotation.y << ", " << island_rotation.z << ", " << island_rotation.w << std::endl;
-
     }
 
     // Sand on the island
-    Entity* sand = world.createEntityWithParams(island,
-    {0.f, 0.5f, 0.f},
-    glm::quat(),
-    {2.f, 1.f, 2.f},
-    &cube,
-    &yellow);
+    Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
 
+    // Test house entity with mixed textures
     Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
-    
-    {
-        // Window 1
+
+    // Create windows as child entities of the house
+    { // Window 1
         Entity* window1 = world.createEntityWithParams(
-            testhouse,
-            // local position relative to testhouse
-            { 2.0f, 1.5f, 0.0f },
-            // rotation using angleAxis
-            glm::angleAxis(glm::half_pi<float>() * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f)), 
-            // scale
-            { 2.0f, 1.0f, 1.0f },
-            &glass,
+            testhouse,                              // parent entity
+            { 2.0f, 1.5f, 0.0f },                  // local position relative to testhouse
+            glm::angleAxis(glm::half_pi<float>() * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f)), // rotation
+            { 2.0f, 1.0f, 1.0f },                  // scale
+            &glass, 
             &GlassMaterial
         );
     }
 
-    {
-        // Window 2
+    { // Window 2
         Entity* window2 = world.createEntityWithParams(
             testhouse,
-            { -0.2f, 2.0f, -2.75f }, // local
-            glm::angleAxis(glm::half_pi<float>() * 0.5f, glm::vec3(1.0f, 0.0f, 0.0f)),
-            { 1.0f, 1.0f, 1.5f },
+            { -0.2f, 2.0f, -2.75f },               // local position
+            glm::angleAxis(glm::half_pi<float>() * 0.5f, glm::vec3(1.0f, 0.0f, 0.0f)), // rotation
+            { 1.0f, 1.0f, 1.5f },                  // scale
             &glass,
             &GlassMaterial
         );
     }
 
-    {
-        // Window 3
+    { // Window 3
         Entity* window3 = world.createEntityWithParams(
             testhouse,
-            { -3.55f, 2.0f, 0.55f }, // local
-            glm::angleAxis(-glm::half_pi<float>() * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f)),
-            { 1.5f, 1.0f, 1.0f },
+            { -3.55f, 2.0f, 0.55f },               // local position
+            glm::angleAxis(-glm::half_pi<float>() * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f)), // rotation
+            { 1.5f, 1.0f, 1.0f },                  // scale
             &glass,
             &GlassMaterial
         );
     }
 
 
-    // Tree base
+    // Create tree base and trunk, and position leaves with offsets.
     Entity* tree = world.createEntityWithParams(island);
-
-    // Tree trunk
     Entity* tree_trunk = world.createEntityWithParams(tree, {0.f, 2.5f, 0.f}, glm::quat(), {0.5f, 5.f, 0.5f}, &cube, &brown);
 
-<<<<<<< HEAD
     glm::vec3 leafOffsets[4] = {
-        { 0.0f, 0.0f, 0.50f },  // leaf 0
-        { 0.0f, 0.0f, 0.75f },  // leaf 1
-        { 0.0f, 0.0f, 2.50f },  // leaf 2
-        { 0.0f, 0.0f, -2.5f }   // leaf 3
-=======
-    // Tree leaves
-
-    glm::vec3 leafOffsets[4] = {
-        { 0.f, 0.f, 0.5f },   // leaf 0
-        { 0.f, 0.f, 0.75f },  // leaf 1
-        { 0.f, 0.f, 2.5f },   // leaf 2
-        { 0.f, 0.f, -2.5f }   // leaf 3
->>>>>>> temp
+        { 0.f, 0.f, 0.5f },
+        { 0.f, 0.f, 0.75f },
+        { 0.f, 0.f, 2.5f },
+        { 0.f, 0.f, -2.5f }
     };
 
+    // Create leaves as child entities of the tree with specific rotations and positions.
     for (int i = 0; i < 4; i++) {
         glm::quat rotY = glm::angleAxis(1.5f * i + 0.7f, glm::vec3(0.f, 1.f, 0.f));
         glm::quat rotZ = glm::angleAxis(0.7f, glm::vec3(0.f, 0.f, 1.f));
 
         world.createEntityWithParams(
             tree,
-<<<<<<< HEAD
-            {leafOffsets[i].x, 6 + leafOffsets[i].y, leafOffsets[i].z},           
-=======
-            {leafOffsets[i].x, 6.0f + leafOffsets[i].y, leafOffsets[i].z},           
->>>>>>> temp
+            {leafOffsets[i].x, 6.0f + leafOffsets[i].y, leafOffsets[i].z},
             rotY * rotZ,
             {0.5f, 2.f, 0.5f},
             &cube,
@@ -315,15 +268,14 @@ int main() {
         );
     }
 
-
     // ---------------------------
-    // Camera controller
+    // Camera Controller Setup
     // ---------------------------
+    // Initialize the camera controller to handle input and camera movement
     CameraController controller;
     controller.setup(window.get_handle(), &world.get_camera());
 
-
-    // FPS Tracking
+    // FPS tracking variables
     float last_time = static_cast<float>(glfwGetTime());
     float last_fps_time = last_time;
     int frameCount = 0;
@@ -331,123 +283,91 @@ int main() {
     // ---------------------------
     // Main Loop
     // ---------------------------
+    // Main loop for rendering and updating the scene.
     while (!glfwWindowShouldClose(window.get_handle())) {
         window.poll_events();
 
         float time = static_cast<float>(glfwGetTime());
         float delta_time = time - last_time;
-        last_time = time;                 // update immediately after delta is computed
+        last_time = time;  // Update time for the next frame
         frameCount++;
 
-
-        glm::vec3 island_position = island->getPosition();
-        glm::quat island_rotation = island->getRotation();
-
-        // Check if 1 second has passed (based on previous `last_time`)
+        // Update FPS and print island's position and rotation every second
         if (time - last_fps_time >= 1.0f) {
-            // Print island's position and rotation every frame
-            std::cout << "Island position: " << island_position.x << ", " << island_position.y << ", " << island_position.z << std::endl;
-            std::cout << "Island rotation: " << island_rotation.x << ", " << island_rotation.y << ", " << island_rotation.z << ", " << island_rotation.w << std::endl;
-
-            // Print world matrix every frame in a more readable format
-            glm::mat4 M = island->getWorldMatrix();
-            std::cout << "Island world matrix: \n";
-            for (int i = 0; i < 4; i++) {
-                std::cout << "| " << M[i][0] << " " << M[i][1] << " " << M[i][2] << " " << M[i][3] << " |\n";
-            }
-
-            // Print FPS
-            printf("FPS: %d\n", frameCount);
-            frameCount = 0;  // Reset frame count after FPS print
-            // Reset last_time after printing FPS
+            std::cout << "Island position: " << island->getPosition().x << ", " << island->getPosition().y << ", " << island->getPosition().z << std::endl;
+            std::cout << "Island rotation: " << island->getRotation().x << ", " << island->getRotation().y << ", " << island->getRotation().z << ", " << island->getRotation().w << std::endl;
+            std::cout << "FPS: " << frameCount << std::endl;
+            frameCount = 0;  // Reset frame count after printing FPS
             last_fps_time = time;
         }
 
-        // Animate water scale and rotate island
+        // Update the water scale and rotate the island
         water->setScale({10.f, 1.0f + 0.1f * glm::sin(time), 10.f});
-        float rot_speed = glm::radians(30.f); // 30 deg/sec
+        glm::quat delta_rot = glm::angleAxis(glm::radians(30.f) * delta_time, glm::vec3(0.f,1.f,0));
+        island->setRotation(delta_rot * island->getRotation());
 
-        glm::quat delta_rot = glm::angleAxis(rot_speed * delta_time, glm::vec3(0.f,1.f,0));
-        island->setRotation(delta_rot * island_rotation);
-
-
-        // Update controller and rendering
+        // Update the controller and perform rendering.
         controller.update(delta_time);
 
-        // Rendering setup
+        // Rendering setup: clear color and depth buffers
         int w, h;
         window.get_framebuffer_size(w, h);
         glViewport(0, 0, w, h);
-        glClearColor(0.90f, 0.95f, 1.0f, 1.0f); // -> replaced by the sky box anyways
-        glClearDepth(1.0f);                     // depth buffer -> anything futher than 1.0 is cleared (culling)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.90f, 0.95f, 1.0f, 1.0f);  // Sky background color
+        glClearDepth(1.0f);  // Clear depth buffer
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // Clear buffers
 
+        // Get the view-projection matrix for the camera and pass it to the shaders
         int width, height;
         glfwGetFramebufferSize(window.get_handle(), &width, &height);
 
-        glm::mat4 VP = world.get_camera().get_view_projection_matrix(
-            glm::vec2(width, height)
-        );
-        
+        glm::mat4 VP = world.get_camera().get_view_projection_matrix(glm::vec2(width, height));
 
         // ---------------------------
         // Draw sky (before other objects)
         // ---------------------------
         if (skySphere.get_vertex_count() > 0 && SkyTexture) {
-
-            // Prepare transform: follow camera and scale big enough
             glm::mat4 M = glm::translate(glm::mat4(1.0f), world.get_camera().position)
-                        * glm::scale(glm::mat4(1.0f), glm::vec3(500.0f)); // adjust scale if needed
+                        * glm::scale(glm::mat4(1.0f), glm::vec3(500.0f));  // Scale sky sphere
 
             glm::mat4 MVP = VP * M;
-            // z/w trick: push sky to far plane
-            MVP[0][2] = MVP[0][3];
+            MVP[0][2] = MVP[0][3];  // Push sky sphere to the far plane
             MVP[1][2] = MVP[1][3];
             MVP[2][2] = MVP[2][3];
             MVP[3][2] = MVP[3][3];
 
-            // Use the shader program first (must be done before any glUniform calls)
+            // Render sky sphere with the house shader
             glUseProgram(houseShader->getProgram());
-
-            // Let the material prepare itself (binds texture/sampler/uniforms if implemented)
             skyMaterial.setShader(houseShader);
             skyMaterial.setup();
 
-            // If your TexturedMaterial doesn't set the sampler uniform name "u_texture",
-            // set it explicitly here (shader expects "u_texture")
-            glActiveTexture(GL_TEXTURE0);
-            
-            // Tell the shader that the sampler 'u_texture' is on texture unit 0
-            glUniform1i(houseShader->getUniformLocation("u_texture"), 0);
-
-            // Upload MVP (now that program is active)
+            glUniform1i(houseShader->getUniformLocation("u_texture"), 0);  // Set texture unit 0
             glUniformMatrix4fv(houseShader->getUniformLocation("MVP"), 1, GL_FALSE, &MVP[0][0]);
 
-            // Render state for sky: don't write depth, draw inside of sphere
+            // Sky rendering settings
             glEnable(GL_CULL_FACE);
-            glCullFace(GL_FRONT);          // view inner surface of sphere
-            glDepthFunc(GL_LEQUAL);       // allow sky drawn at far plane
-            glDepthMask(GL_FALSE);        // don't write depth
+            glCullFace(GL_FRONT);  // View inner surface of sphere
+            glDepthFunc(GL_LEQUAL);  // Allow sky at far plane
+            glDepthMask(GL_FALSE);  // Don't write depth buffer
 
-            skyRenderer.draw();           // draw the sphere mesh
+            skyRenderer.draw();  // Render the sky sphere mesh
 
-            // restore state
+            // Restore render settings
             glDepthMask(GL_TRUE);
             glCullFace(GL_BACK);
             glDepthFunc(GL_LESS);
         }
 
-
-
-
-        // Render all entities
+        // ---------------------------
+        // Render all entities in the world
+        // ---------------------------
         for (Entity* root : world.getEntityManager().getRoots()) {
             world.getEntityManager().renderEntityRecursive(root, VP);
         }
 
-        // ==========================
+        // --------------------------
         // ImGui New Frame
-        // ==========================
+        // --------------------------
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -457,34 +377,26 @@ int main() {
         // --------------------------
         ImGui::Begin("Hello ImGui");
         ImGui::Text("This is working!");
-        
-        // ImGuiHelpers::ShowTransformInspector("Selected", island);
-        ImGuiHelpers::ShowTransformInspector("Selected", testhouse);
-        
+
+        ImGuiHelpers::ShowTransformInspector("Selected", testhouse);  // Show transform inspector for test house
+
         ImGui::End();
 
-        // ==========================
+        // --------------------------
         // Render ImGui
-        // ==========================
+        // --------------------------
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
 
         // Swap buffers for the next frame
         window.swap_buffers();
     }
 
-
-
-    // Cleanup
+    // Cleanup resources at the end
     cube.destroy();
     house.destroy();
     glass.destroy();
-    skyRenderer.destroy();              
-
-    // mainShader.destroy();
-
-    // ImGui cleanup
+    skyRenderer.destroy();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

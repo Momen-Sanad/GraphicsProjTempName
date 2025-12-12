@@ -1,12 +1,8 @@
 #pragma once
 
-//   header-only ImGui "Transform Inspector".
-// - Edit Position / Rotation (Euler degrees) / Scale
-// - Reset button
-// - Writes back to the entity only when user edits values
-//
 
-#include "imgui.h"
+// #include "imgui.h"
+#include <imgui.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -19,7 +15,7 @@ class Entity;
 namespace ImGuiHelpers {
 
 static inline void WritebackVec3IfChanged(Entity* ent, const char* label, glm::vec3& value, glm::vec3 (*getter)(Entity*), void (*setter)(Entity*, const glm::vec3&)) {
-    // convenience function (not used below directly; kept for future use)
+    // convenience function (not used below directly, just kept for future use)
 }
 
 // Main inspector. Safe to call every frame; it will only call entity setters when ImGui reports a change.
@@ -33,12 +29,11 @@ static inline void ShowTransformInspector(const char* title, Entity* ent) {
     glm::quat rotation;
     glm::vec3 scale;
 
-    // We call entity getters in a "try" manner using naked forward declarations above.
-    // Replace these calls with your actual entity API if the names differ.
+    // call entity getters in a "try" manner using naked forward declarations above.
     position = ent->getPosition();
     rotation = ent->getRotation();
 
-    // If your entity does not have scale, you can default to (1,1,1)
+    // If an entity has no scale, it's defaulted to (1,1,1)
     try {
         scale = ent->getScale();
     } catch (...) {
@@ -99,15 +94,3 @@ static inline void ShowTransformInspector(const char* title, Entity* ent) {
 }
 
 }
-
-// ----------------------------
-// Example usage
-//
-// #include "imgui_transform_inspector.hpp"
-//
-// // inside your main loop, once you created a new ImGui frame:
-// ImGui::Begin("Inspector");
-// ImGuiHelpers::ShowTransformInspector("Selected", island);
-// ImGui::End();
-//
-// ----------------------------

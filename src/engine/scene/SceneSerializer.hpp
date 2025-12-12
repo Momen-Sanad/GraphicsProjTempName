@@ -5,7 +5,7 @@
 
 using namespace std;
 
-/**
+/*
  * Simple JSON scene writer
  */
 class SceneSerializer {

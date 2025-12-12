@@ -11,7 +11,7 @@
 
 using namespace std;
 
-/**
+/*
  * Simple scene manager that loads scenes into the existing World
  */
 class SceneManager {
