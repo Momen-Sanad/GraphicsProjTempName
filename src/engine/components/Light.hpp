@@ -1,0 +1,1 @@
+// stores light data (color, type, cone angles, intensity). Position & direction are read from the entity transform.

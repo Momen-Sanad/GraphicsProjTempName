@@ -1,0 +1,1 @@
+// includes texture maps: albedo (base color), metallic/specular, roughness, AO, emission + parameters.

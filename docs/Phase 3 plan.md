@@ -1,28 +1,25 @@
 first, do the most basic game loop then extend it according to the time constraint
 
 
-player class that inherits from entity
-player class extend new functionalities
-player move
-player block
-player atk
-player dodge
+player class that inherits from Entity
+player class extend new functionalities like:
+-  move
+- block
+- atk
+- dodge
 
-player : Entity
-player extends a camera attribute <- camera component gets attached
+player extends a camera attribute <- camera component gets attached and so on
 
-enemies : Entity
+Enemy inherits from Entity
 
+Cursader is an object from Player which sets all needed attributes accordingly
 
-cursader : player
-cursader extends functionalities needed
-
-void CreatePlayer(){
+void CreatePlayer() ->
 	player is a unique pointer
 	player is also a parent
 	player has children -> player mesh (body)
 	player mesh has a child -> weapon (whatever weapon types)
-}
+
 ### Basic:
 
 	This satisfies project requirements
@@ -41,7 +38,9 @@ void CreatePlayer(){
 
 
 if any hit box collides with the player's hurt box
-terrain have a hurtbox or none but still has a collider
+terrain have a hurtbox or none, but still has a collider
+in each frame, check if any hurtbox has collided with a hitbox.
+if so, update the respective owner of the hurtbox with status effects or damage or whatever
 ### extended:
 
 - Gameplay:
@@ -58,4 +57,3 @@ terrain have a hurtbox or none but still has a collider
 	- Do animations 
 	- breakable terrain
 	- design boss level and hard fight level and "rest" level
-	- 

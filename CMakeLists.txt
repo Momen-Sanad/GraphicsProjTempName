@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(ENGINE_BUILD_SHARED "Build Engine as a shared library instead of static" OFF)
-option(ENGINE_BUILD_EXAMPLES "Build example apps (src/app)" ON)
+option(ENGINE_BUILD_EXAMPLES "Build example apps (src/Game)" ON)
 option(ENGINE_ENABLE_TESTS "Enable building tests (tests/)" OFF)
 
 # ==========================================================
@@ -144,7 +144,7 @@ set_target_properties(Engine PROPERTIES
 # ==========================================================
 if (ENGINE_BUILD_EXAMPLES)
     add_executable(OpenGLEngine
-        src/app/main.cpp
+        src/Game/main.cpp
     )
 
     target_link_libraries(OpenGLEngine PRIVATE Engine)

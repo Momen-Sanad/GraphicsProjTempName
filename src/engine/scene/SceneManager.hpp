@@ -9,6 +9,7 @@
 #include <memory>
 #include <unordered_map>
 
+// Update scene/SceneDeserializer / SceneSerializer to read/write Light components in JSON.
 using namespace std;
 
 /*
