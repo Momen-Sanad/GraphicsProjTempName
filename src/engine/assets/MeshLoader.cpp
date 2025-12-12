@@ -1,6 +1,7 @@
 #include "MeshLoader.hpp"
 #include <iostream>
-
+// potential file to load for animations + kf + bone locations: file.dae
+// consider open source lib for fpx
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
@@ -40,7 +41,7 @@ struct VertexHash
 };
 
 
-// suppoets loading a mesh from an .obj file
+// supports loading a mesh from an .obj file
 Mesh* MeshLoader::load(const char* path)
 {
     // Check file extension

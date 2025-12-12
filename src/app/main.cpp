@@ -43,10 +43,21 @@
 
 /* 
  * #TODO
- * Several tasks are listed here for the game engine development pipeline.
- * Including shader work, physics, texture loading, and scene management.
- * Some tasks have already been completed as indicated (e.g. physics and textures).
+ * do something about all this gl stuff (also apply anistrpoic filtering 16x )
+ * probably in GLContext.cpp /.hpp      DONE
+ * do the frame scheduler
+ * need pipelineState.hpp probably for the frame scheduler and coordinator
+ * turn the superloop into unity's Update()
+ * optional: logger
+ * rana should do react3dphysics    DONE
+ * soliman should do textures and obj loading DONE
+ * need to do scenes and scene manager DONE
+ * decide what to do with these files:
+ * system manager, system.hpp, component, asset manager,
+ * renderSystem, TransformSystem <- we already have "TransformComponent"
+ * 
  */
+
 
 int main() {
 

@@ -8,13 +8,14 @@
  */
 class Scene {
 public:
+// add a forward declaration for entity to avoid hard coding entity attributes here in entitydata
     struct EntityData {
         std::string name;
-        std::string parent = "";                     // parent entity name (empty = root)
+        std::string parent = "";                            // parent entity name (empty = root)
         std::vector<float> position = {0.0f, 0.0f, 0.0f};
-        std::vector<float> rotation = {0.0f, 0.0f, 0.0f};  // euler angles in degrees
+        std::vector<float> rotation = {0.0f, 0.0f, 0.0f};   // euler angles in degrees
         std::vector<float> scale = {1.0f, 1.0f, 1.0f};
-        std::vector<float> tint = {1.0f, 1.0f, 1.0f, 1.0f};  // tint color for materials
+        std::vector<float> tint = {1.0f, 1.0f, 1.0f, 1.0f}; // tint color for materials
     };
 
     struct SceneSettings {

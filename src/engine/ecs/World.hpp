@@ -34,5 +34,6 @@ private:
     Camera camera;
     EntityManager manager;
 };
-
+// extend the entity class to optionally accept a camera component
+// useful for lighting next phase
 #endif
