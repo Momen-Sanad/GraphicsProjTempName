@@ -1,6 +1,7 @@
 #include "SceneManager.hpp"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 
 using namespace std;
 
@@ -104,11 +105,59 @@ unique_ptr<Scene> SceneManager::getCurrentSceneData() {
     scene->settings.cameraPosition = {camera.position.x, camera.position.y, camera.position.z};
     scene->settings.cameraDirection = {camera.direction.x, camera.direction.y, camera.direction.z};
     
-    // TODO: Extract entities from world
-    // This would require iterating through world entities and converting them back to EntityData
-    // For now, return empty scene with just camera data
+    // Extract entities from world
+    extractEntitiesFromWorld(scene.get());
     
     return scene;
+}
+
+void SceneManager::extractEntitiesFromWorld(Scene* scene) {
+    // Get all root entities from the world
+    const auto& rootEntities = world->getRoots();
+    
+    // Extract each entity and its children recursively
+    for (Entity* entity : rootEntities) {
+        extractEntityRecursive(entity, scene, "");
+    }
+}
+
+void SceneManager::extractEntityRecursive(Entity* entity, Scene* scene, const string& parentName) {
+    if (!entity) return;
+    
+    Scene::EntityData entityData;
+    
+    // Generate a name for the entity (since Entity doesn't have names)
+    entityData.name = "Entity_" + to_string(scene->entities.size());
+    entityData.parent = parentName;
+    
+    // Extract transform data
+    glm::vec3 pos = entity->getPosition();
+    glm::quat rot = entity->getRotation();
+    glm::vec3 scl = entity->getScale();
+    
+    entityData.position = {pos.x, pos.y, pos.z};
+    entityData.scale = {scl.x, scl.y, scl.z};
+    
+    // Convert quaternion back to euler angles (approximate)
+    entityData.rotation = quatToEuler(rot);
+    
+    // Extract material tint if it's a TintedMaterial
+    Material* material = entity->getMaterial();
+    if (material) {
+        TintedMaterial* tintedMat = dynamic_cast<TintedMaterial*>(material);
+        if (tintedMat) {
+            entityData.tint = {tintedMat->tint.r, tintedMat->tint.g, tintedMat->tint.b, tintedMat->tint.a};
+        }
+    }
+    
+    // Add entity to scene
+    scene->entities.push_back(entityData);
+    
+    // Recursively extract children
+    const auto& children = entity->getChildren();
+    for (Entity* child : children) {
+        extractEntityRecursive(child, scene, entityData.name);
+    }
 }
 
 void SceneManager::clearScene() {
@@ -131,4 +180,10 @@ glm::quat SceneManager::eulerToQuat(const vector<float>& euler) {
         return glm::quat(glm::vec3(x, y, z));
     }
     return glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+}
+
+vector<float> SceneManager::quatToEuler(const glm::quat& quat) {
+    // Convert quaternion to euler angles (in degrees)
+    glm::vec3 euler = glm::eulerAngles(quat);
+    return {glm::degrees(euler.x), glm::degrees(euler.y), glm::degrees(euler.z)};
 }

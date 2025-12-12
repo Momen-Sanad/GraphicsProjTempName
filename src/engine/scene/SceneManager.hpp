@@ -35,4 +35,9 @@ private:
     // Helper functions
     glm::vec3 arrayToVec3(const vector<float>& array);
     glm::quat eulerToQuat(const vector<float>& euler);
+    vector<float> quatToEuler(const glm::quat& quat);
+    
+    // Entity extraction helpers
+    void extractEntitiesFromWorld(Scene* scene);
+    void extractEntityRecursive(Entity* entity, Scene* scene, const string& parentName);
 };
