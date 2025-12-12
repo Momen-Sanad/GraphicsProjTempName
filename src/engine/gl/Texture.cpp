@@ -2,13 +2,14 @@
 #include <cstdio>
 
 
-Texture::Texture() : id(0), width(0), height(0), format(GL_RGBA) {}
+Texture::Texture() : id(0), sampler(0), width(0), height(0), format(GL_RGBA) {}
 
 Texture::~Texture()
 {
-    if (id != 0)
-        glDeleteTextures(1, &id);
+    if (id != 0) glDeleteTextures(1, &id);
+    if (sampler != 0) glDeleteSamplers(1, &sampler);
 }
+
 
 void Texture::create(int width, int height, const unsigned char* data, GLenum format)
 {
@@ -34,50 +35,51 @@ void Texture::create(int width, int height, const unsigned char* data, GLenum fo
 
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    // Default filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glGenSamplers(1, &sampler);
 
-    // Default wrapping
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // Default sampler settings
+    glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
+    // Anisotropy
+    float max_aniso;
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &max_aniso);
+    glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY, max_aniso);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    // Anisotropic filtering for better quality
-    float max_anisotropy;
-    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &max_anisotropy);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY, max_anisotropy);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Texture::set_filters(GLenum min_filter, GLenum mag_filter)
 {
-    glBindTexture(GL_TEXTURE_2D, id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, min_filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, mag_filter);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, min_filter);
+    glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, mag_filter);
 }
 
 void Texture::set_wrap(GLenum wrap_s, GLenum wrap_t)
 {
-    glBindTexture(GL_TEXTURE_2D, id);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap_s);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap_t);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, wrap_s);
+    glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, wrap_t);
 }
+
  
 void Texture::bind(int unit) const
 {
     glActiveTexture(GL_TEXTURE0 + unit);
+
     glBindTexture(GL_TEXTURE_2D, id);
+
+    glBindSampler(unit, sampler);
 }
+
 
 void Texture::unbind() const
 {
     glBindTexture(GL_TEXTURE_2D, 0);
+    glBindSampler(0, 0);
 }
+
 
 GLuint Texture::get_id() const { return id; }
 int Texture::get_width() const { return width; }

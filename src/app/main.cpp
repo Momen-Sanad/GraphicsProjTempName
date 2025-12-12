@@ -42,15 +42,15 @@
 
 /* 
  * #TODO
- * do something about all this gl stuff (also apply anistrpoic filtering 16x )
+ * do something about all this gl stuff (also apply anistrpoic filtering 16x ) DONE
  * probably in GLContext.cpp /.hpp
  * do the frame scheduler
  * need pipelineState.hpp probably for the frame scheduler and coordinator
  * turn the superloop into unity's Update()
  * optional: logger
- * rana should do react3dphysics
- * soliman should do textures and obj loading
- * need to do scenes and scene manager
+ * rana should do react3dphysics    DONE
+ * soliman should do textures and obj loading DONE
+ * need to do scenes and scene manager DONE
  * decide what to do with these files:
  * system manager, system.hpp, component, asset manager,
  * renderSystem, TransformSystem <- we already have "TransformComponent"
@@ -136,12 +136,36 @@ int main() {
     Texture* HouseTexture = TextureLoader::load(HouseText);
     std::cout << "Attempting to load texture: " << HouseText << std::endl;
 
+<<<<<<< HEAD
     // Material for house
     TexturedMaterial houseMaterial(houseShader, HouseTexture);
 
 	TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
     houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);
+=======
+    std::string GlassText = std::string(TEXTURES_DIR) + "/house/glass.png";
+    Texture* GlassTexture = TextureLoader::load(GlassText);
+    std::cout << "Attempting to load texture: " << GlassText << std::endl;
 
+    std::string SkyText = std::string(TEXTURES_DIR) + "/sky.jpg";
+    Texture* SkyTexture = TextureLoader::load(SkyText);
+    if (!SkyTexture) {
+        std::cerr << "Warning: failed to load sky texture: " << SkyText << " (sky will be blank)\n";
+    }
+
+    // Material for house
+    TexturedMaterial houseMaterial(houseShader, HouseTexture);
+	TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
+    houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);
+    
+    TexturedMaterial skyMaterial(houseShader, SkyTexture);
+    skyMaterial.setShader(houseShader);
+>>>>>>> temp
+
+    //house glass material
+    TexturedMaterial GlassMaterial(houseMixedShader, GlassTexture);
+
+    
     //loading mesh from obj
     std::string meshPath = std::string(MODELS_DIR) + "/house/house.obj";
     std::cout << "Attempting to load mesh: " << meshPath << std::endl;
@@ -150,12 +174,18 @@ int main() {
     // creating primitive mesh
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));  // Centered cube with size 1.0f
 
-    // Create a MeshRenderer to upload and render the cube
-    MeshRenderer cube, house;
+    Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
 
+    Mesh skySphere = Mesh::create_sphere();
+
+    // Create a MeshRenderer to upload and render the cube
+    MeshRenderer cube, house, glass, skyRenderer;              
+    
     // Upload the mesh data to the GPU
-    cube.upload(cubeMesh);  // Make sure that cubeMesh is properly set with vertices and indices.
+    cube.upload(cubeMesh);
 	house.upload(*loadedMesh);
+	glass.upload(glass_mesh);
+    skyRenderer.upload(skySphere);
 
     // ---------------------------
     // World + Camera Setup
@@ -166,14 +196,19 @@ int main() {
     world.get_camera().direction = glm::normalize(glm::vec3(-1.f, 0.f, -1.f));
     world.get_camera().up        = glm::vec3(0.f, 1.f, 0.f);
     world.get_camera().fov       = glm::radians(60.0f);
+<<<<<<< HEAD
     world.get_camera().near      = 0.1f;
     world.get_camera().far       = 100.0f;
+=======
+    world.get_camera().near      = 0.1f;            // view-frustum culling
+    world.get_camera().far       = 100.0f;          // view-frustum culling
+>>>>>>> temp
 
     // ---------------------------
     // Scene graph
     // ---------------------------
     Entity* root = world.createEntityWithParams(nullptr);
-
+    
     // Water plane
     Entity* water = world.createEntityWithParams(
         root, {0.f, 0.f, 0.f}, glm::quat(), {10.f, 1.f, 10.f}, &cube, &blue
@@ -190,21 +225,76 @@ int main() {
     }
 
     // Sand on the island
-    Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
-    // Entity* testcube = world.createEntityWithParams(island, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &cube, &yellow);
-    Entity* testhouse = world.createEntityWithParams(root, {1.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
+    Entity* sand = world.createEntityWithParams(island,
+    {0.f, 0.5f, 0.f},
+    glm::quat(),
+    {2.f, 1.f, 2.f},
+    &cube,
+    &yellow);
+
+    Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
     
+    {
+        // Window 1
+        Entity* window1 = world.createEntityWithParams(
+            testhouse,
+            // local position relative to testhouse
+            { 2.0f, 1.5f, 0.0f },
+            // rotation using angleAxis
+            glm::angleAxis(glm::half_pi<float>() * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f)), 
+            // scale
+            { 2.0f, 1.0f, 1.0f },
+            &glass,
+            &GlassMaterial
+        );
+    }
+
+    {
+        // Window 2
+        Entity* window2 = world.createEntityWithParams(
+            testhouse,
+            { -0.2f, 2.0f, -2.75f }, // local
+            glm::angleAxis(glm::half_pi<float>() * 0.5f, glm::vec3(1.0f, 0.0f, 0.0f)),
+            { 1.0f, 1.0f, 1.5f },
+            &glass,
+            &GlassMaterial
+        );
+    }
+
+    {
+        // Window 3
+        Entity* window3 = world.createEntityWithParams(
+            testhouse,
+            { -3.55f, 2.0f, 0.55f }, // local
+            glm::angleAxis(-glm::half_pi<float>() * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f)),
+            { 1.5f, 1.0f, 1.0f },
+            &glass,
+            &GlassMaterial
+        );
+    }
+
+
     // Tree base
     Entity* tree = world.createEntityWithParams(island);
 
     // Tree trunk
     Entity* tree_trunk = world.createEntityWithParams(tree, {0.f, 2.5f, 0.f}, glm::quat(), {0.5f, 5.f, 0.5f}, &cube, &brown);
 
+<<<<<<< HEAD
     glm::vec3 leafOffsets[4] = {
         { 0.0f, 0.0f, 0.50f },  // leaf 0
         { 0.0f, 0.0f, 0.75f },  // leaf 1
         { 0.0f, 0.0f, 2.50f },  // leaf 2
         { 0.0f, 0.0f, -2.5f }   // leaf 3
+=======
+    // Tree leaves
+
+    glm::vec3 leafOffsets[4] = {
+        { 0.f, 0.f, 0.5f },   // leaf 0
+        { 0.f, 0.f, 0.75f },  // leaf 1
+        { 0.f, 0.f, 2.5f },   // leaf 2
+        { 0.f, 0.f, -2.5f }   // leaf 3
+>>>>>>> temp
     };
 
     for (int i = 0; i < 4; i++) {
@@ -213,7 +303,11 @@ int main() {
 
         world.createEntityWithParams(
             tree,
+<<<<<<< HEAD
             {leafOffsets[i].x, 6 + leafOffsets[i].y, leafOffsets[i].z},           
+=======
+            {leafOffsets[i].x, 6.0f + leafOffsets[i].y, leafOffsets[i].z},           
+>>>>>>> temp
             rotY * rotZ,
             {0.5f, 2.f, 0.5f},
             &cube,
@@ -233,8 +327,6 @@ int main() {
     float last_time = static_cast<float>(glfwGetTime());
     float last_fps_time = last_time;
     int frameCount = 0;
-
-    // glm::vec3 ui_island_pos = island->getPosition();
 
     // ---------------------------
     // Main Loop
@@ -286,8 +378,8 @@ int main() {
         int w, h;
         window.get_framebuffer_size(w, h);
         glViewport(0, 0, w, h);
-        glClearColor(0.90f, 0.95f, 1.0f, 1.0f);
-        glClearDepth(1.0f);
+        glClearColor(0.90f, 0.95f, 1.0f, 1.0f); // -> replaced by the sky box anyways
+        glClearDepth(1.0f);                     // depth buffer -> anything futher than 1.0 is cleared (culling)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         int width, height;
@@ -296,6 +388,57 @@ int main() {
         glm::mat4 VP = world.get_camera().get_view_projection_matrix(
             glm::vec2(width, height)
         );
+        
+
+        // ---------------------------
+        // Draw sky (before other objects)
+        // ---------------------------
+        if (skySphere.get_vertex_count() > 0 && SkyTexture) {
+
+            // Prepare transform: follow camera and scale big enough
+            glm::mat4 M = glm::translate(glm::mat4(1.0f), world.get_camera().position)
+                        * glm::scale(glm::mat4(1.0f), glm::vec3(500.0f)); // adjust scale if needed
+
+            glm::mat4 MVP = VP * M;
+            // z/w trick: push sky to far plane
+            MVP[0][2] = MVP[0][3];
+            MVP[1][2] = MVP[1][3];
+            MVP[2][2] = MVP[2][3];
+            MVP[3][2] = MVP[3][3];
+
+            // Use the shader program first (must be done before any glUniform calls)
+            glUseProgram(houseShader->getProgram());
+
+            // Let the material prepare itself (binds texture/sampler/uniforms if implemented)
+            skyMaterial.setShader(houseShader);
+            skyMaterial.setup();
+
+            // If your TexturedMaterial doesn't set the sampler uniform name "u_texture",
+            // set it explicitly here (shader expects "u_texture")
+            glActiveTexture(GL_TEXTURE0);
+            
+            // Tell the shader that the sampler 'u_texture' is on texture unit 0
+            glUniform1i(houseShader->getUniformLocation("u_texture"), 0);
+
+            // Upload MVP (now that program is active)
+            glUniformMatrix4fv(houseShader->getUniformLocation("MVP"), 1, GL_FALSE, &MVP[0][0]);
+
+            // Render state for sky: don't write depth, draw inside of sphere
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_FRONT);          // view inner surface of sphere
+            glDepthFunc(GL_LEQUAL);       // allow sky drawn at far plane
+            glDepthMask(GL_FALSE);        // don't write depth
+
+            skyRenderer.draw();           // draw the sphere mesh
+
+            // restore state
+            glDepthMask(GL_TRUE);
+            glCullFace(GL_BACK);
+            glDepthFunc(GL_LESS);
+        }
+
+
+
 
         // Render all entities
         for (Entity* root : world.getEntityManager().getRoots()) {
@@ -315,10 +458,8 @@ int main() {
         ImGui::Begin("Hello ImGui");
         ImGui::Text("This is working!");
         
-        // if (ImGui::SliderFloat("Island X", &island_position.x, -10.0f, 10.0f)) {
-        //     island->setPosition(island_position);
-        // }        
-        ImGuiHelpers::ShowTransformInspector("Selected", island);
+        // ImGuiHelpers::ShowTransformInspector("Selected", island);
+        ImGuiHelpers::ShowTransformInspector("Selected", testhouse);
         
         ImGui::End();
 
@@ -337,6 +478,10 @@ int main() {
 
     // Cleanup
     cube.destroy();
+    house.destroy();
+    glass.destroy();
+    skyRenderer.destroy();              
+
     // mainShader.destroy();
 
     // ImGui cleanup

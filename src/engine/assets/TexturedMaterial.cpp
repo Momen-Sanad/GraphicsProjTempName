@@ -106,6 +106,69 @@ float TexturedMaterial::getBlendWeight(int index) const
         : 0.0f;
 }
 
+// this doesn't work on my linux due to driver issues
+// void TexturedMaterial::setup()
+// {
+//     if (!shader)
+//         return;
+
+//     shader->use();
+
+//     // Handle single texture case for backward compatibility
+//     if (textureLayers.size() == 1)
+//     {
+//         textureLayers[0].texture->bind(textureLayers[0].unit);
+
+//         GLint texLocation = getUniformLocation("u_texture");
+//         if (texLocation != -1)
+//             glUniform1i(texLocation, textureLayers[0].unit);
+//     }
+//     // Handle multiple textures with blending
+//     else if (textureLayers.size() > 1)
+//     {
+//         // Bind all textures
+//         for (size_t i = 0; i < textureLayers.size(); ++i)
+//         {
+//             if (textureLayers[i].texture)
+//             {
+//                 textureLayers[i].texture->bind(textureLayers[i].unit);
+//             }
+//         }
+
+//         // Set texture sampler uniforms
+//         for (size_t i = 0; i < textureLayers.size(); ++i)
+//         {
+//             std::string uniformName = "u_textures[" + std::to_string(i) + "]";
+//             GLint texLocation = getUniformLocation(uniformName.c_str());
+//             if (texLocation != -1)
+//                 glUniform1i(texLocation, textureLayers[i].unit);
+//         }
+
+//         // Set blend weights
+//         std::vector<float> weights;
+//         for (const auto& layer : textureLayers)
+//             weights.push_back(layer.blendWeight);
+
+//         GLint weightsLocation = getUniformLocation("u_blendWeights");
+//         if (weightsLocation != -1)
+//             glUniform1fv(weightsLocation, static_cast<GLsizei>(weights.size()), weights.data());
+
+//         // Set blend modes
+//         std::vector<GLint> blendModes;
+//         for (const auto& layer : textureLayers)
+//             blendModes.push_back(static_cast<GLint>(layer.blendMode));
+
+//         GLint modesLocation = getUniformLocation("u_blendModes");
+//         if (modesLocation != -1)
+//             glUniform1iv(modesLocation, static_cast<GLsizei>(blendModes.size()), blendModes.data());
+
+//         // Set texture count
+//         GLint countLocation = getUniformLocation("u_textureCount");
+//         if (countLocation != -1)
+//             glUniform1i(countLocation, static_cast<int>(textureLayers.size()));
+//     }
+
+//this is the compatible one along with the edited fragment shaders
 void TexturedMaterial::setup()
 {
     if (!shader)
@@ -113,57 +176,53 @@ void TexturedMaterial::setup()
 
     shader->use();
 
-    // Handle single texture case for backward compatibility
-    if (textureLayers.size() == 1)
+    int count = textureLayers.size();
+    if (count == 0)
+        return;
+
+    // Bind all textures to fixed units
+    for (int i = 0; i < count; i++)
     {
-        textureLayers[0].texture->bind(textureLayers[0].unit);
-
-        GLint texLocation = getUniformLocation("u_texture");
-        if (texLocation != -1)
-            glUniform1i(texLocation, textureLayers[0].unit);
+        if (textureLayers[i].texture)
+        {
+            glActiveTexture(GL_TEXTURE0 + i);
+            glBindTexture(GL_TEXTURE_2D, textureLayers[i].texture->get_id());
+        }
     }
-    // Handle multiple textures with blending
-    else if (textureLayers.size() > 1)
+
+    // Set fixed sampler uniform names: u_tex0, u_tex1, ..., u_tex7
+    static const char* samplerNames[8] = {
+        "u_tex0", "u_tex1", "u_tex2", "u_tex3",
+        "u_tex4", "u_tex5", "u_tex6", "u_tex7"
+    };
+
+    for (int i = 0; i < count; i++)
     {
-        // Bind all textures
-        for (size_t i = 0; i < textureLayers.size(); ++i)
-        {
-            if (textureLayers[i].texture)
-            {
-                textureLayers[i].texture->bind(textureLayers[i].unit);
-            }
-        }
-
-        // Set texture sampler uniforms
-        for (size_t i = 0; i < textureLayers.size(); ++i)
-        {
-            std::string uniformName = "u_textures[" + std::to_string(i) + "]";
-            GLint texLocation = getUniformLocation(uniformName.c_str());
-            if (texLocation != -1)
-                glUniform1i(texLocation, textureLayers[i].unit);
-        }
-
-        // Set blend weights
-        std::vector<float> weights;
-        for (const auto& layer : textureLayers)
-            weights.push_back(layer.blendWeight);
-
-        GLint weightsLocation = getUniformLocation("u_blendWeights");
-        if (weightsLocation != -1)
-            glUniform1fv(weightsLocation, static_cast<GLsizei>(weights.size()), weights.data());
-
-        // **NEW: Set blend modes**
-        std::vector<GLint> blendModes;
-        for (const auto& layer : textureLayers)
-            blendModes.push_back(static_cast<GLint>(layer.blendMode));
-
-        GLint modesLocation = getUniformLocation("u_blendModes");
-        if (modesLocation != -1)
-            glUniform1iv(modesLocation, static_cast<GLsizei>(blendModes.size()), blendModes.data());
-
-        // Set texture count
-        GLint countLocation = getUniformLocation("u_textureCount");
-        if (countLocation != -1)
-            glUniform1i(countLocation, static_cast<int>(textureLayers.size()));
+        GLint loc = getUniformLocation(samplerNames[i]);
+        if (loc != -1)
+            glUniform1i(loc, i);   // texture unit = i
     }
+
+    // Upload blend weights
+    std::vector<float> weights(count);
+    for (int i = 0; i < count; i++)
+        weights[i] = textureLayers[i].blendWeight;
+
+    GLint weightsLoc = getUniformLocation("u_blendWeights");
+    if (weightsLoc != -1)
+        glUniform1fv(weightsLoc, count, weights.data());
+
+    // Upload blend modes
+    std::vector<GLint> modes(count);
+    for (int i = 0; i < count; i++)
+        modes[i] = static_cast<GLint>(textureLayers[i].blendMode);
+
+    GLint modesLoc = getUniformLocation("u_blendModes");
+    if (modesLoc != -1)
+        glUniform1iv(modesLoc, count, modes.data());
+
+    // Upload texture count
+    GLint countLoc = getUniformLocation("u_textureCount");
+    if (countLoc != -1)
+        glUniform1i(countLoc, count);
 }

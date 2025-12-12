@@ -10,6 +10,7 @@ class Texture
 {
 private:
     GLuint id;
+    GLuint sampler;
     int width;
     int height;
     GLenum format;

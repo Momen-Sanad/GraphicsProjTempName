@@ -45,4 +45,4 @@ private:
     void integrateBody(SimpleBodyState& body, float dtSeconds);
 };
 
-} // namespace gproj::physics
+}

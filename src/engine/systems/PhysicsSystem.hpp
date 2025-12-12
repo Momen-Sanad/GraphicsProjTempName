@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 
-// #include "PhysicsTypes.hpp"
+
 #include "PhysicsBackend.hpp"
 
 class EntityManager;
@@ -45,9 +45,12 @@ public:
     void syncEntityToPhysics(Entity* entity);
     void syncPhysicsToEntity(Entity* entity);
 
+<<<<<<< HEAD
     // void syncEntityTransformToPhysics(Entity* entity, PhysicsBodyId bodyId);
     // void syncPhysicsToEntityTransform(Entity* entity, PhysicsBodyId bodyId);
 
+=======
+>>>>>>> temp
 };
 
 }
