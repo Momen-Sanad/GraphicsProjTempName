@@ -35,11 +35,11 @@
 - [ ] Decide the future of the following ECS files:
     
     - `System.hpp`
-        
+	        
     - `SystemManager.cpp / .hpp`
-        
+		    remove the system manager completely 
     - `Component`
-        
+	        
 - [ ] Decide how to handle:
     
     - `TransformSystem` (given `TransformComponent` already exists)
@@ -206,3 +206,11 @@ Populate and cleanly implement the following in
 -  Engine is now **lighting-aware, gameplay-oriented, and production-ready**
     
 -  Begin actual game development (this is probably not really required if we show the other stuff to Dr. Yahia)
+
+
+
+- Composition (fastest): Player wraps an Entity* (use the existing stub in Player.hpp).
+- Implement Player core state + API: move, block, attack, dodge flags/timers; update moves the root entity’s transform or velocity.
+- Camera follow: in Player::update, update world.get_camera() relative to player; disable or bypass CameraController in main.cpp.
+- Add Crusader as a prefab function (or derived class) that sets stats/meshes/materials after CreatePlayer.
+- Implement CreatePlayer(World&) -> std::unique_ptr<Player> that builds the hierarchy: root entity (parent), child body mesh, child weapon mesh.

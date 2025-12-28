@@ -145,6 +145,8 @@ set_target_properties(Engine PROPERTIES
 if (ENGINE_BUILD_EXAMPLES)
     add_executable(OpenGLEngine
         src/Game/main.cpp
+        src/Game/Entities/Player.cpp
+        src/Game/Entities/Enemy.cpp
     )
 
     target_link_libraries(OpenGLEngine PRIVATE Engine)
