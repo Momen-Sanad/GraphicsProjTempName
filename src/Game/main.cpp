@@ -24,6 +24,7 @@
 #include "../engine/assets/TexturedMaterial.hpp"
 #include "../engine/assets/TextureLoader.hpp"
 #include "Entities/Player.hpp"
+#include "Entities/Crusader.hpp"
 #include "Entities/Enemy.hpp"
 
 // Window size definition
@@ -207,11 +208,19 @@ int main() {
     // ---------------------------
     // Player + Enemy Setup
     // ---------------------------
-    auto player = CreateCrusader(world, root, &cube, &green, &cube, &brown);
-    player->setPosition({0.0f, 1.0f, 0.0f});
-    player->setCamera(&world.get_camera(), {0.0f, 2.5f, 6.0f}, {0.0f, 1.0f, 0.0f});
+    
+    // std::unique_ptr<Player> holding a Crusader
+    // second cube and brown are the weapon mesh and material
+    auto player = std::make_unique<Crusader>(world, root, &cube, &green, &cube, &brown);
 
-    auto enemy = CreateEnemy(world, root, &cube, &red);
+    //auto makes us not need to explicitly declare player as unique_ptr
+    // std::unique_ptr<Player> player = std::make_unique<Crusader>(world, root, &cube, &green, &cube, &brown);
+    
+    player->setPosition({0.0f, 1.0f, 0.0f});
+    player->attachCamera(&world.get_camera(), {0.0f, 2.5f, 6.0f}, {0.0f, 1.0f, 0.0f});
+
+    // is a unique ptr cuz we have many enemies that are unrelated
+    std::unique_ptr<Enemy> enemy = CreateEnemy(world, root, &cube, &red);
     enemy->setPosition({-4.0f, 1.0f, 0.0f});
 
     // Create entities for water, island, sand, tree, house, windows, etc.
@@ -327,8 +336,8 @@ int main() {
         // Player input + update
         PlayerInput input;
         GLFWwindow* windowHandle = window.get_handle();
-        if (glfwGetKey(windowHandle, GLFW_KEY_W) == GLFW_PRESS) input.move.y += 1.0f;
-        if (glfwGetKey(windowHandle, GLFW_KEY_S) == GLFW_PRESS) input.move.y -= 1.0f;
+        if (glfwGetKey(windowHandle, GLFW_KEY_W) == GLFW_PRESS) input.move.y -= 1.0f;
+        if (glfwGetKey(windowHandle, GLFW_KEY_S) == GLFW_PRESS) input.move.y += 1.0f;
         if (glfwGetKey(windowHandle, GLFW_KEY_D) == GLFW_PRESS) input.move.x += 1.0f;
         if (glfwGetKey(windowHandle, GLFW_KEY_A) == GLFW_PRESS) input.move.x -= 1.0f;
         input.block = glfwGetKey(windowHandle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;

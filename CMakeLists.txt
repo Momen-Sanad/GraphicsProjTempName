@@ -147,6 +147,7 @@ if (ENGINE_BUILD_EXAMPLES)
         src/Game/main.cpp
         src/Game/Entities/Player.cpp
         src/Game/Entities/Enemy.cpp
+        src/Game/Entities/Crusader.cpp
     )
 
     target_link_libraries(OpenGLEngine PRIVATE Engine)

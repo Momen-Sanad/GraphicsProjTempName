@@ -5,9 +5,11 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "../../engine/ecs/World.hpp"
+#include "../../engine/components/CameraFollowComponent.hpp"
+#include "../../engine/assets/Material.hpp"
 
 struct PlayerInput {
-    glm::vec2 move = {0.0f, 0.0f};
+    glm::vec2 move{0.0f};
     bool block = false;
     bool attack = false;
     bool dodge = false;
@@ -22,42 +24,48 @@ public:
            MeshRenderer* weaponMesh,
            Material* weaponMaterial);
 
+    virtual ~Player() = default;
+
+    // Core
     Entity* entity() const { return root; }
-    Entity* bodyEntity() const { return body; }
-    Entity* weaponEntity() const { return weapon; }
+    Entity* getBody() const { return body; }
+    Entity* getWeapon() const { return weapon; }
 
+    // Input & update
     void setInput(const PlayerInput& input) { inputState = input; }
-    void update(float deltaTime);
+    virtual void update(float deltaTime);
 
+    // Transform
     void setPosition(const glm::vec3& p);
     glm::vec3 getPosition() const;
 
+    // Tunables
     void setMoveSpeed(float speed) { moveSpeed = speed; }
-    void setBlockSpeedMultiplier(float multiplier) { blockSpeedMultiplier = multiplier; }
+    void setBlockSpeedMultiplier(float multiplier);
     void setDodgeSpeed(float speed) { dodgeSpeed = speed; }
     void setAttackTimings(float duration, float cooldown);
     void setDodgeTimings(float duration, float cooldown);
 
-    void setCamera(Camera* cam, const glm::vec3& offset, const glm::vec3& lookOffset);
-    void setCameraOffset(const glm::vec3& offset) { cameraOffset = offset; }
-    void setCameraLookOffset(const glm::vec3& offset) { cameraLookOffset = offset; }
+    // Camera
+    void attachCamera(Camera* camera,
+                      const glm::vec3& offset,
+                      const glm::vec3& lookOffset);
 
+    // State queries
     bool isBlocking() const { return blocking; }
     bool isAttacking() const { return attackTimer > 0.0f; }
     bool isDodging() const { return dodgeTimer > 0.0f; }
 
-private:
-    void updateMovement(float deltaTime);
-    void updateAttack();
-    void updateCamera();
-
+protected:
     World& worldRef;
+
     Entity* root = nullptr;
     Entity* body = nullptr;
     Entity* weapon = nullptr;
 
     PlayerInput inputState{};
-    glm::vec3 facing = {0.0f, 0.0f, 1.0f};
+    glm::vec3 facing{0.0f, 0.0f, 1.0f};
+
     bool blocking = false;
 
     float moveSpeed = 4.0f;
@@ -74,23 +82,12 @@ private:
     float attackTimer = 0.0f;
     float attackCooldownTimer = 0.0f;
 
-    Camera* camera = nullptr;
-    glm::vec3 cameraOffset = {0.0f, 2.5f, 6.0f};
-    glm::vec3 cameraLookOffset = {0.0f, 1.0f, 0.0f};
+    glm::quat weaponRestRotation{1, 0, 0, 0};
 
-    glm::quat weaponRestRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+    // Camera behavior (NOT ECS)
+    std::unique_ptr<CameraFollowPlayer> cameraFollow;
+
+private:
+    void updateMovement(float dt);
+    void updateAttack(float dt);
 };
-
-std::unique_ptr<Player> CreatePlayer(World& world,
-                                     Entity* parent,
-                                     MeshRenderer* bodyMesh,
-                                     Material* bodyMaterial,
-                                     MeshRenderer* weaponMesh,
-                                     Material* weaponMaterial);
-
-std::unique_ptr<Player> CreateCrusader(World& world,
-                                       Entity* parent,
-                                       MeshRenderer* bodyMesh,
-                                       Material* bodyMaterial,
-                                       MeshRenderer* weaponMesh,
-                                       Material* weaponMaterial);
