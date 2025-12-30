@@ -195,65 +195,22 @@ void TexturedMaterial::setup()
         glUniform1i(countLoc, count);  // Upload the texture count
 }
 
+void TexturedMaterial::setAlbedoTexture(Texture* tex) {
+    setTexture(tex);
+}
 
-// this doesn't work on my linux due to driver issues
-// void TexturedMaterial::setup()
-// {
-//     if (!shader)
-//         return;
+void TexturedMaterial::setSpecularTexture(Texture* tex) {
+    addTextureLayer(tex, 1);
+}
 
-//     shader->use();
+void TexturedMaterial::setRoughnessTexture(Texture* tex) {
+    addTextureLayer(tex, 2);
+}
 
-//     // Handle single texture case for backward compatibility
-//     if (textureLayers.size() == 1)
-//     {
-//         textureLayers[0].texture->bind(textureLayers[0].unit);
+void TexturedMaterial::setEmissiveTexture(Texture* tex) {
+    addTextureLayer(tex, 3);
+}
 
-//         GLint texLocation = getUniformLocation("u_texture");
-//         if (texLocation != -1)
-//             glUniform1i(texLocation, textureLayers[0].unit);
-//     }
-//     // Handle multiple textures with blending
-//     else if (textureLayers.size() > 1)
-//     {
-//         // Bind all textures
-//         for (size_t i = 0; i < textureLayers.size(); ++i)
-//         {
-//             if (textureLayers[i].texture)
-//             {
-//                 textureLayers[i].texture->bind(textureLayers[i].unit);
-//             }
-//         }
-
-//         // Set texture sampler uniforms
-//         for (size_t i = 0; i < textureLayers.size(); ++i)
-//         {
-//             std::string uniformName = "u_textures[" + std::to_string(i) + "]";
-//             GLint texLocation = getUniformLocation(uniformName.c_str());
-//             if (texLocation != -1)
-//                 glUniform1i(texLocation, textureLayers[i].unit);
-//         }
-
-//         // Set blend weights
-//         std::vector<float> weights;
-//         for (const auto& layer : textureLayers)
-//             weights.push_back(layer.blendWeight);
-
-//         GLint weightsLocation = getUniformLocation("u_blendWeights");
-//         if (weightsLocation != -1)
-//             glUniform1fv(weightsLocation, static_cast<GLsizei>(weights.size()), weights.data());
-
-//         // Set blend modes
-//         std::vector<GLint> blendModes;
-//         for (const auto& layer : textureLayers)
-//             blendModes.push_back(static_cast<GLint>(layer.blendMode));
-
-//         GLint modesLocation = getUniformLocation("u_blendModes");
-//         if (modesLocation != -1)
-//             glUniform1iv(modesLocation, static_cast<GLsizei>(blendModes.size()), blendModes.data());
-
-//         // Set texture count
-//         GLint countLocation = getUniformLocation("u_textureCount");
-//         if (countLocation != -1)
-//             glUniform1i(countLocation, static_cast<int>(textureLayers.size()));
-//     }
+void TexturedMaterial::setAmbientOcclusionTexture(Texture* tex) {
+    addTextureLayer(tex, 4);
+}

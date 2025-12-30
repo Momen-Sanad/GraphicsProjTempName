@@ -38,7 +38,7 @@
 	        
     - `SystemManager.cpp / .hpp`
 		    remove the system manager completely 
-    - `Component`
+    - `Component` **DONE**
 	        
 - [ ] Decide how to handle:
     
@@ -77,7 +77,7 @@
 
 ### Player Entity
 
-- [ ] Create `Player` class extending `Entity`
+- [x] Create `Player` class extending `Entity` ✅ 2025-12-29
     
 -  Player has:
     

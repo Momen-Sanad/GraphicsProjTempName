@@ -23,6 +23,7 @@
 #include "../engine/assets/MeshLoader.hpp"
 #include "../engine/assets/TexturedMaterial.hpp"
 #include "../engine/assets/TextureLoader.hpp"
+#include "../engine/assets/LitMaterial.hpp"
 #include "Entities/Player.hpp"
 #include "Entities/Crusader.hpp"
 #include "Entities/Enemy.hpp"
@@ -156,8 +157,39 @@ int main() {
         std::cerr << "Warning: failed to load sky texture: " << SkyText << " (sky will be blank)\n";
     }
 
+    std::string AsphaltSpecularPath = std::string(TEXTURES_DIR) + "/asphalt/specular.jpg";
+    auto AsphaltSpecular = TextureLoader::load(AsphaltSpecularPath);
+    std::cout << "Attempting to load texture: " << AsphaltSpecularPath << std::endl;
+
+    std::string AsphaltRoughnessPath = std::string(TEXTURES_DIR) + "/asphalt/roughness.jpg";
+    auto AsphaltRoughness = TextureLoader::load(AsphaltRoughnessPath);
+    std::cout << "Attempting to load texture: " << AsphaltRoughnessPath << std::endl;
+
+    std::string AsphaltEmissivePath = std::string(TEXTURES_DIR) + "/asphalt/emissive.jpg";
+    auto AsphaltEmissive = TextureLoader::load(AsphaltEmissivePath);
+    std::cout << "Attempting to load texture: " << AsphaltEmissivePath << std::endl;
+
+    std::string AsphaltAlbedoPath = std::string(TEXTURES_DIR) + "/asphalt/albedo.jpg";
+    auto AsphaltAlbedo = TextureLoader::load(AsphaltAlbedoPath);
+    std::cout << "Attempting to load texture: " << AsphaltAlbedoPath << std::endl;
+
     // Material setup for house, blending textures.
     TexturedMaterial houseMaterial(houseShader, HouseTexture);
+
+    LitMaterial AsphaltMaterial(houseMixedShader,
+                                AsphaltAlbedo,
+                                AsphaltSpecular,
+                                AsphaltRoughness,
+                                AsphaltEmissive
+                               );
+
+    // AsphaltMaterial.setSpecularTexture(AsphaltSpecular);
+    // AsphaltMaterial.setRoughnessTexture(AsphaltRoughness);
+    // AsphaltMaterial.setEmissiveTexture(AsphaltEmissive);
+    // AsphaltMaterial.setAlbedoTexture(AsphaltAlbedo);
+
+    // AsphaltMaterial.setup();
+
     TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
     houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);  // Add blended texture
 
@@ -176,6 +208,8 @@ int main() {
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh skySphere = Mesh::create_sphere();
+
+    Mesh asphaltMesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
 
     // Create MeshRenderers to upload and render these meshes
     MeshRenderer cube, house, glass, skyRenderer;
@@ -238,6 +272,7 @@ int main() {
     // Sand on the island
     Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
 
+    Entity* asphalt = world.createEntityWithParams(root, {4.0f, 4.0f, 4.0f}, glm::quat(), {1.0f, 1.0f, 1.0f}, &skyRenderer, &AsphaltMaterial);
     // Test house entity with mixed textures
     Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
 

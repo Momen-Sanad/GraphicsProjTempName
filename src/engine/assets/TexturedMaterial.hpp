@@ -16,7 +16,7 @@ enum class BlendMode
 struct TextureLayer
 {
     Texture* texture;
-	BlendMode blendMode;
+    BlendMode blendMode;
     int unit;
     float blendWeight;  // 0.0 to 1.0
 
@@ -55,4 +55,11 @@ public:
     float getBlendWeight(int index) const;
 
     void setup() override;
+
+    // New methods for maps
+    void setAlbedoTexture          (Texture* tex);
+    void setSpecularTexture        (Texture* tex);
+    void setRoughnessTexture       (Texture* tex);
+    void setEmissiveTexture        (Texture* tex);
+    void setAmbientOcclusionTexture(Texture* tex);
 };
