@@ -226,12 +226,12 @@ int main() {
     lightManager.addLight(Light(LightType::SPOT, glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(2.0f, 4.0f, 0.0f), glm::vec3(-1.0f, -1.0f, 0.0f), glm::radians(30.0f), glm::radians(60.0f)));
 
     // Set up the lights in the shader
-    houseMixedMaterial.setup();
+    // houseMixedMaterial.setup();
     AsphaltMaterial.setup();
-    lightShader->use();
-    houseMixedShader->use();
-    houseShader->use();
-    mainShader->use();
+    // lightShader->use();
+    // houseMixedShader->use();
+    // houseShader->use();
+    // mainShader->use();
 
     // Load imported meshes (obj)
     // Load mesh from .obj file
@@ -275,11 +275,13 @@ int main() {
     int width1, height1;
     glfwGetFramebufferSize(window.get_handle(), &width1, &height1);
         
-    glm::mat4 VP1 = world.get_camera().get_view_projection_matrix(glm::vec2(width1, height1));
-    lightShader->use();
-    lightShader->setUniform("viewProj", VP1);
-    lightShader->setUniform("model", glm::mat4(1.0f));
-    lightShader->setUniform("normalMatrix", glm::mat3(1.0f));
+    // glm::mat4 VP1 = world.get_camera().get_view_projection_matrix(glm::vec2(width1, height1));
+    // lightShader->use();
+    // lightShader->setUniform("viewProj", VP1);
+    // glm::mat4 model = asphalt.getLocalMatrix();
+    // shader->setUniform("model", model);
+    // shader->setUniform("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
+
 
     // lightShader->setUniform("normalMatrix", normalMatrix);
     lightShader->setUniform("camera_pos", world.get_camera().position);

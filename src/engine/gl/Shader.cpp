@@ -167,6 +167,13 @@ GLint Shader::getUniformLocation(const std::string& name) const {
     return loc;
 }
 
+bool Shader::hasUniform(const std::string& name) const
+{
+    GLint loc = getUniformLocation(name);
+    return loc != -1;
+}
+
+
 
 // Specialization for int
 template <>
@@ -211,4 +218,24 @@ void Shader::setUniform(const std::string& name, const glm::mat3& value) {
     if (location != -1) {
         glUniformMatrix3fv(location, 1, GL_FALSE, &value[0][0]);
     }
+}
+// Specialization for glm::vec4
+template <>
+void Shader::setUniform(const std::string& name, const glm::vec4& v) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) glUniform4fv(location, 1, &v[0]);
+}
+
+// Specialization for glm::vec2
+template <>
+void Shader::setUniform(const std::string& name, const glm::vec2& v) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) glUniform2fv(location, 1, &v[0]);
+}
+
+// Specialization for bool
+template <>
+void Shader::setUniform(const std::string& name, const bool& b) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) glUniform1i(location, b ? 1 : 0);
 }

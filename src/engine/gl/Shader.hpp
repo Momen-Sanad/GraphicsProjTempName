@@ -39,6 +39,8 @@ public:
     template <typename T>
     void setUniform(const std::string& name, const T& value);
 
+    bool hasUniform(const std::string& name) const;
+    
 private:
     static GLuint compileShader(const std::string& source, GLenum type);
     static std::string readFile(const std::string& path);

@@ -70,7 +70,7 @@ void MeshRenderer::upload(const Mesh& data) {
     );
 
     // ------------------------
-    // Attribute 1 : NORMAL  ✅ FIX
+    // Attribute 1 : NORMAL
     // ------------------------
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(

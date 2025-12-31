@@ -113,45 +113,58 @@ void EntityManager::drawAll(const glm::mat4& viewProj) {
 // ------------------------------------------------------------
 // Render a single entity recursively (including children)
 // ------------------------------------------------------------
-void EntityManager::renderEntityRecursive(Entity* e, const glm::mat4& VP) {
-    if (!e) return;  // Return if the entity is null
+void EntityManager::renderEntityRecursive(Entity* e, const glm::mat4& VP)
+{
+    if (!e) return;
 
-    // Check if the entity has a mesh
-    if (MeshRenderer* m = e->getMesh()) {
-        // Check if the entity has a material
-        if (Material* mat = e->getMaterial()) {
-            mat->setup();  // Set up the material (binds the shader and sets uniforms)
+    MeshRenderer* mesh = e->getMesh();
+    Material* material = e->getMaterial();
 
-            // Compute the world matrix and MVP (Model-View-Projection) matrix
-            glm::mat4 M = e->getWorldMatrix();
-            glm::mat4 MVP = VP * M;
+    if (mesh && material) {
+    std::shared_ptr<Shader> shader = material->getShader();
+    if (!shader) return;
 
-            // Try to get the MVP uniform location from the material
-            GLint loc = mat->getUniform("MVP");
-            if (loc != -1)
-                glUniformMatrix4fv(loc, 1, GL_FALSE, &MVP[0][0]);  // Set the MVP uniform
+    shader->use();
 
-            // Support lit shaders that expect model/viewProj/normalMatrix.
-            loc = mat->getUniform("model");
-            if (loc != -1)
-                glUniformMatrix4fv(loc, 1, GL_FALSE, &M[0][0]);
+        // -----------------------------
+        // Material (textures, params)
+        // -----------------------------
+        material->setup();
 
-            loc = mat->getUniform("viewProj");
-            if (loc != -1)
-                glUniformMatrix4fv(loc, 1, GL_FALSE, &VP[0][0]);
+        // -----------------------------
+        // Transforms
+        // -----------------------------
+        glm::mat4 model = e->getWorldMatrix();
 
-            loc = mat->getUniform("normalMatrix");
-            if (loc != -1) {
-                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(M)));
-                glUniformMatrix3fv(loc, 1, GL_FALSE, &normalMatrix[0][0]);
-            }
+        // New-style (lighting shaders)
+        if (shader->hasUniform("viewProj"))
+            shader->setUniform("viewProj", VP);
 
-            m->draw();  // Draw the mesh
+        if (shader->hasUniform("model"))
+            shader->setUniform("model", model);
+
+        if (shader->hasUniform("normalMatrix")) {
+            glm::mat3 normalMatrix =
+                glm::transpose(glm::inverse(glm::mat3(model)));
+            shader->setUniform("normalMatrix", normalMatrix);
         }
+
+        // Old-style fallback (MVP shaders)
+        if (shader->hasUniform("MVP")) {
+            glm::mat4 MVP = VP * model;
+            shader->setUniform("MVP", MVP);
+        }
+
+        // -----------------------------
+        // Draw
+        // -----------------------------
+        mesh->draw();
     }
 
-    // Recursively render all child entities
+    // -----------------------------
+    // Children
+    // -----------------------------
     for (Entity* child : e->getChildren()) {
-        EntityManager::renderEntityRecursive(child, VP);  // Recursive call for each child
+        renderEntityRecursive(child, VP);
     }
 }
