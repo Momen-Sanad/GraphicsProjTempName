@@ -1041,6 +1041,7 @@ TEST(full_ecs_animation_integration) {
 static const char* SWORDMAN_GLTF_PATH = SOURCE_DIR "/tests/loading_files/the_swordman/scene.gltf";
 #else
 static const char* SWORDMAN_GLTF_PATH = "tests/loading_files/the_swordman/scene.gltf";
+#endif
 
 TEST(gltf_load_swordman_model) {
     if (!std::filesystem::exists(SWORDMAN_GLTF_PATH)) {

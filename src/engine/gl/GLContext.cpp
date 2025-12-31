@@ -1,11 +1,11 @@
-#include <glad/gl.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cstdio>
 #include "GLContext.hpp"
 
 bool GLContext::init() {
     // glad/gl.h uses gladLoadGL with a loader function
-    if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         printf("Failed to initialize GLAD\n");
         return false;
     }

@@ -29,7 +29,7 @@ add_subdirectory(vendor/glfw EXCLUDE_FROM_ALL)
 
 # ---------- GLAD ----------
 # glad is typically just a single C file with headers; we compile it manually.
-set(GLAD_SOURCES ${CMAKE_SOURCE_DIR}/vendor/glad/src/gl.c)
+set(GLAD_SOURCES ${CMAKE_SOURCE_DIR}/vendor/glad/src/glad.c)
 add_library(glad STATIC ${GLAD_SOURCES})
 target_include_directories(glad PUBLIC ${CMAKE_SOURCE_DIR}/vendor/glad/include)
 
@@ -164,29 +164,41 @@ endif()
 if (ENGINE_ENABLE_TESTS)
     enable_testing()
 
-    # Animation tests executable
-    add_executable(animation_tests ${CMAKE_SOURCE_DIR}/tests/animation_tests.cpp)
-    target_link_libraries(animation_tests PRIVATE Engine)
-    target_compile_definitions(animation_tests PRIVATE
-        _CRT_SECURE_NO_WARNINGS
+    # ----- Animation tests -----
+    add_executable(animation_tests
+        ${CMAKE_SOURCE_DIR}/tests/animation_tests.cpp
     )
+    target_link_libraries(animation_tests PRIVATE Engine)
     add_test(NAME animation_tests COMMAND animation_tests)
 
-    # Generic engine tests (all test files)
-    file(GLOB TEST_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/tests/*.cpp)
-    add_executable(EngineTests ${TEST_SOURCES})
-    target_link_libraries(EngineTests PRIVATE Engine)
-    add_test(NAME EngineTests COMMAND EngineTests)
+    # ----- Asset tests -----
+    add_executable(asset_tests
+        ${CMAKE_SOURCE_DIR}/tests/asset_tests.cpp
+    )
+    target_link_libraries(asset_tests PRIVATE Engine)
+    add_test(NAME asset_tests COMMAND asset_tests)
+
+    # ----- ECS tests -----
+    add_executable(ecs_tests
+        ${CMAKE_SOURCE_DIR}/tests/ecs_tests.cpp
+    )
+    target_link_libraries(ecs_tests PRIVATE Engine)
+    add_test(NAME ecs_tests COMMAND ecs_tests)
+
+    # ----- Animation demo (has its own main) -----
+    add_executable(animation_demo
+        ${CMAKE_SOURCE_DIR}/tests/animation_demo.cpp
+    )
+    target_link_libraries(animation_demo PRIVATE Engine glfw glad imgui)
+    target_compile_definitions(animation_demo PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        SHADER_DIR="${CMAKE_SOURCE_DIR}/shaders"
+        ASSET_DIR="${CMAKE_SOURCE_DIR}/assets"
+        SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+    )
+    add_test(NAME animation_demo COMMAND animation_demo)
 endif()
 
-add_executable(animation_demo tests/animation_demo.cpp)
-target_link_libraries(animation_demo Engine glfw glad imgui)
-target_compile_definitions(animation_demo PRIVATE
-    _CRT_SECURE_NO_WARNINGS
-    SHADER_DIR="${CMAKE_SOURCE_DIR}/shaders"
-    ASSET_DIR="${CMAKE_SOURCE_DIR}/assets"
-    SOURCE_DIR="${CMAKE_SOURCE_DIR}"
-)
 
 # ==========================================================
 # ================= Extra helpful CMake hints ==============

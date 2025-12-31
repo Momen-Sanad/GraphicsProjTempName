@@ -2,7 +2,7 @@
 
 #ifndef GLAD_INCLUDED
 #define GLAD_INCLUDED
-#include <glad/gl.h>
+#include <glad/glad.h>
 #endif
 
 #include "../assets/Material.hpp"
