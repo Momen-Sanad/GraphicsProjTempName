@@ -1,11 +1,32 @@
 #include "Mesh.hpp"
-#include "ext/scalar_constants.hpp"
-#include <unordered_map>
-#include <gtc/constants.hpp>
+#include <glm/gtc/constants.hpp>
 
-Mesh::Mesh()
+// ============================================================
+// COMPARISON OPERATORS
+// ============================================================
+
+bool operator==(const Color& a, const Color& b) {
+    return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
+}
+
+bool operator==(const Vertex& a, const Vertex& b) {
+    return a.position == b.position && a.color == b.color && a.tex_coord == b.tex_coord;
+}
+
+bool Vertex::operator==(const Vertex& other) const
 {
-    count = 0;
+    return position == other.position &&
+        color.r == other.color.r && color.g == other.color.g &&
+        color.b == other.color.b && color.a == other.color.a &&
+        tex_coord == other.tex_coord;
+}
+
+// ============================================================
+// MESH CLASS IMPLEMENTATION
+// ============================================================
+
+Mesh::Mesh() : count(0)
+{
 }
 
 Mesh::Mesh(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices)
@@ -13,23 +34,28 @@ Mesh::Mesh(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices
     create(vertices, indices);
 }
 
+void Mesh::create(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices)
+{
+    this->verticies.assign(vertices.begin(), vertices.end());
+    this->indices.assign(indices.begin(), indices.end());
+    count = static_cast<GLsizei>(indices.size());
+}
+
 Mesh::~Mesh()
 {
     destroy();
 }
 
-void Mesh::create(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices)
+void Mesh::destroy()
 {
-    // Copy the vertices and indices into the member vectors.
-    verticies.assign(vertices.begin(), vertices.end());
-    this->indices.assign(indices.begin(), indices.end());
-    count = static_cast<GLsizei>(indices.size());
-}
-
-void Mesh::destroy() {
     count = 0;
+    verticies.clear();
+    indices.clear();
 }
 
+// ============================================================
+// MESH PRIMITIVE CREATION
+// ============================================================
 
 Mesh Mesh::create_cuboid(glm::vec3 center, glm::vec3 size)
 {
@@ -39,37 +65,37 @@ Mesh Mesh::create_cuboid(glm::vec3 center, glm::vec3 size)
     glm::vec3 h = size * 0.5f;
     glm::vec3 c = center;
 
-    // Front
+    // Front face
     vertices.push_back({ .position = { c.x + h.x, c.y + h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 1.0f, 1.0f } });
     vertices.push_back({ .position = { c.x - h.x, c.y + h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 0.0f, 1.0f } });
     vertices.push_back({ .position = { c.x - h.x, c.y - h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 0.0f, 0.0f } });
     vertices.push_back({ .position = { c.x + h.x, c.y - h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 1.0f, 0.0f } });
 
-    // Back
+    // Back face
     vertices.push_back({ .position = { c.x - h.x, c.y + h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 1.0f, 1.0f } });
     vertices.push_back({ .position = { c.x + h.x, c.y + h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 0.0f, 1.0f } });
     vertices.push_back({ .position = { c.x + h.x, c.y - h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 0.0f, 0.0f } });
     vertices.push_back({ .position = { c.x - h.x, c.y - h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 1.0f, 0.0f } });
 
-    // Top
-    vertices.push_back({ .position = { c.x - h.x,  c.y + h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 0.0f, 0.0f } });
-    vertices.push_back({ .position = { c.x + h.x,  c.y + h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 1.0f, 0.0f } });
-    vertices.push_back({ .position = { c.x + h.x,  c.y + h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 1.0f, 1.0f } });
-    vertices.push_back({ .position = { c.x - h.x,  c.y + h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 0.0f, 1.0f } });
+    // Top face
+    vertices.push_back({ .position = { c.x - h.x, c.y + h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 0.0f, 0.0f } });
+    vertices.push_back({ .position = { c.x + h.x, c.y + h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 1.0f, 0.0f } });
+    vertices.push_back({ .position = { c.x + h.x, c.y + h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 1.0f, 1.0f } });
+    vertices.push_back({ .position = { c.x - h.x, c.y + h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 0.0f, 1.0f } });
 
-    // Bottom
+    // Bottom face
     vertices.push_back({ .position = { c.x + h.x, c.y - h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 1.0f, 1.0f } });
     vertices.push_back({ .position = { c.x - h.x, c.y - h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 0.0f, 1.0f } });
     vertices.push_back({ .position = { c.x - h.x, c.y - h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 0.0f, 0.0f } });
     vertices.push_back({ .position = { c.x + h.x, c.y - h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 1.0f, 0.0f } });
 
-    // Right
+    // Right face
     vertices.push_back({ .position = { c.x + h.x, c.y - h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 1.0f, 0.0f } });
     vertices.push_back({ .position = { c.x + h.x, c.y + h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 1.0f, 1.0f } });
     vertices.push_back({ .position = { c.x + h.x, c.y + h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 0.0f, 1.0f } });
     vertices.push_back({ .position = { c.x + h.x, c.y - h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 0.0f, 0.0f } });
 
-    // Left
+    // Left face
     vertices.push_back({ .position = { c.x - h.x, c.y - h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 1.0f, 0.0f } });
     vertices.push_back({ .position = { c.x - h.x, c.y + h.y, c.z + h.z }, .color = WHITE, .tex_coord = { 1.0f, 1.0f } });
     vertices.push_back({ .position = { c.x - h.x, c.y + h.y, c.z - h.z }, .color = WHITE, .tex_coord = { 0.0f, 1.0f } });
@@ -97,14 +123,12 @@ Mesh Mesh::create_plane(glm::vec3 center, glm::vec2 size, glm::vec2 tiling)
     glm::vec3 h = glm::vec3(size.x, 0.0f, size.y) * 0.5f;
     glm::vec3 c = center;
 
-    vertices.push_back({ .position = { c.x - h.x,  c.y, c.z + h.z }, .color = WHITE, .tex_coord = {     0.0f,     0.0f } });
-    vertices.push_back({ .position = { c.x + h.x,  c.y, c.z + h.z }, .color = WHITE, .tex_coord = { tiling.x,     0.0f } });
-    vertices.push_back({ .position = { c.x + h.x,  c.y, c.z - h.z }, .color = WHITE, .tex_coord = { tiling.x, tiling.y } });
-    vertices.push_back({ .position = { c.x - h.x,  c.y, c.z - h.z }, .color = WHITE, .tex_coord = {     0.0f, tiling.y } });
+    vertices.push_back({ .position = { c.x - h.x, c.y, c.z + h.z }, .color = WHITE, .tex_coord = { 0.0f, 0.0f } });
+    vertices.push_back({ .position = { c.x + h.x, c.y, c.z + h.z }, .color = WHITE, .tex_coord = { tiling.x, 0.0f } });
+    vertices.push_back({ .position = { c.x + h.x, c.y, c.z - h.z }, .color = WHITE, .tex_coord = { tiling.x, tiling.y } });
+    vertices.push_back({ .position = { c.x - h.x, c.y, c.z - h.z }, .color = WHITE, .tex_coord = { 0.0f, tiling.y } });
 
-    indices = {
-        0, 1, 2, 2, 3, 0,
-    };
+    indices = { 0, 1, 2, 2, 3, 0 };
 
     Mesh mesh;
     mesh.create(vertices, indices);
@@ -116,18 +140,18 @@ Mesh Mesh::create_sphere(glm::ivec2 segments, glm::vec3 center, float radius)
     std::vector<Vertex> vertices;
     std::vector<uint16_t> indices;
 
-    // populating the sphere vertices by looping over its longitude and latitude
     for (int lat = 0; lat <= segments.y; lat++)
     {
         float v = (float)lat / segments.y;
         float pitch = (v - 0.5f) * glm::pi<float>();
-        float cos = glm::cos(pitch), sin = glm::sin(pitch);
+        float cos_p = glm::cos(pitch);
+        float sin_p = glm::sin(pitch);
 
         for (int lng = 0; lng <= segments.x; lng++)
         {
             float u = (float)lng / segments.x;
             float yaw = u * 2.0f * glm::pi<float>();
-            glm::vec3 position = glm::vec3(cos * glm::cos(yaw), sin, cos * glm::sin(yaw)) * radius + center;
+            glm::vec3 position = glm::vec3(cos_p * glm::cos(yaw), sin_p, cos_p * glm::sin(yaw)) * radius + center;
             glm::vec2 tex_coord = glm::vec2(u, v);
 
             vertices.push_back({ .position = position, .color = WHITE, .tex_coord = tex_coord });
@@ -155,12 +179,9 @@ Mesh Mesh::create_sphere(glm::ivec2 segments, glm::vec3 center, float radius)
     return mesh;
 }
 
-
 Mesh Mesh::create_cylinder(int segments, glm::vec3 center, float height, float radius)
 {
-    Mesh mesh;
-    std::vector<glm::vec3> positions;
-    std::vector<glm::vec2> tex_coords;
+    std::vector<Vertex> vertices;
     std::vector<uint16_t> indices;
     float halfH = height * 0.5f;
 
@@ -172,39 +193,25 @@ Mesh Mesh::create_cylinder(int segments, glm::vec3 center, float height, float r
         float x = cos(angle) * radius;
         float z = sin(angle) * radius;
 
-        // bottom vertex
-        positions.push_back(center + glm::vec3(x, -halfH, z));
-        tex_coords.push_back(glm::vec2(t, 0.0f));
-
-        // top vertex
-        positions.push_back(center + glm::vec3(x, +halfH, z));
-        tex_coords.push_back(glm::vec2(t, 1.0f));
+        vertices.push_back({ .position = center + glm::vec3(x, -halfH, z), .color = WHITE, .tex_coord = {t, 0.0f} });
+        vertices.push_back({ .position = center + glm::vec3(x, +halfH, z), .color = WHITE, .tex_coord = {t, 1.0f} });
     }
 
-    // side indices
+    // Side indices
     for (int i = 0; i < segments; i++)
     {
         int base = i * 2;
-        int i0 = base;
-        int i1 = base + 1;
-        int i2 = base + 2;
-        int i3 = base + 3;
-
-        // triangle 1
-        indices.push_back(static_cast<uint16_t>(i0));
-        indices.push_back(static_cast<uint16_t>(i2));
-        indices.push_back(static_cast<uint16_t>(i1));
-
-        // triangle 2
-        indices.push_back(static_cast<uint16_t>(i1));
-        indices.push_back(static_cast<uint16_t>(i2));
-        indices.push_back(static_cast<uint16_t>(i3));
+        indices.push_back(base);
+        indices.push_back(base + 2);
+        indices.push_back(base + 1);
+        indices.push_back(base + 1);
+        indices.push_back(base + 2);
+        indices.push_back(base + 3);
     }
 
     // Top cap
-    int topCenterIndex = positions.size();
-    positions.push_back(center + glm::vec3(0, +halfH, 0));
-    tex_coords.push_back(glm::vec2(0.5f, 0.5f)); // center of cap
+    int topCenterIndex = vertices.size();
+    vertices.push_back({ .position = center + glm::vec3(0, +halfH, 0), .color = WHITE, .tex_coord = {0.5f, 0.5f} });
 
     for (int i = 0; i <= segments; i++)
     {
@@ -212,29 +219,22 @@ Mesh Mesh::create_cylinder(int segments, glm::vec3 center, float height, float r
         float angle = t * glm::two_pi<float>();
         float x = cos(angle) * radius;
         float z = sin(angle) * radius;
-
-        positions.push_back(center + glm::vec3(x, +halfH, z));
-
         float u = 0.5f + 0.5f * cos(angle);
         float v = 0.5f + 0.5f * sin(angle);
-        tex_coords.push_back(glm::vec2(u, v));
+
+        vertices.push_back({ .position = center + glm::vec3(x, +halfH, z), .color = WHITE, .tex_coord = {u, v} });
     }
 
     for (int i = 0; i < segments; i++)
     {
-        int i0 = topCenterIndex;
-        int i1 = topCenterIndex + 1 + i;
-        int i2 = topCenterIndex + 2 + i;
-
-        indices.push_back(static_cast<uint16_t>(i0));
-        indices.push_back(static_cast<uint16_t>(i1));
-        indices.push_back(static_cast<uint16_t>(i2));
+        indices.push_back(topCenterIndex);
+        indices.push_back(topCenterIndex + 1 + i);
+        indices.push_back(topCenterIndex + 2 + i);
     }
 
     // Bottom cap
-    int bottomCenterIndex = positions.size();
-    positions.push_back(center + glm::vec3(0, -halfH, 0));
-    tex_coords.push_back(glm::vec2(0.5f, 0.5f)); // center of cap
+    int bottomCenterIndex = vertices.size();
+    vertices.push_back({ .position = center + glm::vec3(0, -halfH, 0), .color = WHITE, .tex_coord = {0.5f, 0.5f} });
 
     for (int i = 0; i <= segments; i++)
     {
@@ -242,120 +242,184 @@ Mesh Mesh::create_cylinder(int segments, glm::vec3 center, float height, float r
         float angle = t * glm::two_pi<float>();
         float x = cos(angle) * radius;
         float z = sin(angle) * radius;
-
-        positions.push_back(center + glm::vec3(x, -halfH, z));
-
         float u = 0.5f + 0.5f * cos(angle);
         float v = 0.5f + 0.5f * sin(angle);
-        tex_coords.push_back(glm::vec2(u, v));
+
+        vertices.push_back({ .position = center + glm::vec3(x, -halfH, z), .color = WHITE, .tex_coord = {u, v} });
     }
 
     for (int i = 0; i < segments; i++)
     {
-        int i0 = bottomCenterIndex;
-        int i1 = bottomCenterIndex + 2 + i;
-        int i2 = bottomCenterIndex + 1 + i;
-
-        indices.push_back(static_cast<uint16_t>(i0));
-        indices.push_back(static_cast<uint16_t>(i1));
-        indices.push_back(static_cast<uint16_t>(i2));
+        indices.push_back(bottomCenterIndex);
+        indices.push_back(bottomCenterIndex + 2 + i);
+        indices.push_back(bottomCenterIndex + 1 + i);
     }
 
-    // Build mesh
-    mesh.set_positions(positions);
-    mesh.set_indices(indices);
-    mesh.set_tex_coords(tex_coords);
-    mesh.set_color(WHITE);
-
+    Mesh mesh;
+    mesh.create(vertices, indices);
     return mesh;
 }
 
-void Mesh::set_vertices(const std::span<Vertex>& positions)
+// ============================================================
+// MESH SETTERS
+// ============================================================
+
+void Mesh::set_vertices(const std::span<Vertex>& vertices)
 {
-    verticies.resize(positions.size());
-
-    for (size_t i = 0; i < positions.size(); i++)
-        verticies[i] = positions[i];
-}
-
-void Mesh::set_positions(const std::span<glm::vec3>& positions)
-{
-    verticies.resize(positions.size());
-
-    for (size_t i = 0; i < positions.size(); i++)
-        verticies[i].position = positions[i];
+    this->verticies.assign(vertices.begin(), vertices.end());
 }
 
 void Mesh::set_indices(const std::span<uint16_t>& indices)
 {
-    this->indices.resize(indices.size());
-
-    for (size_t i = 0; i < indices.size(); i++)
-        this->indices[i] = indices[i];
-
+    this->indices.assign(indices.begin(), indices.end());
     count = static_cast<GLsizei>(indices.size());
+}
+
+void Mesh::set_positions(const std::span<glm::vec3>& positions)
+{
+    size_t min_size = std::min(positions.size(), verticies.size());
+    for (size_t i = 0; i < min_size; ++i) {
+        verticies[i].position = positions[i];
+    }
 }
 
 void Mesh::set_color(const Color& color)
 {
-    for (size_t i = 0; i < verticies.size(); i++)
-        verticies[i].color = color;
+    for (auto& vertex : verticies) {
+        vertex.color = color;
+    }
 }
 
 void Mesh::set_colors(const std::span<Color>& colors)
 {
-    for (size_t i = 0; i < colors.size() && i < verticies.size(); i++)
+    size_t min_size = std::min(colors.size(), verticies.size());
+    for (size_t i = 0; i < min_size; ++i) {
         verticies[i].color = colors[i];
+    }
 }
 
 void Mesh::set_tex_coords(const std::span<glm::vec2>& tex_coords)
 {
-    for (size_t i = 0; i < tex_coords.size() && i < verticies.size(); i++)
+    size_t min_size = std::min(tex_coords.size(), verticies.size());
+    for (size_t i = 0; i < min_size; ++i) {
         verticies[i].tex_coord = tex_coords[i];
+    }
 }
 
-GLsizei Mesh::get_vert_count() const
+void Mesh::set_position(size_t index, const glm::vec3& position)
 {
-    return count;
+    if (index < verticies.size()) {
+        verticies[index].position = position;
+    }
 }
 
-std::vector<Vertex> Mesh::get_vertices() const {
-    return verticies;
+void Mesh::set_color(size_t index, const Color& color)
+{
+    if (index < verticies.size()) {
+        verticies[index].color = color;
+    }
+}
+
+void Mesh::set_tex_coord(size_t index, const glm::vec2& tex_coord)
+{
+    if (index < verticies.size()) {
+        verticies[index].tex_coord = tex_coord;
+    }
+}
+
+void Mesh::set_index(size_t index, uint16_t value)
+{
+    if (index < indices.size()) {
+        indices[index] = value;
+    }
+}
+
+void Mesh::add_vertex(const Vertex& vertex)
+{
+    verticies.push_back(vertex);
+}
+
+void Mesh::add_index(uint16_t index)
+{
+    indices.push_back(index);
+    count++;
+}
+
+void Mesh::reserve_vertices(size_t count)
+{
+    verticies.reserve(count);
+}
+
+void Mesh::reserve_indices(size_t count)
+{
+    indices.reserve(count);
+}
+
+// ============================================================
+// MESH GETTERS
+// ============================================================
+
+Vertex& Mesh::get_vertex(size_t index)
+{
+    return verticies.at(index);
+}
+
+const Vertex& Mesh::get_vertex(size_t index) const
+{
+    return verticies.at(index);
+}
+
+uint16_t Mesh::get_index(size_t index) const
+{
+    return indices.at(index);
+}
+
+glm::vec3 Mesh::get_position(size_t index) const
+{
+    return verticies.at(index).position;
+}
+
+Color Mesh::get_color(size_t index) const
+{
+    return verticies.at(index).color;
+}
+
+glm::vec2 Mesh::get_tex_coord(size_t index) const
+{
+    return verticies.at(index).tex_coord;
 }
 
 std::vector<glm::vec3> Mesh::get_positions() const
 {
     std::vector<glm::vec3> positions;
-
     positions.reserve(verticies.size());
-    for (const auto& vertex : verticies)
+    for (const auto& vertex : verticies) {
         positions.push_back(vertex.position);
-
+    }
     return positions;
 }
 
-std::vector<uint16_t> Mesh::get_indices() const {
-    return indices;
-}
-
-bool operator==(const Color& a, const Color& b) {
-    return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
-}
-
-bool operator==(const Vertex& a, const Vertex& b) {
-    return a.position == b.position && a.color == b.color && a.tex_coord == b.tex_coord;
-}
-
-bool Vertex::operator==(const Vertex& other) const
+std::vector<glm::vec2> Mesh::get_tex_coords() const
 {
-    return position == other.position && color.r == other.color.r && color.g == other.color.g &&
-        color.b == other.color.b && color.a == other.color.a &&
-        tex_coord == other.tex_coord;
+    std::vector<glm::vec2> tex_coords;
+    tex_coords.reserve(verticies.size());
+    for (const auto& vertex : verticies) {
+        tex_coords.push_back(vertex.tex_coord);
+    }
+    return tex_coords;
 }
 
-void Vertex::operator=(const Vertex& other)
+const void* Mesh::get_vertex_data() const
 {
-    position = other.position;
-    color = other.color;
-    tex_coord = other.tex_coord;
+    return verticies.data();
+}
+
+size_t Mesh::get_vertex_data_size() const
+{
+    return verticies.size() * sizeof(Vertex);
+}
+
+size_t Mesh::get_vertex_stride() const
+{
+    return sizeof(Vertex);
 }

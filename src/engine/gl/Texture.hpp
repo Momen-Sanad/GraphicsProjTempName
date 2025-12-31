@@ -2,13 +2,15 @@
 #include <string>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
-#include <glm.hpp>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
 
 class Texture
 {
 private:
     GLuint id;
+    GLuint sampler;
     int width;
     int height;
     GLenum format;
@@ -28,6 +30,7 @@ public:
 
     // Bind texture to a texture unit
     void bind(int unit = 0) const;
+    void bind(int unit, const char* samp) const;
 
     // Unbind texture
     void unbind() const;

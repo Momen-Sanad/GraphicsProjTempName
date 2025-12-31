@@ -1,51 +1,38 @@
-#pragma once
+#ifndef WORLD_HPP
+#define WORLD_HPP
 
-#include "Coordinator.hpp"
-#include <string>
-#include <unordered_map>
-#include <memory>
-
-namespace ecs {
-
-/* World is a convenience wrapper around Coordinator that adds name -> entity
-   bookkeeping and parent/child relationships. This preserves
-   a World + Entity-model while still using the manager-based
-   Coordinator internally for components and systems. */
+#include <vector>
+#include "Entity.hpp"
+#include "../components/Camera.hpp"
+#include "EntityManager.hpp"
 
 class World {
 public:
-    World() { coordinator.Init(); }
+    World();
+    ~World() = default;
 
-    EntityId CreateEntity(const std::string &name = "") {
-        EntityId id = coordinator.CreateEntity();
-        if (!name.empty())
-            nameIndex.emplace(name, id);
-        return id;
-    }
-
-    void DestroyEntity(EntityId id) {
-        /* detach parent/children bookkeeping happens externally here; since
-           this World doesn't keep explicit children lists (to keep it simple),
-           user can implement relationship components if needed.
-           Remove from name index
-           NOTE: we keep it simple and remove any matching name entries.*/
-        for (auto it = nameIndex.begin(); it != nameIndex.end();) {
-            if (it->second == id) it = nameIndex.erase(it); else ++it;
-        }
-        coordinator.DestroyEntity(id);
-    }
-
-    EntityId FindByName(const std::string &name) const {
-        auto it = nameIndex.find(name);
-        if (it == nameIndex.end()) return 0;
-        return it->second;
-    }
-
-    Coordinator& GetCoordinator() { return coordinator; }
-
+    // --- Entity Factory ---
+    Entity* createEntityWithParams(Entity* parent = nullptr,
+                                   const glm::vec3& position = glm::vec3(0.f),
+                                   const glm::quat& rotation = glm::quat(1,0,0,0),
+                                   const glm::vec3& scale = glm::vec3(1.f),
+                                   MeshRenderer* mesh = nullptr,
+                                   Material* material = nullptr);
+    
+    Entity* add_entity();
+    void removeEntity(Entity* entity);
+    void clear();
+    
+    // --- Accessors ---
+    Camera& get_camera() { return camera; }
+    const std::vector<Entity*>& get_entities() const { return manager.getRootEntities(); }
+    EntityManager& getEntityManager() { return manager; }
+    
+    const std::vector<Entity*>& getRoots() const { return manager.getRoots(); }
+    
 private:
-    Coordinator coordinator;
-    std::unordered_multimap<std::string, EntityId> nameIndex;
+    Camera camera;
+    EntityManager manager;
 };
 
-}
+#endif

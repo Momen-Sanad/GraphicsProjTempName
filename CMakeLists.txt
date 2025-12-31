@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(ENGINE_BUILD_SHARED "Build Engine as a shared library instead of static" OFF)
 option(ENGINE_BUILD_EXAMPLES "Build example apps (src/app)" ON)
-option(ENGINE_ENABLE_TESTS "Enable building tests (tests/)" OFF)
+option(ENGINE_ENABLE_TESTS "Enable building tests (tests/)" ON)
 
 # ==========================================================
 # ================== GLFW CONFIGURATION ====================
@@ -41,6 +41,25 @@ include_directories(${CMAKE_SOURCE_DIR}/vendor/glm)
 # stb is also header-only.
 include_directories(${CMAKE_SOURCE_DIR}/vendor/stb)
 
+# ---------- ImGui ----------
+set(IMGUI_SOURCES
+    ${CMAKE_SOURCE_DIR}/vendor/imgui/imgui.cpp
+    ${CMAKE_SOURCE_DIR}/vendor/imgui/imgui_demo.cpp
+    ${CMAKE_SOURCE_DIR}/vendor/imgui/imgui_draw.cpp
+    ${CMAKE_SOURCE_DIR}/vendor/imgui/imgui_tables.cpp
+    ${CMAKE_SOURCE_DIR}/vendor/imgui/imgui_widgets.cpp
+    ${CMAKE_SOURCE_DIR}/vendor/imgui/backends/imgui_impl_glfw.cpp
+    ${CMAKE_SOURCE_DIR}/vendor/imgui/backends/imgui_impl_opengl3.cpp
+)
+add_library(imgui STATIC ${IMGUI_SOURCES})
+target_include_directories(imgui PUBLIC
+    ${CMAKE_SOURCE_DIR}/vendor/imgui
+    ${CMAKE_SOURCE_DIR}/vendor/imgui/backends
+    ${CMAKE_SOURCE_DIR}/vendor/glfw/include
+    ${CMAKE_SOURCE_DIR}/vendor/glad/include
+)
+target_link_libraries(imgui PUBLIC glfw glad)
+
 # ==========================================================
 # =================== OPENGL DETECTION =====================
 # ==========================================================
@@ -59,6 +78,7 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/engine/scripting/*.cpp
     ${CMAKE_SOURCE_DIR}/src/engine/systems/*.cpp
     ${CMAKE_SOURCE_DIR}/src/engine/utils/*.cpp
+    ${CMAKE_SOURCE_DIR}/src/engine/animations/*.cpp
 )
 
 # ==========================================================
@@ -78,13 +98,14 @@ target_include_directories(Engine
         ${CMAKE_SOURCE_DIR}/vendor/glad/include
         ${CMAKE_SOURCE_DIR}/vendor/glm
         ${CMAKE_SOURCE_DIR}/vendor/stb
-        ${CMAKE_SOURCE_DIR}/vendor/tinyobjloader
+        ${CMAKE_SOURCE_DIR}/vendor                  # for tiny_obj_loader.h and tinygltf
 )
 
 target_link_libraries(Engine
     PUBLIC
         glfw
         glad
+        imgui
         ${OPENGL_gl_LIBRARY}
 )
 
@@ -119,6 +140,12 @@ if (ENGINE_BUILD_EXAMPLES)
 
     target_link_libraries(OpenGLEngine PRIVATE Engine)
 
+    target_compile_definitions(OpenGLEngine PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        SHADER_DIR="${CMAKE_SOURCE_DIR}/shaders"
+        ASSET_DIR="${CMAKE_SOURCE_DIR}/assets"
+    )
+
     set_target_properties(OpenGLEngine PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
     )
@@ -137,25 +164,28 @@ endif()
 if (ENGINE_ENABLE_TESTS)
     enable_testing()
 
+    # Animation tests executable
+    add_executable(animation_tests ${CMAKE_SOURCE_DIR}/tests/animation_tests.cpp)
+    target_link_libraries(animation_tests PRIVATE Engine)
+    target_compile_definitions(animation_tests PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+    )
+    add_test(NAME animation_tests COMMAND animation_tests)
+
+    # Generic engine tests (all test files)
     file(GLOB TEST_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/tests/*.cpp)
     add_executable(EngineTests ${TEST_SOURCES})
     target_link_libraries(EngineTests PRIVATE Engine)
     add_test(NAME EngineTests COMMAND EngineTests)
 endif()
 
-# ==========================================================
-# =============== UNIT TEST: texture_Mesh_test =============
-# ==========================================================
-add_executable(TextureMeshTest tests/texture_Mesh_test.cpp)
-
-target_link_libraries(TextureMeshTest PRIVATE Engine)
-
-set_target_properties(TextureMeshTest PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
-)
-
-target_compile_definitions(TextureMeshTest PRIVATE
-    TEST_ASSET_DIR="${CMAKE_SOURCE_DIR}/tests/loading_files"
+add_executable(animation_demo tests/animation_demo.cpp)
+target_link_libraries(animation_demo Engine glfw glad imgui)
+target_compile_definitions(animation_demo PRIVATE
+    _CRT_SECURE_NO_WARNINGS
+    SHADER_DIR="${CMAKE_SOURCE_DIR}/shaders"
+    ASSET_DIR="${CMAKE_SOURCE_DIR}/assets"
+    SOURCE_DIR="${CMAKE_SOURCE_DIR}"
 )
 
 # ==========================================================

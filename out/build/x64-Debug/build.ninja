@@ -76,18 +76,137 @@ build glad.lib: C_STATIC_LIBRARY_LINKER__glad_Debug CMakeFiles\glad.dir\vendor\g
   TARGET_PDB = glad.pdb
 
 # =============================================================================
+# Object build statements for STATIC_LIBRARY target imgui
+
+
+#############################################
+# Order-only phony target for imgui
+
+build cmake_object_order_depends_target_imgui: phony || cmake_object_order_depends_target_glad cmake_object_order_depends_target_glfw
+
+build CMakeFiles\imgui.dir\vendor\imgui\imgui.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\imgui.cpp || cmake_object_order_depends_target_imgui
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\vendor\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+
+build CMakeFiles\imgui.dir\vendor\imgui\imgui_demo.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\imgui_demo.cpp || cmake_object_order_depends_target_imgui
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\vendor\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+
+build CMakeFiles\imgui.dir\vendor\imgui\imgui_draw.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\imgui_draw.cpp || cmake_object_order_depends_target_imgui
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\vendor\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+
+build CMakeFiles\imgui.dir\vendor\imgui\imgui_tables.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\imgui_tables.cpp || cmake_object_order_depends_target_imgui
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\vendor\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+
+build CMakeFiles\imgui.dir\vendor\imgui\imgui_widgets.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\imgui_widgets.cpp || cmake_object_order_depends_target_imgui
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\vendor\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+
+build CMakeFiles\imgui.dir\vendor\imgui\backends\imgui_impl_glfw.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends\imgui_impl_glfw.cpp || cmake_object_order_depends_target_imgui
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\vendor\imgui\backends
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+
+build CMakeFiles\imgui.dir\vendor\imgui\backends\imgui_impl_opengl3.cpp.obj: CXX_COMPILER__imgui_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends\imgui_impl_opengl3.cpp || cmake_object_order_depends_target_imgui
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  OBJECT_FILE_DIR = CMakeFiles\imgui.dir\vendor\imgui\backends
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_PDB = imgui.pdb
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target imgui
+
+
+#############################################
+# Link the static library imgui.lib
+
+build imgui.lib: CXX_STATIC_LIBRARY_LINKER__imgui_Debug CMakeFiles\imgui.dir\vendor\imgui\imgui.cpp.obj CMakeFiles\imgui.dir\vendor\imgui\imgui_demo.cpp.obj CMakeFiles\imgui.dir\vendor\imgui\imgui_draw.cpp.obj CMakeFiles\imgui.dir\vendor\imgui\imgui_tables.cpp.obj CMakeFiles\imgui.dir\vendor\imgui\imgui_widgets.cpp.obj CMakeFiles\imgui.dir\vendor\imgui\backends\imgui_impl_glfw.cpp.obj CMakeFiles\imgui.dir\vendor\imgui\backends\imgui_impl_opengl3.cpp.obj || glad.lib vendor\glfw\src\glfw3.lib
+  LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
+  LINK_FLAGS = /machine:x64
+  OBJECT_DIR = CMakeFiles\imgui.dir
+  POST_BUILD = cd .
+  PRE_LINK = cd .
+  TARGET_COMPILE_PDB = CMakeFiles\imgui.dir\imgui.pdb
+  TARGET_FILE = imgui.lib
+  TARGET_PDB = imgui.pdb
+
+# =============================================================================
 # Object build statements for STATIC_LIBRARY target Engine
 
 
 #############################################
 # Order-only phony target for Engine
 
-build cmake_object_order_depends_target_Engine: phony || cmake_object_order_depends_target_glad cmake_object_order_depends_target_glfw
+build cmake_object_order_depends_target_Engine: phony || cmake_object_order_depends_target_glad cmake_object_order_depends_target_glfw cmake_object_order_depends_target_imgui
+
+build CMakeFiles\Engine.dir\src\engine\animations\AnimationClip.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\animations\AnimationClip.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\animations
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\animations\Animator.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\animations\Animator.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\animations
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\animations\Skeleton.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\animations\Skeleton.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\animations
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
 
 build CMakeFiles\Engine.dir\src\engine\assets\AssetManager.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\assets\AssetManager.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\assets
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\assets\MaterialManager.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\assets\MaterialManager.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\assets
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -96,7 +215,16 @@ build CMakeFiles\Engine.dir\src\engine\assets\AssetManager.cpp.obj: CXX_COMPILER
 build CMakeFiles\Engine.dir\src\engine\assets\MeshLoader.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\assets\MeshLoader.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\assets
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\assets\SkinnedMaterial.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\assets\SkinnedMaterial.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\assets
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -105,7 +233,16 @@ build CMakeFiles\Engine.dir\src\engine\assets\MeshLoader.cpp.obj: CXX_COMPILER__
 build CMakeFiles\Engine.dir\src\engine\assets\TextureLoader.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\assets\TextureLoader.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\assets
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\assets\TexturedMaterial.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\assets\TexturedMaterial.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\assets
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -114,7 +251,25 @@ build CMakeFiles\Engine.dir\src\engine\assets\TextureLoader.cpp.obj: CXX_COMPILE
 build CMakeFiles\Engine.dir\src\engine\components\Camera.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\components\Camera.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\components
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\components\MeshRenderer.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\components\MeshRenderer.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\components
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\components\SkinnedMeshRenderer.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\components\SkinnedMeshRenderer.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\components
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -123,7 +278,7 @@ build CMakeFiles\Engine.dir\src\engine\components\Camera.cpp.obj: CXX_COMPILER__
 build CMakeFiles\Engine.dir\src\engine\components\Transform.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\components\Transform.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\components
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -132,7 +287,7 @@ build CMakeFiles\Engine.dir\src\engine\components\Transform.cpp.obj: CXX_COMPILE
 build CMakeFiles\Engine.dir\src\engine\core\Application.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\core\Application.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\core
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -141,7 +296,7 @@ build CMakeFiles\Engine.dir\src\engine\core\Application.cpp.obj: CXX_COMPILER__E
 build CMakeFiles\Engine.dir\src\engine\core\Engine.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\core\Engine.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\core
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -150,16 +305,43 @@ build CMakeFiles\Engine.dir\src\engine\core\Engine.cpp.obj: CXX_COMPILER__Engine
 build CMakeFiles\Engine.dir\src\engine\core\FrameScheduler.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\core\FrameScheduler.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\core
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
   TARGET_PDB = Engine.pdb
 
-build CMakeFiles\Engine.dir\src\engine\ecs\ComponentManager.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\ecs\ComponentManager.cpp || cmake_object_order_depends_target_Engine
+build CMakeFiles\Engine.dir\src\engine\ecs\AnimationComponent.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\ecs\AnimationComponent.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\ecs
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\ecs\CameraController.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\ecs\CameraController.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\ecs
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\ecs\Component.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\ecs\Component.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\ecs
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\ecs\Entity.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\ecs\Entity.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\ecs
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -168,7 +350,16 @@ build CMakeFiles\Engine.dir\src\engine\ecs\ComponentManager.cpp.obj: CXX_COMPILE
 build CMakeFiles\Engine.dir\src\engine\ecs\EntityManager.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\ecs\EntityManager.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\ecs
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\ecs\ShaderManager.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\ecs\ShaderManager.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\ecs
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -177,7 +368,25 @@ build CMakeFiles\Engine.dir\src\engine\ecs\EntityManager.cpp.obj: CXX_COMPILER__
 build CMakeFiles\Engine.dir\src\engine\ecs\SystemManager.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\ecs\SystemManager.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\ecs
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\ecs\TransformComponent.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\ecs\TransformComponent.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\ecs
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\ecs\World.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\ecs\World.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\ecs
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -186,7 +395,7 @@ build CMakeFiles\Engine.dir\src\engine\ecs\SystemManager.cpp.obj: CXX_COMPILER__
 build CMakeFiles\Engine.dir\src\engine\gl\GLContext.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\gl\GLContext.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\gl
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -195,7 +404,7 @@ build CMakeFiles\Engine.dir\src\engine\gl\GLContext.cpp.obj: CXX_COMPILER__Engin
 build CMakeFiles\Engine.dir\src\engine\gl\Mesh.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\gl\Mesh.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\gl
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -204,7 +413,16 @@ build CMakeFiles\Engine.dir\src\engine\gl\Mesh.cpp.obj: CXX_COMPILER__Engine_uns
 build CMakeFiles\Engine.dir\src\engine\gl\Shader.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\gl\Shader.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\gl
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\gl\SkinnedMesh.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\gl\SkinnedMesh.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\gl
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -213,7 +431,7 @@ build CMakeFiles\Engine.dir\src\engine\gl\Shader.cpp.obj: CXX_COMPILER__Engine_u
 build CMakeFiles\Engine.dir\src\engine\gl\Texture.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\gl\Texture.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\gl
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -222,7 +440,7 @@ build CMakeFiles\Engine.dir\src\engine\gl\Texture.cpp.obj: CXX_COMPILER__Engine_
 build CMakeFiles\Engine.dir\src\engine\platform\Window.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\platform\Window.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\platform
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -231,7 +449,7 @@ build CMakeFiles\Engine.dir\src\engine\platform\Window.cpp.obj: CXX_COMPILER__En
 build CMakeFiles\Engine.dir\src\engine\scripting\ScriptSystem.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\scripting\ScriptSystem.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\scripting
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -240,7 +458,7 @@ build CMakeFiles\Engine.dir\src\engine\scripting\ScriptSystem.cpp.obj: CXX_COMPI
 build CMakeFiles\Engine.dir\src\engine\systems\PhysicsSystem.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\systems\PhysicsSystem.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\systems
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -249,7 +467,16 @@ build CMakeFiles\Engine.dir\src\engine\systems\PhysicsSystem.cpp.obj: CXX_COMPIL
 build CMakeFiles\Engine.dir\src\engine\systems\RenderSystem.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\systems\RenderSystem.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\Engine.dir
+  OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\systems
+  TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
+  TARGET_PDB = Engine.pdb
+
+build CMakeFiles\Engine.dir\src\engine\systems\SimplePhysicsBackend.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\systems\SimplePhysicsBackend.cpp || cmake_object_order_depends_target_Engine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\systems
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -258,7 +485,7 @@ build CMakeFiles\Engine.dir\src\engine\systems\RenderSystem.cpp.obj: CXX_COMPILE
 build CMakeFiles\Engine.dir\src\engine\systems\TransformSystem.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\systems\TransformSystem.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\systems
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -267,7 +494,7 @@ build CMakeFiles\Engine.dir\src\engine\systems\TransformSystem.cpp.obj: CXX_COMP
 build CMakeFiles\Engine.dir\src\engine\utils\Logger.cpp.obj: CXX_COMPILER__Engine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\engine\utils\Logger.cpp || cmake_object_order_depends_target_Engine
   DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20 /W4
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\Engine.dir
   OBJECT_FILE_DIR = CMakeFiles\Engine.dir\src\engine\utils
   TARGET_COMPILE_PDB = CMakeFiles\Engine.dir\Engine.pdb
@@ -281,7 +508,7 @@ build CMakeFiles\Engine.dir\src\engine\utils\Logger.cpp.obj: CXX_COMPILER__Engin
 #############################################
 # Link the static library Engine.lib
 
-build Engine.lib: CXX_STATIC_LIBRARY_LINKER__Engine_Debug CMakeFiles\Engine.dir\src\engine\assets\AssetManager.cpp.obj CMakeFiles\Engine.dir\src\engine\assets\MeshLoader.cpp.obj CMakeFiles\Engine.dir\src\engine\assets\TextureLoader.cpp.obj CMakeFiles\Engine.dir\src\engine\components\Camera.cpp.obj CMakeFiles\Engine.dir\src\engine\components\Transform.cpp.obj CMakeFiles\Engine.dir\src\engine\core\Application.cpp.obj CMakeFiles\Engine.dir\src\engine\core\Engine.cpp.obj CMakeFiles\Engine.dir\src\engine\core\FrameScheduler.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\ComponentManager.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\EntityManager.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\SystemManager.cpp.obj CMakeFiles\Engine.dir\src\engine\gl\GLContext.cpp.obj CMakeFiles\Engine.dir\src\engine\gl\Mesh.cpp.obj CMakeFiles\Engine.dir\src\engine\gl\Shader.cpp.obj CMakeFiles\Engine.dir\src\engine\gl\Texture.cpp.obj CMakeFiles\Engine.dir\src\engine\platform\Window.cpp.obj CMakeFiles\Engine.dir\src\engine\scripting\ScriptSystem.cpp.obj CMakeFiles\Engine.dir\src\engine\systems\PhysicsSystem.cpp.obj CMakeFiles\Engine.dir\src\engine\systems\RenderSystem.cpp.obj CMakeFiles\Engine.dir\src\engine\systems\TransformSystem.cpp.obj CMakeFiles\Engine.dir\src\engine\utils\Logger.cpp.obj || glad.lib vendor\glfw\src\glfw3.lib
+build Engine.lib: CXX_STATIC_LIBRARY_LINKER__Engine_Debug CMakeFiles\Engine.dir\src\engine\animations\AnimationClip.cpp.obj CMakeFiles\Engine.dir\src\engine\animations\Animator.cpp.obj CMakeFiles\Engine.dir\src\engine\animations\Skeleton.cpp.obj CMakeFiles\Engine.dir\src\engine\assets\AssetManager.cpp.obj CMakeFiles\Engine.dir\src\engine\assets\MaterialManager.cpp.obj CMakeFiles\Engine.dir\src\engine\assets\MeshLoader.cpp.obj CMakeFiles\Engine.dir\src\engine\assets\SkinnedMaterial.cpp.obj CMakeFiles\Engine.dir\src\engine\assets\TextureLoader.cpp.obj CMakeFiles\Engine.dir\src\engine\assets\TexturedMaterial.cpp.obj CMakeFiles\Engine.dir\src\engine\components\Camera.cpp.obj CMakeFiles\Engine.dir\src\engine\components\MeshRenderer.cpp.obj CMakeFiles\Engine.dir\src\engine\components\SkinnedMeshRenderer.cpp.obj CMakeFiles\Engine.dir\src\engine\components\Transform.cpp.obj CMakeFiles\Engine.dir\src\engine\core\Application.cpp.obj CMakeFiles\Engine.dir\src\engine\core\Engine.cpp.obj CMakeFiles\Engine.dir\src\engine\core\FrameScheduler.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\AnimationComponent.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\CameraController.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\Component.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\Entity.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\EntityManager.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\ShaderManager.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\SystemManager.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\TransformComponent.cpp.obj CMakeFiles\Engine.dir\src\engine\ecs\World.cpp.obj CMakeFiles\Engine.dir\src\engine\gl\GLContext.cpp.obj CMakeFiles\Engine.dir\src\engine\gl\Mesh.cpp.obj CMakeFiles\Engine.dir\src\engine\gl\Shader.cpp.obj CMakeFiles\Engine.dir\src\engine\gl\SkinnedMesh.cpp.obj CMakeFiles\Engine.dir\src\engine\gl\Texture.cpp.obj CMakeFiles\Engine.dir\src\engine\platform\Window.cpp.obj CMakeFiles\Engine.dir\src\engine\scripting\ScriptSystem.cpp.obj CMakeFiles\Engine.dir\src\engine\systems\PhysicsSystem.cpp.obj CMakeFiles\Engine.dir\src\engine\systems\RenderSystem.cpp.obj CMakeFiles\Engine.dir\src\engine\systems\SimplePhysicsBackend.cpp.obj CMakeFiles\Engine.dir\src\engine\systems\TransformSystem.cpp.obj CMakeFiles\Engine.dir\src\engine\utils\Logger.cpp.obj || glad.lib imgui.lib vendor\glfw\src\glfw3.lib
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = CMakeFiles\Engine.dir
@@ -298,11 +525,12 @@ build Engine.lib: CXX_STATIC_LIBRARY_LINKER__Engine_Debug CMakeFiles\Engine.dir\
 #############################################
 # Order-only phony target for OpenGLEngine
 
-build cmake_object_order_depends_target_OpenGLEngine: phony || cmake_object_order_depends_target_Engine cmake_object_order_depends_target_glad cmake_object_order_depends_target_glfw
+build cmake_object_order_depends_target_OpenGLEngine: phony || cmake_object_order_depends_target_Engine cmake_object_order_depends_target_glad cmake_object_order_depends_target_glfw cmake_object_order_depends_target_imgui
 
 build CMakeFiles\OpenGLEngine.dir\src\app\main.cpp.obj: CXX_COMPILER__OpenGLEngine_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\src\app\main.cpp || cmake_object_order_depends_target_OpenGLEngine
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
   OBJECT_DIR = CMakeFiles\OpenGLEngine.dir
   OBJECT_FILE_DIR = CMakeFiles\OpenGLEngine.dir\src\app
   TARGET_COMPILE_PDB = CMakeFiles\OpenGLEngine.dir\
@@ -316,10 +544,10 @@ build CMakeFiles\OpenGLEngine.dir\src\app\main.cpp.obj: CXX_COMPILER__OpenGLEngi
 #############################################
 # Link the executable OpenGLEngine.exe
 
-build OpenGLEngine.exe: CXX_EXECUTABLE_LINKER__OpenGLEngine_Debug CMakeFiles\OpenGLEngine.dir\src\app\main.cpp.obj | Engine.lib vendor\glfw\src\glfw3.lib glad.lib || Engine.lib glad.lib vendor\glfw\src\glfw3.lib
+build OpenGLEngine.exe: CXX_EXECUTABLE_LINKER__OpenGLEngine_Debug CMakeFiles\OpenGLEngine.dir\src\app\main.cpp.obj | Engine.lib imgui.lib vendor\glfw\src\glfw3.lib glad.lib || Engine.lib glad.lib imgui.lib vendor\glfw\src\glfw3.lib
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = Engine.lib  vendor\glfw\src\glfw3.lib  glad.lib  opengl32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = Engine.lib  imgui.lib  vendor\glfw\src\glfw3.lib  glad.lib  opengl32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\OpenGLEngine.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -329,42 +557,42 @@ build OpenGLEngine.exe: CXX_EXECUTABLE_LINKER__OpenGLEngine_Debug CMakeFiles\Ope
   TARGET_PDB = OpenGLEngine.pdb
 
 # =============================================================================
-# Object build statements for EXECUTABLE target TextureMeshTest
+# Object build statements for EXECUTABLE target animation_demo
 
 
 #############################################
-# Order-only phony target for TextureMeshTest
+# Order-only phony target for animation_demo
 
-build cmake_object_order_depends_target_TextureMeshTest: phony || cmake_object_order_depends_target_Engine cmake_object_order_depends_target_glad cmake_object_order_depends_target_glfw
+build cmake_object_order_depends_target_animation_demo: phony || cmake_object_order_depends_target_Engine cmake_object_order_depends_target_glad cmake_object_order_depends_target_glfw cmake_object_order_depends_target_imgui
 
-build CMakeFiles\TextureMeshTest.dir\tests\texture_Mesh_test.cpp.obj: CXX_COMPILER__TextureMeshTest_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\tests\texture_Mesh_test.cpp || cmake_object_order_depends_target_TextureMeshTest
-  DEFINES = -DTEST_ASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/tests/loading_files\"
+build CMakeFiles\animation_demo.dir\tests\animation_demo.cpp.obj: CXX_COMPILER__animation_demo_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\tests\animation_demo.cpp || cmake_object_order_depends_target_animation_demo
+  DEFINES = -DASSET_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/assets\" -DSHADER_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName/shaders\" -DSOURCE_DIR=\"C:/Users/asus/source/repos/GraphicsProjTempName\" -D_CRT_SECURE_NO_WARNINGS
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1 -std:c++20
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\tinyobjloader
-  OBJECT_DIR = CMakeFiles\TextureMeshTest.dir
-  OBJECT_FILE_DIR = CMakeFiles\TextureMeshTest.dir\tests
-  TARGET_COMPILE_PDB = CMakeFiles\TextureMeshTest.dir\
-  TARGET_PDB = tests\TextureMeshTest.pdb
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glm -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\stb -IC:\Users\asus\source\repos\GraphicsProjTempName\src -IC:\Users\asus\source\repos\GraphicsProjTempName\src\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glad\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\imgui\backends
+  OBJECT_DIR = CMakeFiles\animation_demo.dir
+  OBJECT_FILE_DIR = CMakeFiles\animation_demo.dir\tests
+  TARGET_COMPILE_PDB = CMakeFiles\animation_demo.dir\
+  TARGET_PDB = animation_demo.pdb
 
 
 # =============================================================================
-# Link build statements for EXECUTABLE target TextureMeshTest
+# Link build statements for EXECUTABLE target animation_demo
 
 
 #############################################
-# Link the executable tests\TextureMeshTest.exe
+# Link the executable animation_demo.exe
 
-build tests\TextureMeshTest.exe: CXX_EXECUTABLE_LINKER__TextureMeshTest_Debug CMakeFiles\TextureMeshTest.dir\tests\texture_Mesh_test.cpp.obj | Engine.lib vendor\glfw\src\glfw3.lib glad.lib || Engine.lib glad.lib vendor\glfw\src\glfw3.lib
+build animation_demo.exe: CXX_EXECUTABLE_LINKER__animation_demo_Debug CMakeFiles\animation_demo.dir\tests\animation_demo.cpp.obj | Engine.lib vendor\glfw\src\glfw3.lib glad.lib imgui.lib vendor\glfw\src\glfw3.lib glad.lib || Engine.lib glad.lib imgui.lib vendor\glfw\src\glfw3.lib
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = Engine.lib  vendor\glfw\src\glfw3.lib  glad.lib  opengl32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
-  OBJECT_DIR = CMakeFiles\TextureMeshTest.dir
+  LINK_LIBRARIES = Engine.lib  vendor\glfw\src\glfw3.lib  glad.lib  imgui.lib  vendor\glfw\src\glfw3.lib  glad.lib  opengl32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  OBJECT_DIR = CMakeFiles\animation_demo.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_COMPILE_PDB = CMakeFiles\TextureMeshTest.dir\
-  TARGET_FILE = tests\TextureMeshTest.exe
-  TARGET_IMPLIB = TextureMeshTest.lib
-  TARGET_PDB = tests\TextureMeshTest.pdb
+  TARGET_COMPILE_PDB = CMakeFiles\animation_demo.dir\
+  TARGET_FILE = animation_demo.exe
+  TARGET_IMPLIB = animation_demo.lib
+  TARGET_PDB = animation_demo.pdb
 
 
 #############################################
@@ -422,6 +650,12 @@ build vendor\glfw\rebuild_cache: phony vendor\glfw\CMakeFiles\rebuild_cache.util
 # C:/Users/asus/source/repos/GraphicsProjTempName/vendor/glfw/CMakeLists.txt
 # =============================================================================
 
+
+#############################################
+# Utility command for update_mappings
+
+build vendor\glfw\src\update_mappings: phony vendor\glfw\src\CMakeFiles\update_mappings
+
 # =============================================================================
 # Object build statements for STATIC_LIBRARY target glfw
 
@@ -432,7 +666,7 @@ build vendor\glfw\rebuild_cache: phony vendor\glfw\CMakeFiles\rebuild_cache.util
 build cmake_object_order_depends_target_glfw: phony || .
 
 build vendor\glfw\src\CMakeFiles\glfw.dir\context.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\context.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
   INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -441,7 +675,7 @@ build vendor\glfw\src\CMakeFiles\glfw.dir\context.c.obj: C_COMPILER__glfw_unscan
   TARGET_PDB = vendor\glfw\src\glfw3.pdb
 
 build vendor\glfw\src\CMakeFiles\glfw.dir\init.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\init.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
   INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -450,7 +684,7 @@ build vendor\glfw\src\CMakeFiles\glfw.dir\init.c.obj: C_COMPILER__glfw_unscanned
   TARGET_PDB = vendor\glfw\src\glfw3.pdb
 
 build vendor\glfw\src\CMakeFiles\glfw.dir\input.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\input.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
   INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -459,16 +693,7 @@ build vendor\glfw\src\CMakeFiles\glfw.dir\input.c.obj: C_COMPILER__glfw_unscanne
   TARGET_PDB = vendor\glfw\src\glfw3.pdb
 
 build vendor\glfw\src\CMakeFiles\glfw.dir\monitor.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\monitor.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
-  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
-  TARGET_PDB = vendor\glfw\src\glfw3.pdb
-
-build vendor\glfw\src\CMakeFiles\glfw.dir\platform.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\platform.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
   INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -477,7 +702,7 @@ build vendor\glfw\src\CMakeFiles\glfw.dir\platform.c.obj: C_COMPILER__glfw_unsca
   TARGET_PDB = vendor\glfw\src\glfw3.pdb
 
 build vendor\glfw\src\CMakeFiles\glfw.dir\vulkan.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\vulkan.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
   INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -486,88 +711,7 @@ build vendor\glfw\src\CMakeFiles\glfw.dir\vulkan.c.obj: C_COMPILER__glfw_unscann
   TARGET_PDB = vendor\glfw\src\glfw3.pdb
 
 build vendor\glfw\src\CMakeFiles\glfw.dir\window.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\window.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
-  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
-  TARGET_PDB = vendor\glfw\src\glfw3.pdb
-
-build vendor\glfw\src\CMakeFiles\glfw.dir\egl_context.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\egl_context.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
-  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
-  TARGET_PDB = vendor\glfw\src\glfw3.pdb
-
-build vendor\glfw\src\CMakeFiles\glfw.dir\osmesa_context.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\osmesa_context.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
-  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
-  TARGET_PDB = vendor\glfw\src\glfw3.pdb
-
-build vendor\glfw\src\CMakeFiles\glfw.dir\null_init.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\null_init.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
-  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
-  TARGET_PDB = vendor\glfw\src\glfw3.pdb
-
-build vendor\glfw\src\CMakeFiles\glfw.dir\null_monitor.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\null_monitor.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
-  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
-  TARGET_PDB = vendor\glfw\src\glfw3.pdb
-
-build vendor\glfw\src\CMakeFiles\glfw.dir\null_window.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\null_window.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
-  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
-  TARGET_PDB = vendor\glfw\src\glfw3.pdb
-
-build vendor\glfw\src\CMakeFiles\glfw.dir\null_joystick.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\null_joystick.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
-  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
-  TARGET_PDB = vendor\glfw\src\glfw3.pdb
-
-build vendor\glfw\src\CMakeFiles\glfw.dir\win32_module.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\win32_module.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
-  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
-  TARGET_PDB = vendor\glfw\src\glfw3.pdb
-
-build vendor\glfw\src\CMakeFiles\glfw.dir\win32_time.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\win32_time.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
-  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
-  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
-  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
-  TARGET_PDB = vendor\glfw\src\glfw3.pdb
-
-build vendor\glfw\src\CMakeFiles\glfw.dir\win32_thread.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\win32_thread.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
   INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -576,7 +720,7 @@ build vendor\glfw\src\CMakeFiles\glfw.dir\win32_thread.c.obj: C_COMPILER__glfw_u
   TARGET_PDB = vendor\glfw\src\glfw3.pdb
 
 build vendor\glfw\src\CMakeFiles\glfw.dir\win32_init.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\win32_init.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
   INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -585,7 +729,7 @@ build vendor\glfw\src\CMakeFiles\glfw.dir\win32_init.c.obj: C_COMPILER__glfw_uns
   TARGET_PDB = vendor\glfw\src\glfw3.pdb
 
 build vendor\glfw\src\CMakeFiles\glfw.dir\win32_joystick.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\win32_joystick.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
   INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -594,7 +738,25 @@ build vendor\glfw\src\CMakeFiles\glfw.dir\win32_joystick.c.obj: C_COMPILER__glfw
   TARGET_PDB = vendor\glfw\src\glfw3.pdb
 
 build vendor\glfw\src\CMakeFiles\glfw.dir\win32_monitor.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\win32_monitor.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
+  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
+  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
+  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
+  TARGET_PDB = vendor\glfw\src\glfw3.pdb
+
+build vendor\glfw\src\CMakeFiles\glfw.dir\win32_time.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\win32_time.c || cmake_object_order_depends_target_glfw
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
+  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
+  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
+  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
+  TARGET_PDB = vendor\glfw\src\glfw3.pdb
+
+build vendor\glfw\src\CMakeFiles\glfw.dir\win32_thread.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\win32_thread.c || cmake_object_order_depends_target_glfw
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
   INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -603,7 +765,7 @@ build vendor\glfw\src\CMakeFiles\glfw.dir\win32_monitor.c.obj: C_COMPILER__glfw_
   TARGET_PDB = vendor\glfw\src\glfw3.pdb
 
 build vendor\glfw\src\CMakeFiles\glfw.dir\win32_window.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\win32_window.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
   INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -612,7 +774,25 @@ build vendor\glfw\src\CMakeFiles\glfw.dir\win32_window.c.obj: C_COMPILER__glfw_u
   TARGET_PDB = vendor\glfw\src\glfw3.pdb
 
 build vendor\glfw\src\CMakeFiles\glfw.dir\wgl_context.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\wgl_context.c || cmake_object_order_depends_target_glfw
-  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_HYBRID_HPG -D_GLFW_WIN32 -D_UNICODE
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
+  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
+  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
+  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
+  TARGET_PDB = vendor\glfw\src\glfw3.pdb
+
+build vendor\glfw\src\CMakeFiles\glfw.dir\egl_context.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\egl_context.c || cmake_object_order_depends_target_glfw
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
+  INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
+  OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
+  OBJECT_FILE_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
+  TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
+  TARGET_PDB = vendor\glfw\src\glfw3.pdb
+
+build vendor\glfw\src\CMakeFiles\glfw.dir\osmesa_context.c.obj: C_COMPILER__glfw_unscanned_Debug C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\osmesa_context.c || cmake_object_order_depends_target_glfw
+  DEFINES = -DUNICODE -D_CRT_SECURE_NO_WARNINGS -D_GLFW_USE_CONFIG_H -D_UNICODE
   FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1 /W3
   INCLUDES = -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\include -IC:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src -IC:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\vendor\glfw\src
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -628,7 +808,7 @@ build vendor\glfw\src\CMakeFiles\glfw.dir\wgl_context.c.obj: C_COMPILER__glfw_un
 #############################################
 # Link the static library vendor\glfw\src\glfw3.lib
 
-build vendor\glfw\src\glfw3.lib: C_STATIC_LIBRARY_LINKER__glfw_Debug vendor\glfw\src\CMakeFiles\glfw.dir\context.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\init.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\input.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\monitor.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\platform.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\vulkan.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\window.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\egl_context.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\osmesa_context.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\null_init.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\null_monitor.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\null_window.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\null_joystick.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_module.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_time.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_thread.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_init.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_joystick.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_monitor.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_window.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\wgl_context.c.obj
+build vendor\glfw\src\glfw3.lib: C_STATIC_LIBRARY_LINKER__glfw_Debug vendor\glfw\src\CMakeFiles\glfw.dir\context.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\init.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\input.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\monitor.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\vulkan.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\window.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_init.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_joystick.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_monitor.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_time.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_thread.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\win32_window.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\wgl_context.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\egl_context.c.obj vendor\glfw\src\CMakeFiles\glfw.dir\osmesa_context.c.obj
   LANGUAGE_COMPILE_FLAGS = /DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64
   OBJECT_DIR = vendor\glfw\src\CMakeFiles\glfw.dir
@@ -637,12 +817,6 @@ build vendor\glfw\src\glfw3.lib: C_STATIC_LIBRARY_LINKER__glfw_Debug vendor\glfw
   TARGET_COMPILE_PDB = vendor\glfw\src\CMakeFiles\glfw.dir\glfw.pdb
   TARGET_FILE = vendor\glfw\src\glfw3.lib
   TARGET_PDB = vendor\glfw\src\glfw3.pdb
-
-
-#############################################
-# Utility command for update_mappings
-
-build vendor\glfw\src\update_mappings: phony vendor\glfw\src\CMakeFiles\update_mappings
 
 
 #############################################
@@ -682,15 +856,15 @@ build Engine: phony Engine.lib
 
 build OpenGLEngine: phony OpenGLEngine.exe
 
-build TextureMeshTest: phony tests\TextureMeshTest.exe
-
-build TextureMeshTest.exe: phony tests\TextureMeshTest.exe
+build animation_demo: phony animation_demo.exe
 
 build glad: phony glad.lib
 
 build glfw: phony vendor\glfw\src\glfw3.lib
 
 build glfw3.lib: phony vendor\glfw\src\glfw3.lib
+
+build imgui: phony imgui.lib
 
 build update_mappings: phony vendor\glfw\src\update_mappings
 
@@ -702,7 +876,7 @@ build update_mappings: phony vendor\glfw\src\update_mappings
 #############################################
 # Folder: C:/Users/asus/source/repos/GraphicsProjTempName/out/build/x64-Debug
 
-build all: phony glad.lib Engine.lib OpenGLEngine.exe tests\TextureMeshTest.exe
+build all: phony glad.lib imgui.lib Engine.lib OpenGLEngine.exe animation_demo.exe
 
 # =============================================================================
 
@@ -739,14 +913,14 @@ build C$:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\CMake
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE C$:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\CMakeFiles\cmake.verify_globs | C$:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\BasicConfigVersion-SameMajorVersion.cmake.in C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCXXInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeDependentOption.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeGenericSystem.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakePackageConfigHelpers.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeRCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckCSourceCompiles.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckIncludeFile.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckLibraryExists.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindOpenGL.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageMessage.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindThreads.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\GNUInstallDirs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCXXLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCommonLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CheckSourceCompiles.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-Initialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\WindowsPaths.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\WriteBasicConfigVersionFile.cmake C$:\Users\asus\source\repos\GraphicsProjTempName\CMakeLists.txt C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\CMakeLists.txt C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\CMake\glfw3.pc.in C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\CMake\glfw3Config.cmake.in C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\CMakeLists.txt CMakeCache.txt CMakeFiles\3.31.6-msvc6\CMakeCCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeCXXCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeRCCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE C$:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\CMakeFiles\cmake.verify_globs | C$:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\BasicConfigVersion-SameMajorVersion.cmake.in C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCXXInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeDependentOption.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeGenericSystem.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakePackageConfigHelpers.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeRCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckCSourceCompiles.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckIncludeFile.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckLibraryExists.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindOpenGL.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageMessage.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindThreads.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\GNUInstallDirs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCXXLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCommonLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CheckSourceCompiles.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-Initialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\WindowsPaths.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\WriteBasicConfigVersionFile.cmake C$:\Users\asus\source\repos\GraphicsProjTempName\CMakeLists.txt C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\CMakeLists.txt C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\CMakeLists.txt C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\glfw3.pc.in C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\glfw3Config.cmake.in C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\glfw_config.h.in CMakeCache.txt CMakeFiles\3.31.6-msvc6\CMakeCCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeCXXCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeRCCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build C$:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\BasicConfigVersion-SameMajorVersion.cmake.in C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCXXInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeDependentOption.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeGenericSystem.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakePackageConfigHelpers.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeRCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckCSourceCompiles.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckIncludeFile.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckLibraryExists.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindOpenGL.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageMessage.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindThreads.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\GNUInstallDirs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCXXLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCommonLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CheckSourceCompiles.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-Initialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\WindowsPaths.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\WriteBasicConfigVersionFile.cmake C$:\Users\asus\source\repos\GraphicsProjTempName\CMakeLists.txt C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\CMakeLists.txt C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\CMake\glfw3.pc.in C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\CMake\glfw3Config.cmake.in C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\CMakeLists.txt CMakeCache.txt CMakeFiles\3.31.6-msvc6\CMakeCCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeCXXCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeRCCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeSystem.cmake: phony
+build C$:\Users\asus\source\repos\GraphicsProjTempName\out\build\x64-Debug\CMakeFiles\VerifyGlobs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\BasicConfigVersion-SameMajorVersion.cmake.in C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCXXInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeDependentOption.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeGenericSystem.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakePackageConfigHelpers.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeRCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckCSourceCompiles.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckIncludeFile.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\CheckLibraryExists.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Compiler\MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindOpenGL.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageHandleStandardArgs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindPackageMessage.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\FindThreads.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\GNUInstallDirs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCXXLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CMakeCommonLinkerInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Internal\CheckSourceCompiles.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Linker\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-Initialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\Windows.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\Platform\WindowsPaths.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.31\Modules\WriteBasicConfigVersionFile.cmake C$:\Users\asus\source\repos\GraphicsProjTempName\CMakeLists.txt C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\CMakeLists.txt C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\CMakeLists.txt C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\glfw3.pc.in C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\glfw3Config.cmake.in C$:\Users\asus\source\repos\GraphicsProjTempName\vendor\glfw\src\glfw_config.h.in CMakeCache.txt CMakeFiles\3.31.6-msvc6\CMakeCCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeCXXCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeRCCompiler.cmake CMakeFiles\3.31.6-msvc6\CMakeSystem.cmake: phony
 
 
 #############################################

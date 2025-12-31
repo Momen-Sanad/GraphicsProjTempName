@@ -1,12 +1,11 @@
 #pragma once
+#include "../gl/SkinnedMesh.hpp"
+#include "../ecs/AnimationComponent.hpp"
 #include <string>
 #include <unordered_map>
-#include <glad/gl.h>
-#include <GLFW/glfw3.h>
-#include <glm.hpp>
 #include <memory>
 #include <functional>
-#include "../gl/Mesh.hpp"
+
 
 class MeshLoader
 {
@@ -15,7 +14,8 @@ private:
 
 public:
     // Core loading interface
-    static Mesh* load(const char* path);
+    static Mesh* load_obj(const char* path);
+    static ModelData* load_gltf(const char* path);
 
     // Memory management
     static void unload(const std::string& filepath);
