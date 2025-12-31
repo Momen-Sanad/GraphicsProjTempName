@@ -20,7 +20,6 @@
 #include "../engine/components/MeshRenderer.hpp"
 #include "../engine/gl/Mesh.hpp"
 #include "../engine/ecs/Collider.hpp"
-#include "../engine/components/CameraFollowComponent.hpp"
 #include "../engine/utils/Im_GUI_Inspector.hpp"
 #include "../engine/assets/MeshLoader.hpp"
 #include "../engine/assets/TexturedMaterial.hpp"
@@ -256,6 +255,7 @@ int main() {
     // std::unique_ptr<Player> player = std::make_unique<Crusader>(world, root, &cube, &green, &cube, &brown);
     
     player->setPosition({0.0f, 1.0f, 0.0f});
+    player->attachCamera(&world.get_camera(), {0.0f, 2.5f, 6.0f}, {0.0f, 1.0f, 0.0f});
 
     // is a unique ptr cuz we have many enemies that are unrelated
     std::unique_ptr<Enemy> enemy = CreateEnemy(world, root, &cube, &red);
@@ -286,9 +286,6 @@ int main() {
     bool houseCollisionReady = false;
     bool sphereCollisionReady = false;
     const float sphereMoveSpeed = 3.0f;
-
-    CameraFollowPlayer sphereCameraFollow(&world.get_camera(), collisionSphere);
-    sphereCameraFollow.setOffsets({0.0f, 2.0f, 5.0f}, {0.0f, 1.0f, 0.0f});
 
     if (player) {
         playerCollider.setParent(player->getBody());
@@ -438,8 +435,6 @@ int main() {
                 );
             }
         }
-
-        sphereCameraFollow.update(delta_time);
 
         if (player && houseCollisionReady) {
             PhysicsCollisionSystem::resolveStaticCollision(
