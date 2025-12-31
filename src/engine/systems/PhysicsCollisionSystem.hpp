@@ -13,6 +13,15 @@ public:
         glm::vec3 halfExtents{0.5f, 0.5f, 0.5f};
     };
 
+    struct AABB {
+        glm::vec3 min{0.0f};
+        glm::vec3 max{0.0f};
+    };
+
     static bool computeMeshBounds(const Mesh& mesh, MeshBounds& outBounds);
-    struct AABB {\n        glm::vec3 min{0.0f};\n        glm::vec3 max{0.0f};\n    };\n+\n+    static bool resolveStaticCollision(Entity* mover,\n+                                       const Collider& moverCollider,\n+                                       Entity* staticEntity,\n+                                       const Collider& staticCollider);
+
+    static bool resolveStaticCollision(Entity* mover,
+                                       const Collider& moverCollider,
+                                       Entity* staticEntity,
+                                       const Collider& staticCollider);
 };

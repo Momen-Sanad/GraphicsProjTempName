@@ -1,4 +1,5 @@
 #pragma once
+#include <glad/gl.h>
 #include "Material.hpp"
 #include <glm/glm.hpp>
 

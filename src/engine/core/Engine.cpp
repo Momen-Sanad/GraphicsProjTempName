@@ -94,6 +94,7 @@ void Engine::registerCoreSystems() {
     m_renderSystem = std::make_unique<RenderSystem>(m_world, *m_window);
     m_scriptSystem = std::make_unique<ScriptSystem>(m_world);
 
+    // note: this matches the type declared in Engine.hpp
     m_physicsSystem = std::make_unique<gproj::physics::PhysicsSystem>(m_world, *m_physicsBackend);
     m_physicsSystem->initialize();
 

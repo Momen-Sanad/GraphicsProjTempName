@@ -1,8 +1,8 @@
 #pragma once
 
 #include "AssetHandle.hpp"
-#include "MaterialManager.hpp"
 #include "ShaderManager.hpp"
+#include "MaterialManager.hpp"
 #include <string>
 #include <utility>
 

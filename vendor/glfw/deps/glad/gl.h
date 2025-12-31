@@ -3838,3 +3838,14 @@ GLAD_API_CALL int gladLoadGL( GLADloadfunc load);
 }
 #endif
 #endif
+/* Remove or comment out the following block to avoid the C1189 error:
+#ifdef __gl_h_
+    #error OpenGL header already included (API: gl), remove previous include!
+#endif
+#define __gl_h_ 1
+*/
+
+/* Replace with this: */
+#ifndef __gl_h_
+#define __gl_h_ 1
+#endif

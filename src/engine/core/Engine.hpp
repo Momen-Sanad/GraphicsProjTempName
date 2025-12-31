@@ -9,12 +9,13 @@ class SceneManager;
 class Window;
 
 class RenderSystem;
-class PhysicsSystem;
 class ScriptSystem;
 class TransformSystem;
 
+// Forward-declare physics types inside their namespace to match real definitions.
 namespace gproj::physics {
-class PhysicsBackend;
+    class PhysicsBackend;
+    class PhysicsSystem;
 }
 
 class Engine {
@@ -50,7 +51,8 @@ private:
     std::unique_ptr<gproj::physics::PhysicsBackend> m_physicsBackend;
 
     std::unique_ptr<TransformSystem> m_transformSystem;
-    std::unique_ptr<PhysicsSystem> m_physicsSystem;
+    // Use the namespaced PhysicsSystem here so the unique_ptr type matches what you construct.
+    std::unique_ptr<gproj::physics::PhysicsSystem> m_physicsSystem;
     std::unique_ptr<RenderSystem> m_renderSystem;
     std::unique_ptr<ScriptSystem> m_scriptSystem;
 };
