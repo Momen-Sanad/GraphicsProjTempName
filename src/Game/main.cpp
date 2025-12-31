@@ -242,18 +242,20 @@ int main() {
     // Create some primitive meshes (cube, glass plane, sky sphere)
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
-    Mesh skySphere = Mesh::create_sphere();
+    Mesh skySphere = Mesh::create_sphere({32, 16}, glm::vec3(0.0f), 1.0f, true);
+    Mesh ballSphere = Mesh::create_sphere();
 
     // Mesh asphaltMesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
 
     // Create MeshRenderers to upload and render these meshes
-    MeshRenderer cube, house, glass, skyRenderer;
+    MeshRenderer cube, house, glass, skyRenderer, ballRenderer;
 
     // Upload mesh data to the GPU
     cube.upload(cubeMesh);
     house.upload(*loadedMesh);
     glass.upload(glass_mesh);
     skyRenderer.upload(skySphere);
+    ballRenderer.upload(ballSphere);
 
     // ---------------------------
     // World + Camera Setup
@@ -324,7 +326,7 @@ int main() {
     // Sand on the island
     Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
 
-    Entity* asphalt = world.createEntityWithParams(island, {4.0f, 4.0f, 4.0f}, glm::quat(), {1.0f, 1.0f, 1.0f}, &skyRenderer, &AsphaltMaterial);
+    Entity* asphalt = world.createEntityWithParams(island, {4.0f, 4.0f, 4.0f}, glm::quat(), {1.0f, 1.0f, 1.0f}, &ballRenderer, &AsphaltMaterial);
     // Test house entity with mixed textures
     Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
 
@@ -474,7 +476,7 @@ int main() {
 
             // Sky rendering settings
             glEnable(GL_CULL_FACE);
-            glCullFace(GL_FRONT);  // View inner surface of sphere
+            glCullFace(GL_BACK);  // Sky sphere is wound inward; cull the outside
             glDepthFunc(GL_LEQUAL);  // Allow sky at far plane
             glDepthMask(GL_FALSE);  // Don't write depth buffer
 
@@ -533,6 +535,7 @@ int main() {
     house.destroy();
     glass.destroy();
     skyRenderer.destroy();
+    ballRenderer.destroy();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();

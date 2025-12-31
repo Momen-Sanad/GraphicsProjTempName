@@ -1,4 +1,5 @@
 #include "EntityManager.hpp"
+#include <glm/gtc/matrix_inverse.hpp>
 
 // ------------------------------------------------------------
 // Create entity and store it
@@ -129,6 +130,21 @@ void EntityManager::renderEntityRecursive(Entity* e, const glm::mat4& VP) {
             GLint loc = mat->getUniform("MVP");
             if (loc != -1)
                 glUniformMatrix4fv(loc, 1, GL_FALSE, &MVP[0][0]);  // Set the MVP uniform
+
+            // Support lit shaders that expect model/viewProj/normalMatrix.
+            loc = mat->getUniform("model");
+            if (loc != -1)
+                glUniformMatrix4fv(loc, 1, GL_FALSE, &M[0][0]);
+
+            loc = mat->getUniform("viewProj");
+            if (loc != -1)
+                glUniformMatrix4fv(loc, 1, GL_FALSE, &VP[0][0]);
+
+            loc = mat->getUniform("normalMatrix");
+            if (loc != -1) {
+                glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(M)));
+                glUniformMatrix3fv(loc, 1, GL_FALSE, &normalMatrix[0][0]);
+            }
 
             m->draw();  // Draw the mesh
         }

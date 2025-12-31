@@ -177,7 +177,7 @@ Mesh Mesh::create_plane(glm::vec3 center, glm::vec2 size, glm::vec2 tiling)
     return mesh;
 }
 
-Mesh Mesh::create_sphere(glm::ivec2 segments, glm::vec3 center, float radius)
+Mesh Mesh::create_sphere(glm::ivec2 segments, glm::vec3 center, float radius, bool invert_winding)
 {
     std::vector<Vertex> vertices;
     std::vector<uint16_t> indices;
@@ -213,6 +213,13 @@ Mesh Mesh::create_sphere(glm::ivec2 segments, glm::vec3 center, float radius)
             indices.push_back(prev_lng + start - segments.x - 1);
             indices.push_back(prev_lng + start);
             indices.push_back(lng + start);
+        }
+    }
+
+    if (invert_winding) {
+        // Flip winding so the sphere faces inward (useful for sky spheres).
+        for (size_t i = 0; i + 2 < indices.size(); i += 3) {
+            std::swap(indices[i + 1], indices[i + 2]);
         }
     }
 

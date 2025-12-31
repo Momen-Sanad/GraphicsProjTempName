@@ -170,7 +170,7 @@ int main() {
     // Create some primitive meshes (cube, glass plane, sky sphere)
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
-    Mesh skySphere = Mesh::create_sphere();
+    Mesh skySphere = Mesh::create_sphere({32, 16}, glm::vec3(0.0f), 1.0f, true);
 
     // Create MeshRenderers to upload and render these meshes
     MeshRenderer cube, house, glass, skyRenderer;
@@ -357,7 +357,7 @@ int main() {
 
             // Sky rendering settings
             glEnable(GL_CULL_FACE);
-            glCullFace(GL_FRONT);  // View inner surface of sphere
+            glCullFace(GL_BACK);  // Sky sphere is wound inward; cull the outside
             glDepthFunc(GL_LEQUAL);  // Allow sky at far plane
             glDepthMask(GL_FALSE);  // Don't write depth buffer
 

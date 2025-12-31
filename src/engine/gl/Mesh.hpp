@@ -48,7 +48,7 @@ public:
     // Static methods to create primitive meshes
     static Mesh create_cuboid(glm::vec3 center = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f));
     static Mesh create_plane(glm::vec3 center = glm::vec3(0.0f), glm::vec2 size = glm::vec2(1.0f), glm::vec2 tiling = glm::vec2(1.0f));
-    static Mesh create_sphere(glm::ivec2 segments = { 32, 16 }, glm::vec3 center = glm::vec3(0.0f), float radius = 1.0f);
+    static Mesh create_sphere(glm::ivec2 segments = { 32, 16 }, glm::vec3 center = glm::vec3(0.0f), float radius = 1.0f, bool invert_winding = false);
     static Mesh create_cylinder(int segments = 32, glm::vec3 center = glm::vec3(0.0f), float height = 1.0f, float radius = 1.0f);
 
     // Setters for mesh data
