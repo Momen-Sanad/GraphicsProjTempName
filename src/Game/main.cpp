@@ -333,7 +333,7 @@ int main() {
     Entity* asphalt = world.createEntityWithParams(island, {4.0f, 4.0f, 4.0f}, glm::quat(), {1.0f, 1.0f, 1.0f}, &ballRenderer, &AsphaltMaterial);
     // Test house entity with mixed textures
     Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
-    Entity* collisionSphere = world.createEntityWithParams(root, {6.f, 1.0f, -2.f}, glm::quat(), {0.6f, 0.6f, 0.6f}, &sphereRenderer, &blue);
+    Entity* collisionSphere = world.createEntityWithParams(root, {4.f, 2.0f, -3.f}, glm::quat(), {0.6f, 0.6f, 0.6f}, &ballRenderer, &blue);
     Collider playerCollider;
     Collider houseCollider;
     Collider sphereCollider;
@@ -357,7 +357,7 @@ int main() {
     }
     if (collisionSphere) {
         PhysicsCollisionSystem::MeshBounds sphereBounds;
-        if (PhysicsCollisionSystem::computeMeshBounds(sphereMesh, sphereBounds)) {
+        if (PhysicsCollisionSystem::computeMeshBounds(ballSphere, sphereBounds)) {
             sphereCollider.setParent(collisionSphere);
             sphereCollider.setLocalOffset(sphereBounds.center);
             sphereCollider.setHalfExtents(sphereBounds.halfExtents);
