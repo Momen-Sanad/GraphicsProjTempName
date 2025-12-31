@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 
-#include "../ecs/Collider.hpp"
+#include "../components/Collider.hpp"
 #include "../ecs/Entity.hpp"
 #include "../gl/Mesh.hpp"
 
@@ -14,7 +14,5 @@ public:
     };
 
     static bool computeMeshBounds(const Mesh& mesh, MeshBounds& outBounds);
-    static bool resolveStaticCollision(Entity* mover,
-                                       const Collider& moverCollider,
-                                       const Collider& staticCollider);
+    struct AABB {\n        glm::vec3 min{0.0f};\n        glm::vec3 max{0.0f};\n    };\n+\n+    static bool resolveStaticCollision(Entity* mover,\n+                                       const Collider& moverCollider,\n+                                       Entity* staticEntity,\n+                                       const Collider& staticCollider);
 };

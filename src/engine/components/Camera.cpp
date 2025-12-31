@@ -1,32 +1,21 @@
-#include "Camera.hpp"
+#include "CameraUtils.hpp"
+#include <glm/gtc/matrix_transform.hpp>
 
-// ------------------------------------------------------
-// Returns the view matrix for the camera
-// This matrix transforms world coordinates into camera coordinates (view space).
-// ------------------------------------------------------
-glm::mat4 Camera::get_view_matrix() const {
-    // Using glm's lookAt function, which generates a view matrix
-    // The view matrix is defined by the camera's position, direction, and up vector
-    return glm::lookAt(position, position + direction, up);
+static float safe_aspect_ratio(glm::vec2 viewportSize) {
+    if (viewportSize.y <= 0.0f) {
+        return 1.0f;
+    }
+    return viewportSize.x / viewportSize.y;
 }
 
-// ------------------------------------------------------
-// Returns the projection matrix for the camera
-// This matrix is used to convert camera space coordinates into normalized device coordinates (NDC).
-// The aspect ratio of the viewport (width/height) is taken into account here.
-// ------------------------------------------------------
-glm::mat4 Camera::get_projection_matrix(glm::vec2 viewport_size) const {
-    float aspect = viewport_size.x / viewport_size.y;  // Aspect ratio of the viewport (width / height)
-    // Using glm's perspective function, which generates a perspective projection matrix
-    return glm::perspective(fov, aspect, near, far);
+glm::mat4 camera_view_matrix(const Camera& camera) {
+    return glm::lookAt(camera.position, camera.position + camera.direction, camera.up);
 }
 
-// ------------------------------------------------------
-// Returns the combined view-projection matrix
-// This is the result of multiplying the view matrix with the projection matrix.
-// It is often used directly in shaders to transform world coordinates into NDC in one step.
-// ------------------------------------------------------
-glm::mat4 Camera::get_view_projection_matrix(glm::vec2 viewport_size) const {
-    // Multiply the projection matrix by the view matrix for a combined transformation
-    return get_projection_matrix(viewport_size) * get_view_matrix();
+glm::mat4 camera_projection_matrix(const Camera& camera, glm::vec2 viewportSize) {
+    return glm::perspective(camera.fov, safe_aspect_ratio(viewportSize), camera.near, camera.far);
+}
+
+glm::mat4 camera_view_projection_matrix(const Camera& camera, glm::vec2 viewportSize) {
+    return camera_projection_matrix(camera, viewportSize) * camera_view_matrix(camera);
 }

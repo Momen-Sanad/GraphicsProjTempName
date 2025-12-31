@@ -5,7 +5,8 @@
 #include <glm/gtc/quaternion.hpp>
 
 #include "../../engine/ecs/World.hpp"
-#include "../../engine/components/CameraFollowComponent.hpp"
+#include "../components/CameraFollowComponent.hpp"
+#include "../../engine/gl/GpuMesh.hpp"
 #include "../../engine/assets/Material.hpp"
 
 struct PlayerInput {
@@ -19,9 +20,9 @@ class Player {
 public:
     Player(World& world,
            Entity* parent,
-           MeshRenderer* bodyMesh,
+           GpuMesh* bodyMesh,
            Material* bodyMaterial,
-           MeshRenderer* weaponMesh,
+           GpuMesh* weaponMesh,
            Material* weaponMaterial);
 
     virtual ~Player() = default;

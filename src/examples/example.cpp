@@ -15,10 +15,11 @@
 #include "../engine/platform/Window.hpp"
 #include "../engine/gl/GLContext.hpp"
 #include "../engine/ecs/World.hpp"
-#include "../engine/ecs/CameraController.hpp"
-#include "../engine/ecs/ShaderManager.hpp"
+#include "../engine/components/CameraUtils.hpp"
+#include "../Game/CameraController.hpp"
+#include "../engine/assets/ShaderManager.hpp"
 #include "../engine/assets/MaterialManager.hpp"
-#include "../engine/components/MeshRenderer.hpp"
+#include "../engine/gl/GpuMesh.hpp"
 #include "../engine/gl/Mesh.hpp"
 #include "../engine/utils/Im_GUI_Inspector.hpp"
 #include "../engine/assets/MeshLoader.hpp"
@@ -172,8 +173,8 @@ int main() {
     Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh skySphere = Mesh::create_sphere();
 
-    // Create MeshRenderers to upload and render these meshes
-    MeshRenderer cube, house, glass, skyRenderer;
+    // Create GPU meshes to upload and render these meshes
+    GpuMesh cube, house, glass, skyRenderer;
 
     // Upload mesh data to the GPU
     cube.upload(cubeMesh);
@@ -332,7 +333,7 @@ int main() {
         int width, height;
         glfwGetFramebufferSize(window.get_handle(), &width, &height);
 
-        glm::mat4 VP = world.get_camera().get_view_projection_matrix(glm::vec2(width, height));
+        glm::mat4 VP = camera_view_projection_matrix(world.get_camera(), glm::vec2(width, height));
 
         // ---------------------------
         // Draw sky (before other objects)

@@ -3,8 +3,9 @@
 #include <algorithm>
 #include <cmath>
 
-#include "../../engine/components/MeshRenderer.hpp"
+#include "../../engine/gl/GpuMesh.hpp"
 #include "../../engine/components/Camera.hpp"
+#include "../../engine/components/MeshRenderer.hpp"
 #include "../../engine/ecs/Entity.hpp"
 
 // Helper: get world position from an entity's world matrix.
@@ -18,9 +19,9 @@ static glm::vec3 getEntityWorldPosition(const Entity* e) {
 // Constructor: create root, body and weapon entities using World API
 Player::Player(World& world,
                Entity* parent,
-               MeshRenderer* bodyMesh,
+               GpuMesh* bodyMesh,
                Material* bodyMaterial,
-               MeshRenderer* weaponMesh,
+               GpuMesh* weaponMesh,
                Material* weaponMaterial)
     : worldRef(world) {
 
@@ -35,20 +36,28 @@ Player::Player(World& world,
         root,
         /* position */ glm::vec3{0.0f, 1.0f, 0.0f},
         /* rotation */ glm::quat{1.0f, 0.0f, 0.0f, 0.0f},
-        /* scale    */ glm::vec3{1.0f, 2.0f, 1.0f},
-        /* mesh     */ bodyMesh,
-        /* material */ bodyMaterial
+        /* scale    */ glm::vec3{1.0f, 2.0f, 1.0f}
     );
+
+    if (body) {
+        auto& renderer = body->addComponent<MeshRenderer>();
+        renderer.mesh = bodyMesh;
+        renderer.material = bodyMaterial;
+    }
 
     // create weapon as a child of body, with its own transform and mesh/material
     weapon = worldRef.createEntityWithParams(
         body,
         /* position */ glm::vec3{0.75f, 0.75f, 0.0f},
         /* rotation */ glm::quat{1.0f, 0.0f, 0.0f, 0.0f},
-        /* scale    */ glm::vec3{0.2f, 0.8f, 0.2f},
-        /* mesh     */ weaponMesh,
-        /* material */ weaponMaterial
+        /* scale    */ glm::vec3{0.2f, 0.8f, 0.2f}
     );
+
+    if (weapon) {
+        auto& renderer = weapon->addComponent<MeshRenderer>();
+        renderer.mesh = weaponMesh;
+        renderer.material = weaponMaterial;
+    }
 
     // remember weapon rest rotation (local)
     if (weapon) {

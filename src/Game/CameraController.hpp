@@ -3,7 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
-#include "../components/Camera.hpp"
+#include "../engine/components/Camera.hpp"
 
 class CameraController {
 public:

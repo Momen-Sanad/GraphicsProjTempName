@@ -1,3 +1,15 @@
-// update/replace your forward renderer to collect Light components 
-// and upload them to shader uniforms; 
-// render meshes using LitMaterial where available.
+#pragma once
+
+class World;
+class Window;
+
+class RenderSystem {
+public:
+    RenderSystem(World& world, Window& window);
+
+    void render(float deltaSeconds);
+
+private:
+    World& m_world;
+    Window& m_window;
+};

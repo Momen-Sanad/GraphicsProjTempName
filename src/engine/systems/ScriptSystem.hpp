@@ -2,9 +2,9 @@
 
 class World;
 
-class TransformSystem {
+class ScriptSystem {
 public:
-    explicit TransformSystem(World& world);
+    explicit ScriptSystem(World& world);
 
     void update(float deltaSeconds);
 

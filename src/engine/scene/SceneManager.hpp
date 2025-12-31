@@ -4,7 +4,7 @@
 #include "SceneDeserializer.hpp"
 #include "SceneSerializer.hpp"
 #include "../ecs/World.hpp"
-#include "../ecs/ShaderManager.hpp"
+#include "../assets/AssetManager.hpp"
 #include "../assets/TintedMaterial.hpp"
 #include <memory>
 #include <unordered_map>
@@ -18,7 +18,7 @@ using namespace std;
 class SceneManager {
 private:
     World* world;
-    ShaderManager* shaderManager;
+    AssetManager* assetManager;
     string lastError;
     
     // Helper functions
@@ -26,7 +26,7 @@ private:
     glm::quat eulerToQuat(const vector<float>& euler);
 
 public:
-    SceneManager(World* world, ShaderManager* shaderManager);
+    SceneManager(World* world, AssetManager* assetManager);
     ~SceneManager() = default;
 
     bool loadScene(const string& filePath);

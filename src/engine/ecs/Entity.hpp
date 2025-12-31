@@ -1,81 +1,82 @@
 #pragma once
 
-#ifndef GLAD_INCLUDED
-#define GLAD_INCLUDED
-#include <glad/glad.h>
-#endif
-
-#include "../assets/Material.hpp"
-#include "../components/MeshRenderer.hpp"
-#include <glm/gtc/quaternion.hpp>
+#include "Types.hpp"
+#include "../components/Transform.hpp"
 #include <glm/gtc/matrix_transform.hpp>
-#include <algorithm>
+#include <glm/gtc/quaternion.hpp>
+#include <utility>
+#include <vector>
 
-
+class World;
 
 class Entity {
-private:
-    Entity* parent = nullptr;
-    std::vector<Entity*> children;
-
-    glm::vec3 position = glm::vec3(0.0f);
-    glm::quat rotation = glm::quat(1.0f, 0.f, 0.f, 0.f);
-    glm::vec3 scale    = glm::vec3(1.0f);
-
-    MeshRenderer* mesh = nullptr;
-    Material* material = nullptr;
-
 public:
-    Entity() = default;
-    ~Entity();
+    Entity(EntityId id, World* world);
 
-    // Prevent copying
-    Entity(const Entity&) = delete;
-    Entity& operator=(const Entity&) = delete;
+    EntityId id() const { return m_id; }
+    bool isValid() const;
 
-    // Allow moving
-    Entity(Entity&&) = default;
-    Entity& operator=(Entity&&) = default;
+    template <typename T, typename... Args>
+    T& addComponent(Args&&... args);
 
-    // -------------------------------
-    // Transform accessors
-    // -------------------------------
-    void setPosition(const glm::vec3& p)  { position = p; }
-    void setRotation(const glm::quat& q)  { rotation = q; }
-    void setScale(const glm::vec3& s)     { scale = s; }
+    template <typename T>
+    bool hasComponent() const;
 
-    glm::vec3 getPosition() const { return position; }
-    glm::quat getRotation() const { return rotation; }
-    glm::vec3 getScale()    const { return scale; }
+    template <typename T>
+    T& getComponent();
 
-    // convenience: apply an incremental rotation (delta quaternion)
-    void rotateBy(const glm::quat& dq) { rotation = dq * rotation; }
+    template <typename T>
+    const T& getComponent() const;
 
-    // -------------------------------
-    // Hierarchy management
-    // -------------------------------
+    template <typename T>
+    void removeComponent();
+
+    Transform& transform();
+    const Transform& transform() const;
+
     void setParent(Entity* newParent);
-    Entity* getParent() const { return parent; }
+    Entity* getParent() const;
+    std::vector<Entity*> getChildren() const;
 
-    const std::vector<Entity*>& getChildren() const { return children; }
+    void setPosition(const glm::vec3& p);
+    void setRotation(const glm::quat& q);
+    void setScale(const glm::vec3& s);
 
-    // -------------------------------
-    // Rendering data
-    // -------------------------------
-    void setMesh(MeshRenderer* m) { mesh = m; }
-    void setMaterial(Material* mat) { material = mat; }
+    glm::vec3 getPosition() const;
+    glm::quat getRotation() const;
+    glm::vec3 getScale() const;
 
-    MeshRenderer* getMesh()     const { return mesh; }
-    Material*     getMaterial() const { return material; }
+    void rotateBy(const glm::quat& dq);
 
-    // -------------------------------
-    // Transformation
-    // -------------------------------
     glm::mat4 getLocalMatrix() const;
     glm::mat4 getWorldMatrix() const;
 
-    // -------------------------------
-    // Draw this entity and children
-    // -------------------------------
-    void draw(const glm::mat4& viewProj);
+private:
+    EntityId m_id;
+    World* m_world = nullptr;
 };
+
+template <typename T, typename... Args>
+T& Entity::addComponent(Args&&... args) {
+    return m_world->addComponent<T>(m_id, std::forward<Args>(args)...);
+}
+
+template <typename T>
+bool Entity::hasComponent() const {
+    return m_world->hasComponent<T>(m_id);
+}
+
+template <typename T>
+T& Entity::getComponent() {
+    return m_world->getComponent<T>(m_id);
+}
+
+template <typename T>
+const T& Entity::getComponent() const {
+    return m_world->getComponent<T>(m_id);
+}
+
+template <typename T>
+void Entity::removeComponent() {
+    m_world->removeComponent<T>(m_id);
+}

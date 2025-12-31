@@ -1,25 +1,25 @@
-#include "MeshRenderer.hpp"
+#include "GpuMesh.hpp"
 
 // ------------------------------------------------------------
 // Constructor / Destructor
 // ------------------------------------------------------------
-MeshRenderer::MeshRenderer() {}
+GpuMesh::GpuMesh() {}
 
-MeshRenderer::~MeshRenderer() {
+GpuMesh::~GpuMesh() {
     destroy();  // Clean up OpenGL resources on destruction
 }
 
 // ------------------------------------------------------------
 // Move Constructor
 // ------------------------------------------------------------
-MeshRenderer::MeshRenderer(MeshRenderer&& other) noexcept {
+GpuMesh::GpuMesh(GpuMesh&& other) noexcept {
     *this = std::move(other);  // Move the resources from another object
 }
 
 // ------------------------------------------------------------
 // Move Assignment
 // ------------------------------------------------------------
-MeshRenderer& MeshRenderer::operator=(MeshRenderer&& other) noexcept {
+GpuMesh& GpuMesh::operator=(GpuMesh&& other) noexcept {
     if (this != &other) {  // Check for self-assignment
         destroy();  // Destroy any current resources
 
@@ -41,7 +41,7 @@ MeshRenderer& MeshRenderer::operator=(MeshRenderer&& other) noexcept {
 // ------------------------------------------------------------
 // Upload data to GPU
 // ------------------------------------------------------------
-void MeshRenderer::upload(const Mesh& data) {
+void GpuMesh::upload(const Mesh& data) {
     destroy();  // Clear previous mesh data if it exists
 
     // Create a new VAO (stores the state of the vertex input)
@@ -105,7 +105,7 @@ void MeshRenderer::upload(const Mesh& data) {
 // ------------------------------------------------------------
 // Draw Mesh
 // ------------------------------------------------------------
-void MeshRenderer::draw() const {
+void GpuMesh::draw() const {
     if (!vao) return;  // If no VAO exists, return early
 
     glBindVertexArray(vao);  // Bind the VAO to the OpenGL context
@@ -116,7 +116,7 @@ void MeshRenderer::draw() const {
 // ------------------------------------------------------------
 // Destroy OpenGL GPU Objects
 // ------------------------------------------------------------
-void MeshRenderer::destroy() {
+void GpuMesh::destroy() {
     // Delete the OpenGL resources if they exist
     if (vao) glDeleteVertexArrays(1, &vao);
     if (vbo) glDeleteBuffers(1, &vbo);

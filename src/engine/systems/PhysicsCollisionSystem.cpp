@@ -1,5 +1,28 @@
 #include "PhysicsCollisionSystem.hpp"
 
+static PhysicsCollisionSystem::AABB compute_aabb(const Entity* entity,
+                                                 const Collider& collider) {
+    PhysicsCollisionSystem::AABB box;
+    if (!entity) {
+        return box;
+    }
+
+    const glm::vec3 scale = entity->getScale();
+    const glm::vec3 half = collider.halfExtents * scale;
+    const glm::vec3 center = entity->getPosition() + collider.localOffset;
+
+    box.min = center - half;
+    box.max = center + half;
+    return box;
+}
+
+static bool intersects_aabb(const PhysicsCollisionSystem::AABB& a,
+                            const PhysicsCollisionSystem::AABB& b) {
+    return (a.min.x <= b.max.x && a.max.x >= b.min.x) &&
+           (a.min.y <= b.max.y && a.max.y >= b.min.y) &&
+           (a.min.z <= b.max.z && a.max.z >= b.min.z);
+}
+
 bool PhysicsCollisionSystem::computeMeshBounds(const Mesh& mesh, MeshBounds& outBounds) {
     const auto positions = mesh.get_positions();
     if (positions.empty()) return false;
@@ -19,12 +42,18 @@ bool PhysicsCollisionSystem::computeMeshBounds(const Mesh& mesh, MeshBounds& out
 
 bool PhysicsCollisionSystem::resolveStaticCollision(Entity* mover,
                                                     const Collider& moverCollider,
+                                                    Entity* staticEntity,
                                                     const Collider& staticCollider) {
-    if (!mover) return false;
-    if (!moverCollider.intersects(staticCollider)) return false;
+    if (!mover || !staticEntity) {
+        return false;
+    }
 
-    AABB a = moverCollider.getWorldAABB();
-    AABB b = staticCollider.getWorldAABB();
+    AABB a = compute_aabb(mover, moverCollider);
+    AABB b = compute_aabb(staticEntity, staticCollider);
+
+    if (!intersects_aabb(a, b)) {
+        return false;
+    }
 
     glm::vec3 aCenter = (a.min + a.max) * 0.5f;
     glm::vec3 bCenter = (b.min + b.max) * 0.5f;

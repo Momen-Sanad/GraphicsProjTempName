@@ -1,94 +1,78 @@
 #include "Entity.hpp"
+#include "World.hpp"
 
-// ------------------------------------------------------------
-// Destructor -> does NOT delete children (EntityManager owns them)
-// ------------------------------------------------------------
-Entity::~Entity() {
-    // detach from parent
-    if (parent) {
-        auto& siblings = parent->children;
-        siblings.erase(std::remove(siblings.begin(), siblings.end(), this), siblings.end());
-    }
+Entity::Entity(EntityId id, World* world)
+    : m_id(id), m_world(world) {}
 
-    parent = nullptr;
-    children.clear();
+bool Entity::isValid() const {
+    return m_world && m_world->isAlive(m_id);
 }
 
-// ------------------------------------------------------------
-// Set parent
-// ------------------------------------------------------------
+Transform& Entity::transform() {
+    return getComponent<Transform>();
+}
+
+const Transform& Entity::transform() const {
+    return getComponent<Transform>();
+}
+
 void Entity::setParent(Entity* newParent) {
-    if (parent == newParent) return;
-
-    // remove from old parent if exists
-    if (parent) {
-        auto& siblings = parent->children;
-        siblings.erase(std::remove(siblings.begin(), siblings.end(), this), siblings.end());
-    }
-
-    parent = newParent;
-
-    if (parent) {
-        // avoid duplicates
-        if (std::find(parent->children.begin(), parent->children.end(), this) == parent->children.end())
-            parent->children.push_back(this);
-    }
+    auto& tr = transform();
+    tr.parent = newParent ? newParent->id() : kInvalidEntity;
 }
 
-// ------------------------------------------------------------
-// Local matrix: T * R * S
-// ------------------------------------------------------------
+Entity* Entity::getParent() const {
+    const auto& tr = transform();
+    if (tr.parent == kInvalidEntity) {
+        return nullptr;
+    }
+    return m_world->getEntity(tr.parent);
+}
+
+std::vector<Entity*> Entity::getChildren() const {
+    return m_world->getChildren(m_id);
+}
+
+void Entity::setPosition(const glm::vec3& p) {
+    transform().position = p;
+}
+
+void Entity::setRotation(const glm::quat& q) {
+    transform().rotation = q;
+}
+
+void Entity::setScale(const glm::vec3& s) {
+    transform().scale = s;
+}
+
+glm::vec3 Entity::getPosition() const {
+    return transform().position;
+}
+
+glm::quat Entity::getRotation() const {
+    return transform().rotation;
+}
+
+glm::vec3 Entity::getScale() const {
+    return transform().scale;
+}
+
+void Entity::rotateBy(const glm::quat& dq) {
+    transform().rotation = dq * transform().rotation;
+}
+
 glm::mat4 Entity::getLocalMatrix() const {
-    glm::mat4 T = glm::translate(glm::mat4(1.f), position);
-    glm::mat4 R = glm::mat4_cast(rotation);
-    glm::mat4 S = glm::scale(glm::mat4(1.f), scale);
+    const auto& tr = transform();
+    glm::mat4 T = glm::translate(glm::mat4(1.0f), tr.position);
+    glm::mat4 R = glm::mat4_cast(tr.rotation);
+    glm::mat4 S = glm::scale(glm::mat4(1.0f), tr.scale);
     return T * R * S;
 }
 
-// ------------------------------------------------------------
-// Recursive world matrix
-// ------------------------------------------------------------
 glm::mat4 Entity::getWorldMatrix() const {
-    if (parent)
-        return parent->getWorldMatrix() * getLocalMatrix();
-    else
+    Entity* parent = getParent();
+    if (!parent) {
         return getLocalMatrix();
-}
-
-// ------------------------------------------------------------
-// Draw entity (uses Material's uniform accessor to set MVP)
-// ------------------------------------------------------------
-void Entity::draw(const glm::mat4& viewProj) {
-    if (material && mesh) {
-        // Let the material bind the shader and common uniforms
-        material->setup();
-
-        // Compute world matrix + MVP
-        glm::mat4 M  = getWorldMatrix();
-        glm::mat4 MVP = viewProj * M;
-
-        // Use Material's public method to get uniform location if available.
-        // Many of your files use "MVP" as the uniform name in main.cpp — use that.
-        GLint loc = -1;
-        // Try Material's public uniform getter if it exists
-        // (we assume Material exposes getUniform(const std::string&) -> GLint)
-        // If not present, you can fallback to accessing shader's uniform (less preferred).
-        try {
-            loc = material->getUniform("MVP");
-        } catch(...) {
-            // fallback: try shader directly if your Material exposes it
-            if (material->getShader()) {
-                loc = material->getShader()->getUniformLocation("MVP");
-            }
-        }
-
-        if (loc != -1)
-            glUniformMatrix4fv(loc, 1, GL_FALSE, &MVP[0][0]);
-
-        mesh->draw();
     }
-
-    // Draw children recursively
-    for (Entity* c : children)
-        c->draw(viewProj);
+    return parent->getWorldMatrix() * getLocalMatrix();
 }

@@ -5,8 +5,8 @@ class Crusader : public Player {
 public:
     Crusader(World& world,
              Entity* parent,
-             MeshRenderer* bodyMesh,
+             GpuMesh* bodyMesh,
              Material* bodyMaterial,
-             MeshRenderer* weaponMesh,
+             GpuMesh* weaponMesh,
              Material* weaponMaterial);
 };

@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
+#include <utility>
 #include "Material.hpp"
 #include "TintedMaterial.hpp"
 
@@ -25,3 +26,10 @@ public:
     // Returns a shared pointer to the Material, or nullptr if not found
     std::shared_ptr<Material> get(const std::string& name) const;
 };
+
+template<typename T, typename... Args>
+std::shared_ptr<T> MaterialManager::create(const std::string& name, Args&&... args) {
+    auto mat = std::make_shared<T>(std::forward<Args>(args)...);
+    materials[name] = mat;
+    return mat;
+}

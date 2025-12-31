@@ -143,12 +143,11 @@ set_target_properties(Engine PROPERTIES
 # ============== APPLICATION EXECUTABLE SETUP ==============
 # ==========================================================
 if (ENGINE_BUILD_EXAMPLES)
-    add_executable(OpenGLEngine
-        src/Game/main.cpp
-        src/Game/Entities/Player.cpp
-        src/Game/Entities/Enemy.cpp
-        src/Game/Entities/Crusader.cpp
+    file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
+        ${CMAKE_SOURCE_DIR}/src/Game/*.cpp
     )
+
+    add_executable(OpenGLEngine ${GAME_SOURCES})
 
     target_link_libraries(OpenGLEngine PRIVATE Engine)
 

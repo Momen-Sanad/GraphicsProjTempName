@@ -1,55 +1,152 @@
 #include "World.hpp"
+World::World() {
+    Entity* cameraEntity = createEntity();
+    mainCameraId = cameraEntity->id();
+    addComponent<Camera>(mainCameraId);
+}
 
-// ------------------------------------------------------------
-// Constructor for World class (default constructor)
-// ------------------------------------------------------------
-World::World() = default;  // Uses default constructor
+Entity* World::createEntity() {
+    EntityId id = nextId++;
+    if (id >= entities.size()) {
+        entities.resize(id + 1);
+    }
 
-// ------------------------------------------------------------
-// Create an entity with specified parameters
-// ------------------------------------------------------------
+    auto& slot = entities[id];
+    slot.alive = true;
+    slot.handle = std::make_unique<Entity>(id, this);
+
+    addComponent<Transform>(id);
+    return slot.handle.get();
+}
+
 Entity* World::createEntityWithParams(Entity* parent,
                                       const glm::vec3& position,
                                       const glm::quat& rotation,
-                                      const glm::vec3& scale,
-                                      MeshRenderer* mesh,
-                                      Material* material)
-{
-    // Use the EntityManager to create an entity with the specified parameters
-    Entity* e = manager.createEntityWithParams(
-        parent,  // Set the parent entity (can be nullptr)
-        position,  // Position of the entity in world space
-        glm::quat(1,0,0,0),  // Always pass identity quaternion (no rotation) as a default
-        scale,  // Scale of the entity
-        mesh,  // MeshRenderer to be used with this entity
-        material  // Material to be applied to the entity
-    );
+                                      const glm::vec3& scale) {
+    Entity* entity = createEntity();
+    auto& tr = getComponent<Transform>(entity->id());
+    tr.position = position;
+    tr.rotation = rotation;
+    tr.scale = scale;
+    tr.parent = parent ? parent->id() : kInvalidEntity;
 
-    // If the provided rotation is significant (non-zero), set it to the entity
-    if (glm::length(rotation) > 0.0001f) {
-        e->setRotation(rotation);  // Apply the given rotation to the entity
+    return entity;
+}
+
+Entity* World::add_entity() {
+    return createEntity();
+}
+
+void World::removeEntity(Entity* entity) {
+    if (!entity) {
+        return;
     }
 
-    return e;  // Return the newly created entity
+    EntityId id = entity->id();
+    if (!isAlive(id)) {
+        return;
+    }
+
+    if (registry.hasStorage<Transform>()) {
+        auto& storage = registry.storage<Transform>();
+        for (auto& [childId, transform] : storage.all()) {
+            if (transform.parent == id) {
+                transform.parent = kInvalidEntity;
+            }
+        }
+    }
+
+    registry.removeAll(id);
+    entities[id].alive = false;
 }
 
-// ------------------------------------------------------------
-// Add a new entity to the world (default root entity)
-// ------------------------------------------------------------
-Entity* World::add_entity() {
-    return manager.createEntity();  // Creates a default root entity
-}
-
-// ------------------------------------------------------------
-// Remove an entity from the world
-// ------------------------------------------------------------
-void World::removeEntity(Entity* entity) {
-    manager.destroyEntity(entity);  // Delegate the removal of the entity to the EntityManager
-}
-
-// ------------------------------------------------------------
-// Clear all entities in the world (destroy all entities)
-// ------------------------------------------------------------
 void World::clear() {
-    manager.clear();  // Calls the EntityManager to clear all entities
+    for (auto& slot : entities) {
+        slot.alive = false;
+    }
+    registry.clearComponents();
+
+    mainCameraId = kInvalidEntity;
+    Entity* cameraEntity = createEntity();
+    mainCameraId = cameraEntity->id();
+    addComponent<Camera>(mainCameraId);
+}
+
+bool World::isAlive(EntityId id) const {
+    return id < entities.size() && entities[id].alive;
+}
+
+Entity* World::getEntity(EntityId id) const {
+    if (!isAlive(id)) {
+        return nullptr;
+    }
+    return entities[id].handle.get();
+}
+
+std::vector<Entity*> World::getEntities() const {
+    std::vector<Entity*> result;
+    result.reserve(entities.size());
+    for (const auto& slot : entities) {
+        if (slot.alive && slot.handle) {
+            result.push_back(slot.handle.get());
+        }
+    }
+    return result;
+}
+
+std::vector<Entity*> World::getRoots() const {
+    std::vector<Entity*> roots;
+    if (!registry.hasStorage<Transform>()) {
+        return roots;
+    }
+
+    const auto& storage = registry.storage<Transform>();
+    for (const auto& [id, transform] : storage.all()) {
+        if (!isAlive(id)) {
+            continue;
+        }
+        if (transform.parent == kInvalidEntity) {
+            roots.push_back(getEntity(id));
+        }
+    }
+
+    return roots;
+}
+
+std::vector<Entity*> World::getChildren(EntityId parentId) const {
+    std::vector<Entity*> children;
+    if (!registry.hasStorage<Transform>()) {
+        return children;
+    }
+
+    const auto& storage = registry.storage<Transform>();
+    for (const auto& [id, transform] : storage.all()) {
+        if (transform.parent == parentId && isAlive(id)) {
+            children.push_back(getEntity(id));
+        }
+    }
+
+    return children;
+}
+
+Camera& World::get_camera() {
+    return getComponent<Camera>(mainCameraId);
+}
+
+const Camera& World::get_camera() const {
+    return getComponent<Camera>(mainCameraId);
+}
+
+void World::setMainCamera(Entity* entity) {
+    if (!entity || !isAlive(entity->id())) {
+        return;
+    }
+    mainCameraId = entity->id();
+    if (!hasComponent<Camera>(mainCameraId)) {
+        addComponent<Camera>(mainCameraId);
+    }
+}
+
+Entity* World::getMainCamera() const {
+    return getEntity(mainCameraId);
 }

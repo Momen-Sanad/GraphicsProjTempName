@@ -1,11 +1,13 @@
 #include "SceneManager.hpp"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
+#include "../components/MeshRenderer.hpp"
+#include "../gl/GpuMesh.hpp"
 
 using namespace std;
 
-SceneManager::SceneManager(World* world, ShaderManager* shaderManager) 
-   : world(world), shaderManager(shaderManager) {
+SceneManager::SceneManager(World* world, AssetManager* assetManager) 
+   : world(world), assetManager(assetManager) {
 }
 
 bool SceneManager::loadScene(const string& filePath) {
@@ -30,7 +32,7 @@ bool SceneManager::loadScene(const string& filePath) {
 
    // Create a cube mesh for scene entities
    Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));
-   MeshRenderer* cubeRenderer = new MeshRenderer();
+   GpuMesh* cubeRenderer = new GpuMesh();
    cubeRenderer->upload(cubeMesh);
 
    // Create entities
@@ -47,7 +49,10 @@ bool SceneManager::loadScene(const string& filePath) {
        entity->setScale(arrayToVec3(entityData.scale));
        
        // Assign cube mesh to all entities
-       entity->setMesh(cubeRenderer);
+       auto& renderer = entity->hasComponent<MeshRenderer>()
+           ? entity->getComponent<MeshRenderer>()
+           : entity->addComponent<MeshRenderer>();
+       renderer.mesh = cubeRenderer;
        // it shouldn't "cube" to all entities
        // rather it should have one of the primitive shapes we have
        // like plane, cylinder, sphere etc..
@@ -65,7 +70,7 @@ bool SceneManager::loadScene(const string& filePath) {
        
        // Create simple tinted material if tint is specified
        if (entityData.tint.size() == 4) {
-           auto shader = shaderManager->loadShader("blackToWhite",
+           auto shader = assetManager->shaders().loadShader("blackToWhite",
                              string(SHADER_DIR) + "/blackToWhite.vert",
                              string(SHADER_DIR) + "/blackToWhite.frag"
            );
@@ -75,7 +80,10 @@ bool SceneManager::loadScene(const string& filePath) {
                tintedMat->setShader(shader);
                tintedMat->tint = glm::vec4(entityData.tint[0], entityData.tint[1], 
                                           entityData.tint[2], entityData.tint[3]);
-               entity->setMaterial(tintedMat);
+               auto& renderer = entity->hasComponent<MeshRenderer>()
+                   ? entity->getComponent<MeshRenderer>()
+                   : entity->addComponent<MeshRenderer>();
+               renderer.material = tintedMat;
            }
        }
    }
