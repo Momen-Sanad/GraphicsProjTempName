@@ -204,6 +204,7 @@ void Shader::setUniform(const std::string& name, const glm::mat4& value) {
     }
 }
 
+// Specialization for glm::mat3
 template <>
 void Shader::setUniform(const std::string& name, const glm::mat3& value) {
     GLint location = getUniformLocation(name);

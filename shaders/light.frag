@@ -65,6 +65,8 @@ struct Light {
     vec3 position, direction;
     // Cone angles are used for spot lights.
     float cos_inner_angle, cos_outer_angle;
+
+    float intensity;
 };
 
 in Varyings {
@@ -90,7 +92,6 @@ uniform int light_count;
 void main() {
     // First, we sample the material color from the material textures.
     Material sampled = sample_material(material, fs_in.tex_coord);
-    
     vec3 normal = normalize(fs_in.normal); // Although the normal was already normalized, it may become shorter during interpolation.
     vec3 view = normalize(camera_pos - fs_in.world);
 
@@ -102,33 +103,48 @@ void main() {
     // Now we will loop over all the lights.
     for(int index = 0; index < count; index++){
         Light light = lights[index];
-        vec3 light_direction;
-        float attenuation = 1;
-        if(light.type == TYPE_DIRECTIONAL)
-            light_direction = -light.direction; // If light is directional, use its direction as the light direction
-        else {
-            // If not directional, compute the direction from the position.
-            light_direction = light.position - fs_in.world;
-            float distance = length(light_direction);
-            light_direction /= distance;
+        vec3 Ldir;
+        float attenuation = 1.0;
+        float intensity = 1.0;
+        // if light struct had intensity, you can use it:
+        #ifdef LIGHT_HAS_INTENSITY
+            intensity = light.intensity; // if defined in GLSL
+        #endif
 
-            // And compute the attenuation.
-            attenuation *= 1.0f / (distance * distance);
+        if(light.type == TYPE_DIRECTIONAL) {
+            // For directional lights, we treat light.direction as the direction the light is pointing.
+            // We want the vector *from surface to light*, so negate it.
+            Ldir = normalize(-light.direction);
+        } else {
+            // If not directional, compute the direction from the light position to the surface.
+            vec3 ld = light.position - fs_in.world;
+            float distance = length(ld);
+            if (distance > 1e-6) {
+                Ldir = ld / distance;
+                // inverse square attenuation
+                attenuation *= 1.0 / (distance * distance);
+            } else {
+                // fallback direction if we're exactly at light position (rare)
+                Ldir = normalize(ld + vec3(1e-6));
+            }
 
             if(light.type == TYPE_SPOT){
-                // If it is a spot light, comput the angle attenuation.
-                float cos_angle = dot(light.direction, light_direction);
+                // ensure light.direction is normalized
+                vec3 spotDir = normalize(light.direction);
+                float cos_angle = dot(spotDir, Ldir);
                 attenuation *= smoothstep(light.cos_outer_angle, light.cos_inner_angle, cos_angle);
             }
         }
 
         // Now we compute the 2 components of the light separately.
-        vec3 diffuse = sampled.diffuse * light.color * calculate_lambert(normal, light_direction);
-        vec3 specular = sampled.specular * light.color * calculate_blinn_phong(normal, light_direction, view, sampled.shininess);
+        float NdotL = calculate_lambert(normal, Ldir);
+        vec3 diffuse = sampled.diffuse * light.color * NdotL;
+        vec3 specular = sampled.specular * light.color * calculate_blinn_phong(normal, Ldir, view, sampled.shininess);
 
-        // Then we accumulate the light components additively.
-        accumulated_light += (diffuse + specular) * attenuation;
+        // Apply intensity and attenuation
+        accumulated_light += (diffuse + specular) * attenuation * intensity;
     }
+
 
     // frag_color = vec4(1, 0, 1, 1);
     frag_color = fs_in.color * vec4(accumulated_light, sampled.alpha);
