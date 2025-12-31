@@ -11,6 +11,7 @@ Enemy::Enemy(World& world, Entity* parent, MeshRenderer* bodyMesh, Material* bod
         bodyMesh,
         bodyMaterial
     );
+
 }
 
 void Enemy::setPosition(const glm::vec3& p) {
@@ -18,6 +19,7 @@ void Enemy::setPosition(const glm::vec3& p) {
         root->setPosition(p);
     }
 }
+
 
 std::unique_ptr<Enemy> CreateEnemy(World& world, Entity* parent, MeshRenderer* bodyMesh, Material* bodyMaterial) {
     return std::make_unique<Enemy>(world, parent, bodyMesh, bodyMaterial);

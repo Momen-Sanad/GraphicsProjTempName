@@ -19,11 +19,13 @@
 #include "../engine/assets/MaterialManager.hpp"
 #include "../engine/components/MeshRenderer.hpp"
 #include "../engine/gl/Mesh.hpp"
+#include "../engine/ecs/Collider.hpp"
 #include "../engine/utils/Im_GUI_Inspector.hpp"
 #include "../engine/assets/MeshLoader.hpp"
 #include "../engine/assets/TexturedMaterial.hpp"
 #include "../engine/assets/TextureLoader.hpp"
 #include "../engine/assets/LitMaterial.hpp"
+#include "../engine/systems/PhysicsCollisionSystem.hpp"
 #include "../engine/systems/LightSystem.hpp"
 #include "Entities/Player.hpp"
 #include "Entities/Crusader.hpp"
@@ -331,6 +333,37 @@ int main() {
     Entity* asphalt = world.createEntityWithParams(island, {4.0f, 4.0f, 4.0f}, glm::quat(), {1.0f, 1.0f, 1.0f}, &ballRenderer, &AsphaltMaterial);
     // Test house entity with mixed textures
     Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
+    Entity* collisionSphere = world.createEntityWithParams(root, {6.f, 1.0f, -2.f}, glm::quat(), {0.6f, 0.6f, 0.6f}, &sphereRenderer, &blue);
+    Collider playerCollider;
+    Collider houseCollider;
+    Collider sphereCollider;
+    bool houseCollisionReady = false;
+    bool sphereCollisionReady = false;
+    const float sphereMoveSpeed = 3.0f;
+
+    if (player) {
+        playerCollider.setParent(player->getBody());
+        playerCollider.setHalfExtents(glm::vec3(0.3f, 0.45f, 0.3f));
+    }
+
+    if (loadedMesh) {
+        PhysicsCollisionSystem::MeshBounds houseBounds;
+        if (PhysicsCollisionSystem::computeMeshBounds(*loadedMesh, houseBounds)) {
+            houseCollider.setParent(testhouse);
+            houseCollider.setLocalOffset(houseBounds.center);
+            houseCollider.setHalfExtents(houseBounds.halfExtents);
+            houseCollisionReady = true;
+        }
+    }
+    if (collisionSphere) {
+        PhysicsCollisionSystem::MeshBounds sphereBounds;
+        if (PhysicsCollisionSystem::computeMeshBounds(sphereMesh, sphereBounds)) {
+            sphereCollider.setParent(collisionSphere);
+            sphereCollider.setLocalOffset(sphereBounds.center);
+            sphereCollider.setHalfExtents(sphereBounds.halfExtents);
+            sphereCollisionReady = true;
+        }
+    }
 
     // Create windows as child entities of the house
     { // Window 1
@@ -439,6 +472,44 @@ int main() {
         if (player) {
             player->setInput(input);
             player->update(delta_time);
+        }
+
+        if (collisionSphere) {
+            glm::vec3 sphereMove(0.0f);
+            if (glfwGetKey(windowHandle, GLFW_KEY_UP) == GLFW_PRESS) sphereMove.z -= 1.0f;
+            if (glfwGetKey(windowHandle, GLFW_KEY_DOWN) == GLFW_PRESS) sphereMove.z += 1.0f;
+            if (glfwGetKey(windowHandle, GLFW_KEY_LEFT) == GLFW_PRESS) sphereMove.x -= 1.0f;
+            if (glfwGetKey(windowHandle, GLFW_KEY_RIGHT) == GLFW_PRESS) sphereMove.x += 1.0f;
+
+            float moveLen = glm::length(sphereMove);
+            if (moveLen > 0.001f) {
+                sphereMove /= moveLen;
+                collisionSphere->setPosition(
+                    collisionSphere->getPosition() + sphereMove * sphereMoveSpeed * delta_time
+                );
+            }
+        }
+
+        if (player && houseCollisionReady) {
+            PhysicsCollisionSystem::resolveStaticCollision(
+                player->entity(),
+                playerCollider,
+                houseCollider
+            );
+        }
+        if (collisionSphere && houseCollisionReady && sphereCollisionReady) {
+            PhysicsCollisionSystem::resolveStaticCollision(
+                collisionSphere,
+                sphereCollider,
+                houseCollider
+            );
+        }
+        if (player && sphereCollisionReady) {
+            PhysicsCollisionSystem::resolveStaticCollision(
+                player->entity(),
+                playerCollider,
+                sphereCollider
+            );
         }
 
         // Rendering setup: clear color and depth buffers
