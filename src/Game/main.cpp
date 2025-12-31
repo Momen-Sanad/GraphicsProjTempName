@@ -1,3 +1,4 @@
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -248,7 +249,7 @@ private:
         sand = spawnRenderable(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cubeGpu, &yellow);
         asphalt = spawnRenderable(root, {4.0f, 4.0f, 4.0f}, glm::quat(), {1.0f, 1.0f, 1.0f}, &asphaltGpu, asphaltMaterial.get());
         testhouse = spawnRenderable(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &houseGpu, houseMixedMaterial.get());
-        collisionSphere = spawnRenderable(root, {6.f, 1.0f, -2.f}, glm::quat(), {0.6f, 0.6f, 0.6f}, &sphereGpu, &blue);
+        collisionSphere = spawnRenderable(root, {5.f, 1.0f, -3.f}, glm::quat(), {0.6f, 0.6f, 0.6f}, &sphereGpu, &blue);
 
         if (player) {
             playerCollider.halfExtents = glm::vec3(0.3f, 0.45f, 0.3f);
