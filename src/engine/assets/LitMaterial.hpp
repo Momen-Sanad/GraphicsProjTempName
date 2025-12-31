@@ -1,30 +1,35 @@
 #pragma once
-#include "TexturedMaterial.hpp"
 
-class LitMaterial : public TexturedMaterial
+#include "Material.hpp"
+#include "../gl/Texture.hpp"
+#include "../gl/Shader.hpp"
+
+#include <memory>
+
+class LitMaterial : public Material
 {
 private:
-    Texture* albedoMap = nullptr;
-    Texture* specularMap = nullptr;
-    Texture* roughnessMap = nullptr;
-    Texture* emissiveMap = nullptr;
+    Texture* albedoMap           = nullptr;
+    Texture* specularMap         = nullptr;
+    Texture* roughnessMap        = nullptr;
+    Texture* emissiveMap         = nullptr;
     Texture* ambientOcclusionMap = nullptr;
 
 public:
-    // Constructor with default values for the texture maps
-    LitMaterial(std::shared_ptr<Shader> shader, 
-                Texture* albedo = nullptr, 
-                Texture* specular = nullptr, 
-                Texture* roughness = nullptr, 
-                Texture* emissive = nullptr, 
+    LitMaterial(std::shared_ptr<Shader> shader,
+                Texture* albedo           = nullptr,
+                Texture* specular         = nullptr,
+                Texture* roughness        = nullptr,
+                Texture* emissive         = nullptr,
                 Texture* ambientOcclusion = nullptr);
 
-    // Setter functions for all the maps
+    // Map setters
     void setAlbedoMap(Texture* tex);
     void setSpecularMap(Texture* tex);
     void setRoughnessMap(Texture* tex);
     void setEmissiveMap(Texture* tex);
     void setAmbientOcclusionMap(Texture* tex);
 
+    // Upload textures & material state
     void setup() override;
 };

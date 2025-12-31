@@ -24,6 +24,7 @@
 #include "../engine/assets/TexturedMaterial.hpp"
 #include "../engine/assets/TextureLoader.hpp"
 #include "../engine/assets/LitMaterial.hpp"
+#include "../engine/systems/LightSystem.hpp"
 #include "Entities/Player.hpp"
 #include "Entities/Crusader.hpp"
 #include "Entities/Enemy.hpp"
@@ -108,10 +109,26 @@ int main() {
         std::string(SHADER_DIR) + "/blended.frag"
     );
 
+    auto lightShader = shaderManager.loadShader("light",
+        std::string(SHADER_DIR) + "/light.vert",
+        std::string(SHADER_DIR) + "/light.frag"
+    );
+
     if (!mainShader) {
         fprintf(stderr, "Failed to load main shader\n");
         return 1;  // Exit if shader loading fails.
     }
+
+    if (!houseShader) {
+        fprintf(stderr, "Failed to load house shader\n");
+        return 1;  // Exit if shader loading fails.
+    }
+
+    if (!houseMixedShader) {
+        fprintf(stderr, "Failed to load houseMixed shader\n");
+        return 1;  // Exit if shader loading fails.
+    }
+
 
     // ---------------------------
     // Create Materials
@@ -173,22 +190,21 @@ int main() {
     auto AsphaltAlbedo = TextureLoader::load(AsphaltAlbedoPath);
     std::cout << "Attempting to load texture: " << AsphaltAlbedoPath << std::endl;
 
+    std::string SuzanneAOPath = std::string(TEXTURES_DIR) + "/suzanne/ambient_occlusion.jpg";
+    auto SuzanneAO = TextureLoader::load(SuzanneAOPath);
+    std::cout << "Attempting to load texture: " << SuzanneAOPath << std::endl;
+
     // Material setup for house, blending textures.
     TexturedMaterial houseMaterial(houseShader, HouseTexture);
 
-    LitMaterial AsphaltMaterial(houseMixedShader,
+    LitMaterial AsphaltMaterial(lightShader,
                                 AsphaltAlbedo,
                                 AsphaltSpecular,
                                 AsphaltRoughness,
-                                AsphaltEmissive
-                               );
+                                AsphaltEmissive,
+                                SuzanneAO
+                                );
 
-    // AsphaltMaterial.setSpecularTexture(AsphaltSpecular);
-    // AsphaltMaterial.setRoughnessTexture(AsphaltRoughness);
-    // AsphaltMaterial.setEmissiveTexture(AsphaltEmissive);
-    // AsphaltMaterial.setAlbedoTexture(AsphaltAlbedo);
-
-    // AsphaltMaterial.setup();
 
     TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
     houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);  // Add blended texture
@@ -198,7 +214,26 @@ int main() {
 
     // House glass material
     TexturedMaterial GlassMaterial(houseMixedShader, GlassTexture);
+    
+    // 
+    // Create Lighting stuff
+    //
+    LightSystem lightManager;
+    
 
+    lightManager.addLight(Light(LightType::DIRECTIONAL, glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 10.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+    lightManager.addLight(Light(LightType::POINT, glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 5.0f, 0.0f)));
+    lightManager.addLight(Light(LightType::SPOT, glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(2.0f, 4.0f, 0.0f), glm::vec3(-1.0f, -1.0f, 0.0f), glm::radians(30.0f), glm::radians(60.0f)));
+
+    // Set up the lights in the shader
+    houseMixedMaterial.setup();
+    AsphaltMaterial.setup();
+    lightShader->use();
+    houseMixedShader->use();
+    houseShader->use();
+    mainShader->use();
+
+    // Load imported meshes (obj)
     // Load mesh from .obj file
     std::string meshPath = std::string(MODELS_DIR) + "/house/house.obj";
     std::cout << "Attempting to load mesh: " << meshPath << std::endl;
@@ -209,7 +244,7 @@ int main() {
     Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh skySphere = Mesh::create_sphere();
 
-    Mesh asphaltMesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
+    // Mesh asphaltMesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
 
     // Create MeshRenderers to upload and render these meshes
     MeshRenderer cube, house, glass, skyRenderer;
@@ -233,6 +268,23 @@ int main() {
     world.get_camera().near      = 0.1f;  // Near clipping plane
     world.get_camera().far       = 100.0f;  // Far clipping plane
 
+
+    // compute initial view-projection and set light shader globals (use proper viewport)
+    int width1, height1;
+    glfwGetFramebufferSize(window.get_handle(), &width1, &height1);
+        
+    glm::mat4 VP1 = world.get_camera().get_view_projection_matrix(glm::vec2(width1, height1));
+    lightShader->use();
+    lightShader->setUniform("viewProj", VP1);
+    lightShader->setUniform("model", glm::mat4(1.0f));
+    lightShader->setUniform("normalMatrix", glm::mat3(1.0f));
+
+    // lightShader->setUniform("normalMatrix", normalMatrix);
+    lightShader->setUniform("camera_pos", world.get_camera().position);
+    lightShader->setUniform("ambient", glm::vec3(0.05f));
+
+    lightManager.setupLightsInShader(lightShader);
+    
     // ---------------------------
     // Scene Graph (Entity Creation)
     // ---------------------------
@@ -272,7 +324,7 @@ int main() {
     // Sand on the island
     Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
 
-    Entity* asphalt = world.createEntityWithParams(root, {4.0f, 4.0f, 4.0f}, glm::quat(), {1.0f, 1.0f, 1.0f}, &skyRenderer, &AsphaltMaterial);
+    Entity* asphalt = world.createEntityWithParams(island, {4.0f, 4.0f, 4.0f}, glm::quat(), {1.0f, 1.0f, 1.0f}, &skyRenderer, &AsphaltMaterial);
     // Test house entity with mixed textures
     Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
 
@@ -317,8 +369,8 @@ int main() {
 
     glm::vec3 leafOffsets[4] = {
         { 0.f, 0.f, 0.5f },
-        { 0.f, 0.f, 0.75f },
-        { 0.f, 0.f, 2.5f },
+        { 0.f, 0.75f, 0.75f },
+        { 0.f, 0.75f, 2.5f },
         { 0.f, 0.f, -2.5f }
     };
 
@@ -396,7 +448,7 @@ int main() {
         // Get the view-projection matrix for the camera and pass it to the shaders
         int width, height;
         glfwGetFramebufferSize(window.get_handle(), &width, &height);
-
+        
         glm::mat4 VP = world.get_camera().get_view_projection_matrix(glm::vec2(width, height));
 
         // ---------------------------

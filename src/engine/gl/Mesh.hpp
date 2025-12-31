@@ -23,7 +23,7 @@ struct Vertex
     glm::vec3 position;
     Color color;
     glm::vec2 tex_coord = {0.0f, 0.0f};
-
+    glm::vec3 normal = {0.0f, 0.0f, 0.0f};
     bool operator==(const Vertex& other) const;
     void operator=(const Vertex& other);
 };

@@ -1,69 +1,63 @@
 #include "LitMaterial.hpp"
+#include <glad/glad.h>
 
-LitMaterial::LitMaterial(std::shared_ptr<Shader> shader, 
-                Texture* albedo, 
-                Texture* specular, 
-                Texture* roughness, 
-                Texture* emissive,
-                Texture* ambientOcclusion
-                )
-        : TexturedMaterial(shader, albedo)  // Call the base class constructor
-        {
-            // Initialize LitMaterial-specific properties (specular, roughness, etc.)
-            LitMaterial::setAlbedoMap(albedo);
-            LitMaterial::setSpecularMap(specular);
-            LitMaterial::setRoughnessMap(roughness);
-            LitMaterial::setEmissiveMap(emissive);
-            LitMaterial::setAmbientOcclusionMap(ambientOcclusion);
-            LitMaterial::setup();
-        }
+LitMaterial::LitMaterial(
+    std::shared_ptr<Shader> shader,
+    Texture* albedo,
+    Texture* specular,
+    Texture* roughness,
+    Texture* emissive,
+    Texture* ambientOcclusion
+)
+    : Material()
+{
+    setShader(std::move(shader));
 
-void LitMaterial::setAlbedoMap(Texture* tex) {
-    albedoMap = tex;
+    albedoMap           = albedo;
+    specularMap         = specular;
+    roughnessMap        = roughness;
+    emissiveMap         = emissive;
+    ambientOcclusionMap = ambientOcclusion;
 }
 
-void LitMaterial::setSpecularMap(Texture* tex) {
-    specularMap = tex;
-}
+// ---------------- setters ----------------
 
-void LitMaterial::setRoughnessMap(Texture* tex) {
-    roughnessMap = tex;
-}
+void LitMaterial::setAlbedoMap(Texture* tex)            { albedoMap = tex; }
+void LitMaterial::setSpecularMap(Texture* tex)          { specularMap = tex; }
+void LitMaterial::setRoughnessMap(Texture* tex)         { roughnessMap = tex; }
+void LitMaterial::setEmissiveMap(Texture* tex)          { emissiveMap = tex; }
+void LitMaterial::setAmbientOcclusionMap(Texture* tex)  { ambientOcclusionMap = tex; }
 
-void LitMaterial::setEmissiveMap(Texture* tex) {
-    emissiveMap = tex;
-}
+// ---------------- setup ----------------
 
-void LitMaterial::setAmbientOcclusionMap(Texture* tex) {
-    ambientOcclusionMap = tex;
-}
+void LitMaterial::setup()
+{
+    if (!shader) return;
 
-void LitMaterial::setup() {
-    TexturedMaterial::setup();
+    shader->use();
 
-    // Bind and send texture maps to the shader
-    if (albedoMap) {
-        albedoMap->bind(0);
-        glUniform1i(getUniformLocation("material.albedo_map"), 0);
-    }
+    // Albedo
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, albedoMap ? albedoMap->get_id() : 0);
+    shader->setUniform("material.albedo_map", 0);
 
-    if (specularMap) {
-        specularMap->bind(1);
-        glUniform1i(getUniformLocation("material.specular_map"), 1);
-    }
+    // Specular
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, specularMap ? specularMap->get_id() : 0);
+    shader->setUniform("material.specular_map", 1);
 
-    if (roughnessMap) {
-        roughnessMap->bind(2);
-        glUniform1i(getUniformLocation("material.roughness_map"), 2);
-    }
+    // Ambient Occlusion
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, ambientOcclusionMap ? ambientOcclusionMap->get_id() : 0);
+    shader->setUniform("material.ambient_occlusion_map", 2);
 
-    if (emissiveMap) {
-        emissiveMap->bind(3);
-        glUniform1i(getUniformLocation("material.emissive_map"), 3);
-    }
+    // Roughness
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, roughnessMap ? roughnessMap->get_id() : 0);
+    shader->setUniform("material.roughness_map", 3);
 
-    if (ambientOcclusionMap) {
-        ambientOcclusionMap->bind(4);
-        glUniform1i(getUniformLocation("material.ambient_occlusion_map"), 4);
-    }
+    // Emissive
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, emissiveMap ? emissiveMap->get_id() : 0);
+    shader->setUniform("material.emissive_map", 4);
 }

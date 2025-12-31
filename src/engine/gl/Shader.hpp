@@ -5,6 +5,7 @@
 #endif
 #include <string>
 #include <unordered_map>
+#include <glm/glm.hpp>
 
 class Shader {
 private:
@@ -33,6 +34,10 @@ public:
     GLuint getProgram() const { return program; }
 
     GLint getUniformLocation(const std::string& name) const;
+
+    // Set uniform values for various types
+    template <typename T>
+    void setUniform(const std::string& name, const T& value);
 
 private:
     static GLuint compileShader(const std::string& source, GLenum type);

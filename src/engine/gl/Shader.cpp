@@ -166,3 +166,48 @@ GLint Shader::getUniformLocation(const std::string& name) const {
     uniformCache[name] = loc;  // Cache the uniform location for future use
     return loc;
 }
+
+
+// Specialization for int
+template <>
+void Shader::setUniform(const std::string& name, const int& value) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) {
+        glUniform1i(location, value);
+    }
+}
+
+// Specialization for float
+template <>
+void Shader::setUniform(const std::string& name, const float& value) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) {
+        glUniform1f(location, value);
+    }
+}
+
+// Specialization for glm::vec3
+template <>
+void Shader::setUniform(const std::string& name, const glm::vec3& value) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) {
+        glUniform3fv(location, 1, &value[0]);
+    }
+}
+
+// Specialization for glm::mat4
+template <>
+void Shader::setUniform(const std::string& name, const glm::mat4& value) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) {
+        glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
+    }
+}
+
+template <>
+void Shader::setUniform(const std::string& name, const glm::mat3& value) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) {
+        glUniformMatrix3fv(location, 1, GL_FALSE, &value[0][0]);
+    }
+}

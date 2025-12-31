@@ -1,6 +1,63 @@
 #include "Mesh.hpp"
 #include <unordered_map>
 #include <glm/gtc/constants.hpp>
+#include <glm/glm.hpp>
+#include <algorithm>
+#include <cstddef>
+
+namespace {
+    // Helper: compute per-vertex normals from triangles (indices).
+    // Accumulate face normals to each vertex then normalize.
+    void compute_normals(std::vector<Vertex>& verts, const std::vector<uint16_t>& indices) {
+        if (verts.empty() || indices.empty()) {
+            // nothing to do
+            return;
+        }
+
+        // zero out normals
+        for (auto &v : verts) {
+            v.normal = glm::vec3(0.0f);
+        }
+
+        // accumulate face normals
+        size_t triCount = indices.size() / 3;
+        for (size_t t = 0; t < triCount; ++t) {
+            uint16_t i0 = indices[t*3 + 0];
+            uint16_t i1 = indices[t*3 + 1];
+            uint16_t i2 = indices[t*3 + 2];
+
+            // guard against bad indices
+            if (i0 >= verts.size() || i1 >= verts.size() || i2 >= verts.size()) continue;
+
+            const glm::vec3 &p0 = verts[i0].position;
+            const glm::vec3 &p1 = verts[i1].position;
+            const glm::vec3 &p2 = verts[i2].position;
+
+            glm::vec3 e1 = p1 - p0;
+            glm::vec3 e2 = p2 - p0;
+
+            glm::vec3 faceNormal = glm::cross(e1, e2);
+            float len = glm::length(faceNormal);
+            if (len > 1e-6f) {
+                faceNormal /= len; // normalize
+                verts[i0].normal += faceNormal;
+                verts[i1].normal += faceNormal;
+                verts[i2].normal += faceNormal;
+            }
+        }
+
+        // normalize vertex normals; fallback to up if zero-length
+        for (auto &v : verts) {
+            float l = glm::length(v.normal);
+            if (l > 1e-6f) {
+                v.normal = v.normal / l;
+            } else {
+                // fallback normal (reasonable default)
+                v.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+            }
+        }
+    }
+} // anonymous namespace
 
 Mesh::Mesh()
 {
@@ -22,6 +79,10 @@ void Mesh::create(const std::span<Vertex>& vertices, const std::span<uint16_t>& 
     // Copy the vertices and indices into the member vectors.
     verticies.assign(vertices.begin(), vertices.end());
     this->indices.assign(indices.begin(), indices.end());
+    
+    // Compute normals from the geometry we just stored.
+    compute_normals(verticies, this->indices);
+
     count = static_cast<GLsizei>(indices.size());
 }
 
@@ -83,6 +144,9 @@ Mesh Mesh::create_cuboid(glm::vec3 center, glm::vec3 size)
         20, 21, 22, 22, 23, 20
     };
 
+    // compute normals
+    compute_normals(vertices, indices);
+
     Mesh mesh;
     mesh.create(vertices, indices);
     return mesh;
@@ -104,6 +168,9 @@ Mesh Mesh::create_plane(glm::vec3 center, glm::vec2 size, glm::vec2 tiling)
     indices = {
         0, 1, 2, 2, 3, 0,
     };
+
+    // plane normals (all up)
+    compute_normals(vertices, indices);
 
     Mesh mesh;
     mesh.create(vertices, indices);
@@ -148,6 +215,9 @@ Mesh Mesh::create_sphere(glm::ivec2 segments, glm::vec3 center, float radius)
             indices.push_back(lng + start);
         }
     }
+
+    // compute normals (sphere uses position based normals)
+    compute_normals(vertices, indices);
 
     Mesh mesh;
     mesh.create(vertices, indices);
@@ -266,6 +336,9 @@ Mesh Mesh::create_cylinder(int segments, glm::vec3 center, float height, float r
     mesh.set_tex_coords(tex_coords);
     mesh.set_color(WHITE);
 
+    // compute normals now because set_positions + set_indices were used
+    compute_normals(mesh.verticies, mesh.indices);
+
     return mesh;
 }
 
@@ -275,6 +348,11 @@ void Mesh::set_vertices(const std::span<Vertex>& positions)
 
     for (size_t i = 0; i < positions.size(); i++)
         verticies[i] = positions[i];
+
+    // compute normals if we already have indices
+    if (!indices.empty()) {
+        compute_normals(verticies, indices);
+    }
 }
 
 void Mesh::set_positions(const std::span<glm::vec3>& positions)
@@ -283,6 +361,11 @@ void Mesh::set_positions(const std::span<glm::vec3>& positions)
 
     for (size_t i = 0; i < positions.size(); i++)
         verticies[i].position = positions[i];
+
+    // compute normals only if we have indices to form faces
+    if (!indices.empty()) {
+        compute_normals(verticies, indices);
+    }
 }
 
 void Mesh::set_indices(const std::span<uint16_t>& indices)
@@ -293,6 +376,11 @@ void Mesh::set_indices(const std::span<uint16_t>& indices)
         this->indices[i] = indices[i];
 
     count = static_cast<GLsizei>(indices.size());
+
+    // compute normals now that indices are available
+    if (!verticies.empty()) {
+        compute_normals(verticies, this->indices);
+    }
 }
 
 void Mesh::set_color(const Color& color)

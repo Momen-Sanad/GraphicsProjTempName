@@ -42,65 +42,86 @@ MeshRenderer& MeshRenderer::operator=(MeshRenderer&& other) noexcept {
 // Upload data to GPU
 // ------------------------------------------------------------
 void MeshRenderer::upload(const Mesh& data) {
-    destroy();  // Clear previous mesh data if it exists
+    destroy();
 
-    // Create a new VAO (stores the state of the vertex input)
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
     // ------------------------
-    // VBO (stores vertex data)
+    // VBO
     // ------------------------
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER,
-                 data.get_vertex_count() * sizeof(Vertex),  // Size of vertex data
-                 data.get_vertices().data(),                // Vertex data
-                 GL_STATIC_DRAW);                           // Static data, won't change frequently
-
-    // Vertex attribute 0 -> position
-    glEnableVertexAttribArray(0);  // Enable attribute at location 0
-    glVertexAttribPointer(
-        0, 3, GL_FLOAT, GL_FALSE,
-        sizeof(Vertex),                     // Stride: size of a vertex
-        (void*)offsetof(Vertex, position)   // Offset to position data in the vertex structure
-    );
-
-    // Vertex attribute 1 -> color
-    glEnableVertexAttribArray(1);  // Enable attribute at location 1
-    glVertexAttribPointer(
-        1, 4, GL_UNSIGNED_BYTE, GL_TRUE,
-        sizeof(Vertex),                      // Stride: size of a vertex
-        (void*)offsetof(Vertex, color)       // Offset to color data in the vertex structure
-    );
-
-    /*
-    Added this part to support texture coordinates in the mesh.
-    */
-
-    // Vertex attribute 2 -> texture coordinates
-    glEnableVertexAttribArray(2);  // Enable attribute at location 2
-    glVertexAttribPointer(
-        2, 2, GL_FLOAT, GL_FALSE,
-        sizeof(Vertex),                     // Stride: size of a vertex
-        (void*)offsetof(Vertex, tex_coord)  // Offset to texture coordinates data in the vertex structure
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        data.get_vertex_count() * sizeof(Vertex),
+        data.get_vertices().data(),
+        GL_STATIC_DRAW
     );
 
     // ------------------------
-    // EBO (stores index data)
+    // Attribute 0 : POSITION
+    // ------------------------
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(
+        0, 3, GL_FLOAT, GL_FALSE,
+        sizeof(Vertex),
+        (void*)offsetof(Vertex, position)
+    );
+
+    // ------------------------
+    // Attribute 1 : NORMAL  ✅ FIX
+    // ------------------------
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(
+        1, 3, GL_FLOAT, GL_FALSE,
+        sizeof(Vertex),
+        (void*)offsetof(Vertex, normal)
+    );
+
+    // ------------------------
+    // Attribute 2 : TEXCOORD
+    // ------------------------
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(
+        2, 2, GL_FLOAT, GL_FALSE,
+        sizeof(Vertex),
+        (void*)offsetof(Vertex, tex_coord)
+    );
+
+    // ------------------------
+    // Attribute 3 : COLOR
+    // ------------------------
+    if constexpr (std::is_same_v<decltype(Vertex::color), glm::u8vec4>) {
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(
+            3, 4, GL_UNSIGNED_BYTE, GL_TRUE,
+            sizeof(Vertex),
+            (void*)offsetof(Vertex, color)
+        );
+    } else {
+        // Fallback: constant white if mesh has no colors
+        glDisableVertexAttribArray(3);
+        glVertexAttrib4f(3, 1.f, 1.f, 1.f, 1.f);
+    }
+
+    // ------------------------
+    // EBO
     // ------------------------
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 data.get_index_count() * sizeof(uint16_t),  // Size of index data
-                 data.get_indices().data(),                   // Index data
-                 GL_STATIC_DRAW);                              // Static data, won't change frequently
+    glBufferData(
+        GL_ELEMENT_ARRAY_BUFFER,
+        data.get_index_count() * sizeof(uint16_t),
+        data.get_indices().data(),
+        GL_STATIC_DRAW
+    );
 
-    // Unbind the VAO (reset the OpenGL state)
     glBindVertexArray(0);
 
-    count = data.get_index_count();  // Update the count to the number of indices
+    count = data.get_index_count();
 }
+
 
 // ------------------------------------------------------------
 // Draw Mesh
