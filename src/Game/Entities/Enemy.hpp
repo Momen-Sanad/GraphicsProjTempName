@@ -16,6 +16,7 @@ private:
     World& worldRef;
     Entity* root = nullptr;
     Entity* body = nullptr;
+
 };
 
 std::unique_ptr<Enemy> CreateEnemy(World& world,

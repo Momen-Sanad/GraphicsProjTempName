@@ -54,6 +54,7 @@ Player::Player(World& world,
     if (weapon) {
         weaponRestRotation = weapon->getRotation();
     }
+
 }
 
 void Player::setPosition(const glm::vec3& p) {
@@ -81,6 +82,7 @@ void Player::setDodgeTimings(float duration, float cooldown) {
     dodgeDuration = std::max(0.01f, duration);
     dodgeCooldown = std::max(0.0f, cooldown);
 }
+
 
 void Player::attachCamera(Camera* camera,
                           const glm::vec3& offset,

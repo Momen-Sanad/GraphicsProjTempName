@@ -19,11 +19,14 @@
 #include "../engine/assets/MaterialManager.hpp"
 #include "../engine/components/MeshRenderer.hpp"
 #include "../engine/gl/Mesh.hpp"
+#include "../engine/ecs/Collider.hpp"
+#include "../engine/components/CameraFollowComponent.hpp"
 #include "../engine/utils/Im_GUI_Inspector.hpp"
 #include "../engine/assets/MeshLoader.hpp"
 #include "../engine/assets/TexturedMaterial.hpp"
 #include "../engine/assets/TextureLoader.hpp"
 #include "../engine/assets/LitMaterial.hpp"
+#include "../engine/systems/PhysicsCollisionSystem.hpp"
 #include "Entities/Player.hpp"
 #include "Entities/Crusader.hpp"
 #include "Entities/Enemy.hpp"
@@ -208,17 +211,19 @@ int main() {
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh skySphere = Mesh::create_sphere();
+    Mesh sphereMesh = Mesh::create_sphere();
 
     Mesh asphaltMesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
 
     // Create MeshRenderers to upload and render these meshes
-    MeshRenderer cube, house, glass, skyRenderer;
+    MeshRenderer cube, house, glass, skyRenderer, sphereRenderer;
 
     // Upload mesh data to the GPU
     cube.upload(cubeMesh);
     house.upload(*loadedMesh);
     glass.upload(glass_mesh);
     skyRenderer.upload(skySphere);
+    sphereRenderer.upload(sphereMesh);
 
     // ---------------------------
     // World + Camera Setup
@@ -251,7 +256,6 @@ int main() {
     // std::unique_ptr<Player> player = std::make_unique<Crusader>(world, root, &cube, &green, &cube, &brown);
     
     player->setPosition({0.0f, 1.0f, 0.0f});
-    player->attachCamera(&world.get_camera(), {0.0f, 2.5f, 6.0f}, {0.0f, 1.0f, 0.0f});
 
     // is a unique ptr cuz we have many enemies that are unrelated
     std::unique_ptr<Enemy> enemy = CreateEnemy(world, root, &cube, &red);
@@ -275,6 +279,40 @@ int main() {
     Entity* asphalt = world.createEntityWithParams(root, {4.0f, 4.0f, 4.0f}, glm::quat(), {1.0f, 1.0f, 1.0f}, &skyRenderer, &AsphaltMaterial);
     // Test house entity with mixed textures
     Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
+    Entity* collisionSphere = world.createEntityWithParams(root, {6.f, 1.0f, -2.f}, glm::quat(), {0.6f, 0.6f, 0.6f}, &sphereRenderer, &blue);
+    Collider playerCollider;
+    Collider houseCollider;
+    Collider sphereCollider;
+    bool houseCollisionReady = false;
+    bool sphereCollisionReady = false;
+    const float sphereMoveSpeed = 3.0f;
+
+    CameraFollowPlayer sphereCameraFollow(&world.get_camera(), collisionSphere);
+    sphereCameraFollow.setOffsets({0.0f, 2.0f, 5.0f}, {0.0f, 1.0f, 0.0f});
+
+    if (player) {
+        playerCollider.setParent(player->getBody());
+        playerCollider.setHalfExtents(glm::vec3(0.3f, 0.45f, 0.3f));
+    }
+
+    if (loadedMesh) {
+        PhysicsCollisionSystem::MeshBounds houseBounds;
+        if (PhysicsCollisionSystem::computeMeshBounds(*loadedMesh, houseBounds)) {
+            houseCollider.setParent(testhouse);
+            houseCollider.setLocalOffset(houseBounds.center);
+            houseCollider.setHalfExtents(houseBounds.halfExtents);
+            houseCollisionReady = true;
+        }
+    }
+    if (collisionSphere) {
+        PhysicsCollisionSystem::MeshBounds sphereBounds;
+        if (PhysicsCollisionSystem::computeMeshBounds(sphereMesh, sphereBounds)) {
+            sphereCollider.setParent(collisionSphere);
+            sphereCollider.setLocalOffset(sphereBounds.center);
+            sphereCollider.setHalfExtents(sphereBounds.halfExtents);
+            sphereCollisionReady = true;
+        }
+    }
 
     // Create windows as child entities of the house
     { // Window 1
@@ -385,6 +423,46 @@ int main() {
             player->update(delta_time);
         }
 
+        if (collisionSphere) {
+            glm::vec3 sphereMove(0.0f);
+            if (glfwGetKey(windowHandle, GLFW_KEY_UP) == GLFW_PRESS) sphereMove.z -= 1.0f;
+            if (glfwGetKey(windowHandle, GLFW_KEY_DOWN) == GLFW_PRESS) sphereMove.z += 1.0f;
+            if (glfwGetKey(windowHandle, GLFW_KEY_LEFT) == GLFW_PRESS) sphereMove.x -= 1.0f;
+            if (glfwGetKey(windowHandle, GLFW_KEY_RIGHT) == GLFW_PRESS) sphereMove.x += 1.0f;
+
+            float moveLen = glm::length(sphereMove);
+            if (moveLen > 0.001f) {
+                sphereMove /= moveLen;
+                collisionSphere->setPosition(
+                    collisionSphere->getPosition() + sphereMove * sphereMoveSpeed * delta_time
+                );
+            }
+        }
+
+        sphereCameraFollow.update(delta_time);
+
+        if (player && houseCollisionReady) {
+            PhysicsCollisionSystem::resolveStaticCollision(
+                player->entity(),
+                playerCollider,
+                houseCollider
+            );
+        }
+        if (collisionSphere && houseCollisionReady && sphereCollisionReady) {
+            PhysicsCollisionSystem::resolveStaticCollision(
+                collisionSphere,
+                sphereCollider,
+                houseCollider
+            );
+        }
+        if (player && sphereCollisionReady) {
+            PhysicsCollisionSystem::resolveStaticCollision(
+                player->entity(),
+                playerCollider,
+                sphereCollider
+            );
+        }
+
         // Rendering setup: clear color and depth buffers
         int w, h;
         window.get_framebuffer_size(w, h);
@@ -481,6 +559,7 @@ int main() {
     house.destroy();
     glass.destroy();
     skyRenderer.destroy();
+    sphereRenderer.destroy();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
