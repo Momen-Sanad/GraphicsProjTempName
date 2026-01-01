@@ -408,8 +408,10 @@ int main() {
         std::unique_ptr<Enemy> enemy;
         HealthComponent health;
         HurtboxComponent hurtbox;
+        Collider collider;
         Entity* skeletonEntity = nullptr;
         std::vector<SkinnedMeshRenderer*> skeletonRenderers;
+        AnimationComponent* animComponent = nullptr;
         bool wasDead = false;
     };
     std::vector<EnemyData> enemies;
@@ -468,6 +470,13 @@ int main() {
         data.hurtbox.halfExtents = {0.5f, 1.0f, 0.5f};
         data.hurtbox.localOffset = {0.0f, 1.0f, 0.0f};
         
+        // Set up collider for enemy
+        if (data.enemy->entity()) {
+            data.collider.setParent(data.enemy->entity());
+            data.collider.setHalfExtents(glm::vec3(0.4f, 1.0f, 0.4f));
+            data.collider.setLocalOffset(glm::vec3(0.0f, 1.0f, 0.0f));
+        }
+        
         // Add skeleton model
         if (skeletonModelData && skeletonMaterial) {
             data.skeletonEntity = world.createEntityWithParams(
@@ -488,10 +497,10 @@ int main() {
             data.skeletonEntity->setSkinnedRenderers(data.skeletonRenderers);
             data.skeletonEntity->setSkinnedMaterial(skeletonMaterial.get());
             
-            AnimationComponent* anim = new AnimationComponent(skeletonModelData);
-            data.skeletonEntity->addComponent(anim);
-            if (anim->get_animation_count() > 0) {
-                anim->play_animation(0, true);
+            data.animComponent = new AnimationComponent(skeletonModelData);
+            data.skeletonEntity->addComponent(data.animComponent);
+            if (data.animComponent->get_animation_count() > 0) {
+                data.animComponent->play_animation(0, true);
             }
             
             // Hide red cube
@@ -765,16 +774,7 @@ int main() {
                 }
             }
             
-            // Handle enemy respawn
-            if (enemyData.enemy->entity() && enemyData.health.ready_to_respawn()) {
-                enemyData.health.respawn();
-                enemyData.enemy->setPosition(enemyData.health.spawnPos);
-                enemyData.enemy->entity()->setScale({1.0f, 1.0f, 1.0f});
-                if (enemyData.skeletonEntity) {
-                    enemyData.skeletonEntity->setScale({skeletonScale, skeletonScale, skeletonScale});
-                }
-                enemyData.wasDead = false;
-            }
+            // NOTE: Individual enemy respawn disabled - using wave system instead
         }
         
         // Wave progression - all enemies dead, spawn next wave
@@ -789,6 +789,32 @@ int main() {
             }
             
             std::cout << "WAVE " << currentWave << " START! Spawning " << enemiesPerWave << " enemies. DMG x" << enemyDamageMultiplier << std::endl;
+            
+            // Clean up old enemy resources before clearing
+            // Note: We hide entities but don't delete them to prevent crashes
+            for (auto& enemyData : enemies) {
+                // Hide skeleton and clear its renderer references
+                if (enemyData.skeletonEntity) {
+                    enemyData.skeletonEntity->setSkinnedRenderers({});
+                    enemyData.skeletonEntity->setSkinnedMaterial(nullptr);
+                    enemyData.skeletonEntity->setScale({0.0f, 0.0f, 0.0f});
+                }
+                // Hide enemy entity
+                if (enemyData.enemy && enemyData.enemy->entity()) {
+                    enemyData.enemy->entity()->setScale({0.0f, 0.0f, 0.0f});
+                }
+                // Destroy GPU resources but keep renderer objects alive
+                // (they'll be leaked but prevents crash)
+                for (SkinnedMeshRenderer* renderer : enemyData.skeletonRenderers) {
+                    if (renderer) {
+                        renderer->destroy();  // Free GPU resources
+                    }
+                }
+                // Don't delete renderers - just clear our tracking
+                enemyData.skeletonRenderers.clear();
+                enemyData.animComponent = nullptr;
+                enemyData.skeletonEntity = nullptr;
+            }
             
             // Clear old enemies and spawn new wave
             enemies.clear();
@@ -901,6 +927,17 @@ int main() {
                 playerCollider,
                 sphereCollider
             );
+        }
+        
+        // Player-Enemy collision
+        for (auto& enemyData : enemies) {
+            if (player && enemyData.enemy && enemyData.enemy->entity() && !enemyData.health.dead) {
+                PhysicsCollisionSystem::resolveStaticCollision(
+                    player->entity(),
+                    playerCollider,
+                    enemyData.collider
+                );
+            }
         }
 
         for (Entity* rootEntity : world.getEntityManager().getRoots()) {
