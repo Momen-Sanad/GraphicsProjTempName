@@ -12,4 +12,3 @@ void main()
     v_texCoord = a_texCoord;
     gl_Position = MVP * vec4(a_position, 1.0);
 }
-

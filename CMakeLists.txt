@@ -88,6 +88,7 @@ file(GLOB_RECURSE ENGINE_SOURCES CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/engine/systems/*.cpp
     ${CMAKE_SOURCE_DIR}/src/engine/utils/*.cpp
     ${CMAKE_SOURCE_DIR}/src/engine/scene/*.cpp
+    ${CMAKE_SOURCE_DIR}/src/engine/animations/*.cpp
 )
 
 # ==========================================================
@@ -108,12 +109,14 @@ target_include_directories(Engine
         ${CMAKE_SOURCE_DIR}/vendor/json/single_include
         ${CMAKE_SOURCE_DIR}/vendor/glm
         ${CMAKE_SOURCE_DIR}/vendor/stb
+        ${CMAKE_SOURCE_DIR}/vendor                  # for tiny_obj_loader.h and tinygltf
 )
 
 target_link_libraries(Engine
     PUBLIC
         glfw
         glad
+        imgui
         imgui
         ${OPENGL_gl_LIBRARY}
 )
@@ -152,6 +155,12 @@ if (ENGINE_BUILD_EXAMPLES)
 
     target_link_libraries(OpenGLEngine PRIVATE Engine)
 
+    target_compile_definitions(OpenGLEngine PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        SHADER_DIR="${CMAKE_SOURCE_DIR}/shaders"
+        ASSET_DIR="${CMAKE_SOURCE_DIR}/assets"
+    )
+
     set_target_properties(OpenGLEngine PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
     )
@@ -163,8 +172,37 @@ endif()
 if (ENGINE_ENABLE_TESTS)
     enable_testing()
 
-    file(GLOB TEST_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/tests/*.cpp)
-    add_executable(EngineTests ${TEST_SOURCES})
-    target_link_libraries(EngineTests PRIVATE Engine)
-    add_test(NAME EngineTests COMMAND EngineTests)
+    # ----- Animation tests -----
+    add_executable(animation_tests
+        ${CMAKE_SOURCE_DIR}/tests/animation_tests.cpp
+    )
+    target_link_libraries(animation_tests PRIVATE Engine)
+    add_test(NAME animation_tests COMMAND animation_tests)
+
+    # ----- Asset tests -----
+    add_executable(asset_tests
+        ${CMAKE_SOURCE_DIR}/tests/asset_tests.cpp
+    )
+    target_link_libraries(asset_tests PRIVATE Engine)
+    add_test(NAME asset_tests COMMAND asset_tests)
+
+    # ----- ECS tests -----
+    add_executable(ecs_tests
+        ${CMAKE_SOURCE_DIR}/tests/ecs_tests.cpp
+    )
+    target_link_libraries(ecs_tests PRIVATE Engine)
+    add_test(NAME ecs_tests COMMAND ecs_tests)
+
+    # ----- Animation demo (has its own main) -----
+    add_executable(animation_demo
+        ${CMAKE_SOURCE_DIR}/tests/animation_demo.cpp
+    )
+    target_link_libraries(animation_demo PRIVATE Engine glfw glad imgui)
+    target_compile_definitions(animation_demo PRIVATE
+        _CRT_SECURE_NO_WARNINGS
+        SHADER_DIR="${CMAKE_SOURCE_DIR}/shaders"
+        ASSET_DIR="${CMAKE_SOURCE_DIR}/assets"
+        SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+    )
+    add_test(NAME animation_demo COMMAND animation_demo)
 endif()

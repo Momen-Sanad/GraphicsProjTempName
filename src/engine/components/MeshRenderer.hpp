@@ -1,42 +1,51 @@
 #pragma once
-
 #ifndef GLAD_INCLUDED
 #define GLAD_INCLUDED
 #include <glad/glad.h>
 #endif
-
 #include "../gl/Mesh.hpp"
-#include <cstring>
 
 // ------------------------------------------------------------
-// GPU-side mesh (VAO + VBO + EBO)
+// GPU-side mesh renderer (VAO + VBO + EBO)
+// Handles rendering of basic Mesh objects
 // ------------------------------------------------------------
 class MeshRenderer {
-private:
-    GLuint vao    = 0; // Vertex Array Object
-    GLuint vbo    = 0; // Vertex Buffer Object
-    GLuint ebo    = 0; // Element Buffer Object
-    GLsizei count = 0; // Number of elements to render
+protected:
+    GLuint vao = 0;  // Vertex Array Object
+    GLuint vbo = 0;  // Vertex Buffer Object
+    GLuint ebo = 0;  // Element Buffer Object
+    GLsizei count = 0;  // Number of elements to render
 
 public:
     MeshRenderer();
-    ~MeshRenderer();
+    virtual ~MeshRenderer();
 
-    // Prevent copying of MeshRenderer objects to avoid accidental resource sharing.
+    // Prevent copying
     MeshRenderer(const MeshRenderer&) = delete;
     MeshRenderer& operator=(const MeshRenderer&) = delete;
 
-    // Move constructor and move assignment operator.
-    // Allows efficient transfer of resources without unnecessary copies.
+    // Move semantics
     MeshRenderer(MeshRenderer&& other) noexcept;
     MeshRenderer& operator=(MeshRenderer&& other) noexcept;
 
-    // Upload mesh data to the GPU (VBO, EBO).
-    void upload(const Mesh& mesh);  // Use the proper Mesh type here.
+    // Upload mesh data to GPU
+    virtual void upload(const Mesh& mesh);
 
-    // Render the mesh using the bound VAO/VBO/EBO.
-    void draw() const;
+    // Render the mesh
+    virtual void draw() const;
 
-    // Clean up OpenGL resources (VAO, VBO, EBO).
-    void destroy();
+    // Clean up OpenGL resources
+    virtual void destroy();
+
+    // Getters
+    GLuint get_vao() const { return vao; }
+    GLuint get_vbo() const { return vbo; }
+    GLuint get_ebo() const { return ebo; }
+    GLsizei get_count() const { return count; }
+    bool is_uploaded() const { return vao != 0; }
 };
+
+// ------------------------------------------------------------
+// GPU-side skinned mesh renderer
+// Handles rendering of SkinnedMesh objects with skeleton data
+// ------------------------------------------------------------

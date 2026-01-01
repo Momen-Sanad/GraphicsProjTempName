@@ -30,6 +30,7 @@ public:
 
     // Bind texture to a texture unit
     void bind(int unit = 0) const;
+    void bind(int unit, const char* samp) const;
 
     // Unbind texture
     void unbind() const;

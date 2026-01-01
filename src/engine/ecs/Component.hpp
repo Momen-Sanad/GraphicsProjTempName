@@ -15,6 +15,7 @@ public:
 
     // Called every frame by a System
     virtual void update(float deltaTime) {}
+    virtual void render(Entity& entity) = 0;
 
     // lifecycle hooks
     virtual void onAdded() {}

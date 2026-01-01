@@ -3,23 +3,14 @@
 #include <sstream>
 #include <iostream>
 
-// ----------------------------------------------------
-// Destructor: Cleans up the shader program and its resources
-// ----------------------------------------------------
 Shader::~Shader() {
-    destroy();  // Calls the destroy function to delete the shader program
+    destroy();
 }
 
-// ----------------------------------------------------
-// Move constructor: Transfers ownership of resources from another shader object
-// ----------------------------------------------------
 Shader::Shader(Shader&& other) noexcept {
-    *this = std::move(other);  // Uses move assignment operator to transfer resources
+    *this = std::move(other);
 }
 
-// ----------------------------------------------------
-// Move assignment: Releases current resources and transfers ownership from another shader
-// ----------------------------------------------------
 Shader& Shader::operator=(Shader&& other) noexcept {
     if (this != &other) {
         destroy();  // Cleans up any existing resources
@@ -34,14 +25,11 @@ Shader& Shader::operator=(Shader&& other) noexcept {
     return *this;
 }
 
-// ----------------------------------------------------
-// File reading helper: Reads the contents of a shader file
-// ----------------------------------------------------
 std::string Shader::readFile(const std::string& path) {
     std::ifstream file(path);
     if (!file) {
         std::cerr << "Failed to open shader file: " << path << std::endl;
-        return "";  // Returns an empty string if file cannot be opened
+        return "";
     }
     
     std::stringstream ss;
@@ -238,4 +226,8 @@ template <>
 void Shader::setUniform(const std::string& name, const bool& b) {
     GLint location = getUniformLocation(name);
     if (location != -1) glUniform1i(location, b ? 1 : 0);
+}
+
+void Shader::set_mat4_array(const std::string& name, const glm::mat4* values, int count) const {
+    glUniformMatrix4fv(getUniformLocation(name), count, GL_FALSE, glm::value_ptr(values[0]));
 }

@@ -88,7 +88,10 @@ void Texture::bind(int unit) const
     glBindTexture(GL_TEXTURE_2D, id);  // Bind the texture to the GL_TEXTURE_2D target
 
     glBindSampler(unit, sampler);  // Bind the sampler to the texture unit
+
+    glUniform1i(sampler, unit);
 }
+
 
 // ----------------------------------------------------
 // Unbinds the texture and sampler
