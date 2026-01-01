@@ -274,11 +274,11 @@ int main() {
     Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh skySphere = Mesh::create_sphere({32, 16}, glm::vec3(0.0f), 1.0f, true);
     Mesh ballSphere = Mesh::create_sphere();
+    Mesh plane_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
 
-    // Mesh asphaltMesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
 
     // Create MeshRenderers to upload and render these meshes
-    MeshRenderer cube, house, glass, skyRenderer, ballRenderer;
+    MeshRenderer cube, house, glass, skyRenderer, ballRenderer, planeRenderer;
 
     // Upload mesh data to the GPU
     cube.upload(cubeMesh);
@@ -291,6 +291,7 @@ int main() {
     glass.upload(glass_mesh);
     skyRenderer.upload(skySphere);
     ballRenderer.upload(ballSphere);
+    planeRenderer.upload(plane_mesh);
 
     // ---------------------------
     // World + Camera Setup
@@ -304,19 +305,7 @@ int main() {
     world.get_camera().fov       = glm::radians(60.0f);  // Field of view
     world.get_camera().near      = 0.1f;  // Near clipping plane
     world.get_camera().far       = 100.0f;  // Far clipping plane
-
-
-    // compute initial view-projection and set light shader globals (use proper viewport)
-    int width1, height1;
-    glfwGetFramebufferSize(window.get_handle(), &width1, &height1);
         
-    // glm::mat4 VP1 = world.get_camera().get_view_projection_matrix(glm::vec2(width1, height1));
-    // lightShader->use();
-    // lightShader->setUniform("viewProj", VP1);
-    // glm::mat4 model = asphalt.getLocalMatrix();
-    // shader->setUniform("model", model);
-    // shader->setUniform("normalMatrix", glm::transpose(glm::inverse(glm::mat3(model))));
-
 
     // lightShader->setUniform("normalMatrix", normalMatrix);
     lightShader->setUniform("camera_pos", world.get_camera().position);
@@ -347,7 +336,7 @@ int main() {
     //auto makes us not need to explicitly declare player as unique_ptr
     // std::unique_ptr<Player> player = std::make_unique<Crusader>(world, root, &cube, &green, &cube, &brown);
     
-    player->setPosition({0.0f, 1.0f, 0.0f});
+    player->setPosition({0.0f, 0.0f, 0.0f});
     player->attachCamera(&world.get_camera(), {0.0f, 2.0f, 4.0f}, {0.0f, 1.0f, 0.0f});
     player->setMoveSpeed(4.0f);
     player->setDodgeSpeed(10.0f);
@@ -519,7 +508,7 @@ int main() {
     };
     
     // Spawn initial wave (1 enemy)
-    spawnEnemy({-4.0f, 1.0f, 0.0f});
+    spawnEnemy({-4.0f, 0.0f, 0.0f});
 
     // ---------------------------
     // XP Orb System
@@ -572,8 +561,6 @@ int main() {
     playerCombat.hitbox.halfExtents = {0.6f, 0.8f, 0.6f};
     playerCombat.hitbox.localOffset = {0.0f, 1.0f, 0.9f};
 
-    // Create entities for water, island, sand, tree, house, windows, etc.
-    Entity* water = world.createEntityWithParams(root, {0.f, 0.f, 0.f}, glm::quat(), {10.f, 1.f, 10.f}, &cube, &blue);
 
     // Create island as a parent entity for sand and tree entities
     Entity* island = world.createEntityWithParams(root);
@@ -584,10 +571,8 @@ int main() {
         std::cout << "Island rotation: " << island_rotation.x << ", " << island_rotation.y << ", " << island_rotation.z << ", " << island_rotation.w << std::endl;
     }
 
-    // Sand on the island
-    Entity* sand = world.createEntityWithParams(island, {0.f, 0.5f, 0.f}, glm::quat(), {2.f, 1.f, 2.f}, &cube, &yellow);
 
-    Entity* asphalt = world.createEntityWithParams(island, {4.0f, 4.0f, 4.0f}, glm::quat(), {1.0f, 1.0f, 1.0f}, &ballRenderer, &AsphaltMaterial);
+    Entity* asphalt = world.createEntityWithParams(root, {0.0f, 0.0f, 0.0f}, glm::quat(), {100.0f, 100.0f, 100.0f}, &planeRenderer, &AsphaltMaterial);
     // Test house entity with mixed textures
     Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
     Entity* collisionSphere = world.createEntityWithParams(root, {4.f, 2.0f, -3.f}, glm::quat(), {0.6f, 0.6f, 0.6f}, &ballRenderer, &blue);
@@ -622,65 +607,6 @@ int main() {
         }
     }
 
-    // Create windows as child entities of the house
-    { // Window 1
-        Entity* window1 = world.createEntityWithParams(
-            testhouse,                              // parent entity
-            { 2.0f, 1.5f, 0.0f },                  // local position relative to testhouse
-            glm::angleAxis(glm::half_pi<float>() * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f)), // rotation
-            { 2.0f, 1.0f, 1.0f },                  // scale
-            &glass, 
-            &GlassMaterial
-        );
-    }
-
-    { // Window 2
-        Entity* window2 = world.createEntityWithParams(
-            testhouse,
-            { -0.2f, 2.0f, -2.75f },               // local position
-            glm::angleAxis(glm::half_pi<float>() * 0.5f, glm::vec3(1.0f, 0.0f, 0.0f)), // rotation
-            { 1.0f, 1.0f, 1.5f },                  // scale
-            &glass,
-            &GlassMaterial
-        );
-    }
-
-    { // Window 3
-        Entity* window3 = world.createEntityWithParams(
-            testhouse,
-            { -3.55f, 2.0f, 0.55f },               // local position
-            glm::angleAxis(-glm::half_pi<float>() * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f)), // rotation
-            { 1.5f, 1.0f, 1.0f },                  // scale
-            &glass,
-            &GlassMaterial
-        );
-    }
-
-    // Create tree base and trunk, and position leaves with offsets.
-    Entity* tree = world.createEntityWithParams(island);
-    Entity* tree_trunk = world.createEntityWithParams(tree, {0.f, 2.5f, 0.f}, glm::quat(), {0.5f, 5.f, 0.5f}, &cube, &brown);
-
-    glm::vec3 leafOffsets[4] = {
-        { 0.f, 0.f, 0.5f },
-        { 0.f, 0.75f, 0.75f },
-        { 0.f, 0.75f, 2.5f },
-        { 0.f, 0.f, -2.5f }
-    };
-
-    // Create leaves as child entities of the tree with specific rotations and positions.
-    for (int i = 0; i < 4; i++) {
-        glm::quat rotY = glm::angleAxis(1.5f * i + 0.7f, glm::vec3(0.f, 1.f, 0.f));
-        glm::quat rotZ = glm::angleAxis(0.7f, glm::vec3(0.f, 0.f, 1.f));
-
-        world.createEntityWithParams(
-            tree,
-            {leafOffsets[i].x, 6.0f + leafOffsets[i].y, leafOffsets[i].z},
-            rotY * rotZ,
-            {0.5f, 2.f, 0.5f},
-            &cube,
-            &green
-        );
-    }
 
     // FPS tracking variables
     float last_time = static_cast<float>(glfwGetTime());
@@ -709,7 +635,6 @@ int main() {
         }
 
         // Update the water scale and rotate the island
-        water->setScale({10.f, 1.0f + 0.1f * glm::sin(time), 10.f});
         glm::quat delta_rot = glm::angleAxis(glm::radians(30.f) * delta_time, glm::vec3(0.f,1.f,0));
         island->setRotation(delta_rot * island->getRotation());
 
@@ -955,22 +880,6 @@ int main() {
                 [](const XPOrb& o) { return o.collected; }),
             xpOrbs.end()
         );
-
-        if (collisionSphere) {
-            glm::vec3 sphereMove(0.0f);
-            if (glfwGetKey(windowHandle, GLFW_KEY_UP) == GLFW_PRESS) sphereMove.z -= 1.0f;
-            if (glfwGetKey(windowHandle, GLFW_KEY_DOWN) == GLFW_PRESS) sphereMove.z += 1.0f;
-            if (glfwGetKey(windowHandle, GLFW_KEY_LEFT) == GLFW_PRESS) sphereMove.x -= 1.0f;
-            if (glfwGetKey(windowHandle, GLFW_KEY_RIGHT) == GLFW_PRESS) sphereMove.x += 1.0f;
-
-            float moveLen = glm::length(sphereMove);
-            if (moveLen > 0.001f) {
-                sphereMove /= moveLen;
-                collisionSphere->setPosition(
-                    collisionSphere->getPosition() + sphereMove * sphereMoveSpeed * delta_time
-                );
-            }
-        }
 
         if (player && houseCollisionReady) {
             PhysicsCollisionSystem::resolveStaticCollision(
