@@ -242,10 +242,8 @@ int main() {
 
         glm::mat4 VP = world.get_camera().get_view_projection_matrix(glm::vec2(w, h));
 
-        // Render all entities
-        for (Entity* rootEntity : world.getEntityManager().getRoots()) {
-            world.getEntityManager().renderEntityRecursive(rootEntity, VP);
-        }
+        // Render all entities (including skinned meshes)
+        world.getEntityManager().drawAll(VP);
 
         // ImGui UI
         ImGui_ImplOpenGL3_NewFrame();
@@ -328,6 +326,7 @@ int main() {
 
         window.swap_buffers();
     }
+    
 
     // Cleanup
     for (auto* renderer : characterRenderers) {
