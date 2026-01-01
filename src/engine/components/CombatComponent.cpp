@@ -24,7 +24,8 @@ bool CombatComponent::resolve_attack(bool isAttacking,
                                      const glm::vec3& attackerForward,
                                      const HurtboxComponent& targetHurtbox,
                                      const glm::vec3& targetPos,
-                                     HealthComponent& targetHealth) {
+                                     HealthComponent& targetHealth,
+                                     const DefenseState* targetDefense) {
     update_attack_state(isAttacking);
 
     if (!isAttacking || hitThisSwing || !hitbox.enabled || !targetHurtbox.enabled) {
@@ -40,7 +41,23 @@ bool CombatComponent::resolve_attack(bool isAttacking,
         return false;
     }
 
-    if (targetHealth.apply_damage(damage)) {
+    // Calculate actual damage based on defense state
+    int actualDamage = damage;
+    
+    if (targetDefense) {
+        // Blocking = no damage
+        if (targetDefense->blocking) {
+            hitThisSwing = true;
+            return false;  // Attack was blocked
+        }
+        
+        // Dodge within window = half damage
+        if (targetDefense->dodging && targetDefense->dodgeTimer <= targetDefense->dodgeWindow) {
+            actualDamage = damage / 2;
+        }
+    }
+
+    if (targetHealth.apply_damage(actualDamage)) {
         hitThisSwing = true;
         return true;
     }

@@ -278,7 +278,12 @@ int main() {
 
     // Upload mesh data to the GPU
     cube.upload(cubeMesh);
-    house.upload(*loadedMesh);
+    if (loadedMesh) {
+        house.upload(*loadedMesh);
+    } else {
+        std::cerr << "Warning: house.obj not found, using cube as fallback\n";
+        house.upload(cubeMesh);
+    }
     glass.upload(glass_mesh);
     skyRenderer.upload(skySphere);
     ballRenderer.upload(ballSphere);
@@ -405,6 +410,25 @@ int main() {
     // is a unique ptr cuz we have many enemies that are unrelated
     std::unique_ptr<Enemy> enemy = CreateEnemy(world, root, &cube, &red);
     enemy->setPosition({-4.0f, 1.0f, 0.0f});
+    
+    // Set enemy to follow player
+    if (player) {
+        enemy->setTarget(player->entity());
+    }
+
+    // Player health
+    HealthComponent playerHealth;
+    playerHealth.maxHP = 100;
+    playerHealth.hp = playerHealth.maxHP;
+    playerHealth.invulnDuration = 0.5f;
+    playerHealth.respawnDelay = 3.0f;
+    if (player) {
+        playerHealth.set_spawn_point(player->getPosition());
+    }
+
+    HurtboxComponent playerHurtbox;
+    playerHurtbox.halfExtents = {0.4f, 0.9f, 0.4f};
+    playerHurtbox.localOffset = {0.0f, 1.0f, 0.0f};
 
     HealthComponent enemyHealth;
     enemyHealth.maxHP = 100;
@@ -583,6 +607,12 @@ int main() {
         // Combat: player hitbox vs enemy hurtbox
         bool attacking = player && player->isAttacking();
         enemyHealth.update(delta_time);
+        playerHealth.update(delta_time);
+
+        // Update enemy AI
+        if (enemy && !enemyHealth.dead) {
+            enemy->update(delta_time);
+        }
 
         if (player && enemy && enemy->entity()) {
             glm::vec3 playerPos = player->getPosition();
@@ -592,6 +622,7 @@ int main() {
                 forward = glm::normalize(glm::vec3(rot * glm::vec4(forward, 0.0f)));
             }
 
+            // Player attacks enemy
             playerCombat.resolve_attack(
                 attacking,
                 playerPos,
@@ -600,6 +631,31 @@ int main() {
                 enemy->entity()->getPosition(),
                 enemyHealth
             );
+            
+            // Enemy attacks player (with player defense)
+            if (!enemyHealth.dead && !playerHealth.dead) {
+                glm::vec3 enemyPos = enemy->getPosition();
+                glm::vec3 enemyForward = glm::vec3(0.0f, 0.0f, 1.0f);
+                glm::mat4 enemyRot = glm::mat4_cast(enemy->entity()->getRotation());
+                enemyForward = glm::normalize(glm::vec3(enemyRot * glm::vec4(enemyForward, 0.0f)));
+                
+                // Setup player defense state
+                DefenseState playerDefense;
+                playerDefense.blocking = player->isBlocking();
+                playerDefense.dodging = player->isDodging();
+                playerDefense.dodgeTimer = player->isDodging() ? 0.0f : 1.0f; // 0 if currently dodging
+                playerDefense.dodgeWindow = 0.5f;
+                
+                enemy->getCombat().resolve_attack(
+                    enemy->isAttacking(),
+                    enemyPos,
+                    enemyForward,
+                    playerHurtbox,
+                    playerPos,
+                    playerHealth,
+                    &playerDefense
+                );
+            }
         }
 
         if (enemy && enemy->entity() && enemyHealth.dead) {
@@ -610,6 +666,15 @@ int main() {
             enemyHealth.respawn();
             enemy->setPosition(enemyHealth.spawnPos);
             enemy->entity()->setScale({1.0f, 1.0f, 1.0f});
+        }
+
+        // Player respawn
+        if (player && playerHealth.dead) {
+            // Could hide player model here if needed
+        }
+        if (player && playerHealth.ready_to_respawn()) {
+            playerHealth.respawn();
+            player->setPosition(playerHealth.spawnPos);
         }
 
         if (collisionSphere) {
@@ -761,6 +826,53 @@ int main() {
         }
 
         ImGui::End();
+        
+        // --------------------------
+        // Player Health Bar (top-right corner)
+        // --------------------------
+        {
+            ImGuiIO& io = ImGui::GetIO();
+            float barWidth = 200.0f;
+            float barHeight = 25.0f;
+            float padding = 20.0f;
+            
+            ImVec2 barPos(io.DisplaySize.x - barWidth - padding, padding);
+            ImVec2 barEnd(barPos.x + barWidth, barPos.y + barHeight);
+            
+            float playerHpFrac = playerHealth.maxHP > 0
+                ? static_cast<float>(playerHealth.hp) / static_cast<float>(playerHealth.maxHP)
+                : 0.0f;
+            playerHpFrac = glm::clamp(playerHpFrac, 0.0f, 1.0f);
+            
+            ImDrawList* drawList = ImGui::GetForegroundDrawList();
+            
+            // Background
+            drawList->AddRectFilled(barPos, barEnd, IM_COL32(40, 40, 40, 200), 4.0f);
+            
+            // Health fill
+            ImVec2 fillEnd(barPos.x + barWidth * playerHpFrac, barEnd.y);
+            ImU32 healthColor = playerHpFrac > 0.5f ? IM_COL32(80, 200, 80, 220) :
+                               playerHpFrac > 0.25f ? IM_COL32(220, 180, 50, 220) :
+                               IM_COL32(220, 60, 60, 220);
+            drawList->AddRectFilled(barPos, fillEnd, healthColor, 4.0f);
+            
+            // Border
+            drawList->AddRect(barPos, barEnd, IM_COL32(255, 255, 255, 180), 4.0f, 0, 2.0f);
+            
+            // Text
+            char hpText[32];
+            snprintf(hpText, sizeof(hpText), "HP: %d / %d", playerHealth.hp, playerHealth.maxHP);
+            ImVec2 textSize = ImGui::CalcTextSize(hpText);
+            ImVec2 textPos(barPos.x + (barWidth - textSize.x) * 0.5f, barPos.y + (barHeight - textSize.y) * 0.5f);
+            drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), hpText);
+            
+            if (playerHealth.dead) {
+                const char* deadText = "RESPAWNING...";
+                ImVec2 deadSize = ImGui::CalcTextSize(deadText);
+                ImVec2 deadPos(barPos.x + (barWidth - deadSize.x) * 0.5f, barEnd.y + 5.0f);
+                drawList->AddText(deadPos, IM_COL32(255, 100, 100, 255), deadText);
+            }
+        }
 
         // --------------------------
         // Render ImGui

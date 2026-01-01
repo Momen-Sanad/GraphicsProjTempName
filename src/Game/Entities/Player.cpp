@@ -103,7 +103,8 @@ void Player::update(float dt) {
     attackCooldownTimer = std::max(0.0f, attackCooldownTimer - dt);
     dodgeCooldownTimer = std::max(0.0f, dodgeCooldownTimer - dt);
 
-    if (inputState.attack && attackCooldownTimer <= 0.0f && attackTimer <= 0.0f) {
+    // Can't attack while blocking
+    if (inputState.attack && !blocking && attackCooldownTimer <= 0.0f && attackTimer <= 0.0f) {
         attackTimer = attackDuration;
         attackCooldownTimer = attackCooldown;
     }
