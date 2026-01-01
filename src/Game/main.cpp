@@ -60,8 +60,10 @@
 #endif
 #ifdef SOURCE_DIR
 #define SWORDMAN_GLTF_PATH SOURCE_DIR "/tests/loading_files/the_swordman/scene.gltf"
+#define SKELETON_GLTF_PATH SOURCE_DIR "/assets/models/lowpoly_skeleton/scene.gltf"
 #else
 #define SWORDMAN_GLTF_PATH "tests/loading_files/the_swordman/scene.gltf"
+#define SKELETON_GLTF_PATH "assets/models/lowpoly_skeleton/scene.gltf"
 #endif
 
 /* 
@@ -347,6 +349,8 @@ int main() {
     
     player->setPosition({0.0f, 1.0f, 0.0f});
     player->attachCamera(&world.get_camera(), {0.0f, 2.0f, 4.0f}, {0.0f, 1.0f, 0.0f});
+    player->setMoveSpeed(4.0f);
+    player->setDodgeSpeed(10.0f);
 
     const float swordmanScale = 0.01f;
     const glm::vec3 swordmanLocalOffset{0.0f, 0.9f, 0.0f};
@@ -410,13 +414,112 @@ int main() {
     }
 
     // is a unique ptr cuz we have many enemies that are unrelated
-    std::unique_ptr<Enemy> enemy = CreateEnemy(world, root, &cube, &red);
-    enemy->setPosition({-4.0f, 1.0f, 0.0f});
+    // Now we support multiple enemies
+    struct EnemyData {
+        std::unique_ptr<Enemy> enemy;
+        HealthComponent health;
+        HurtboxComponent hurtbox;
+        Entity* skeletonEntity = nullptr;
+        std::vector<SkinnedMeshRenderer*> skeletonRenderers;
+        bool wasDead = false;
+    };
+    std::vector<EnemyData> enemies;
     
-    // Set enemy to follow player
-    if (player) {
-        enemy->setTarget(player->entity());
+    // Skeleton model data (shared between all enemies)
+    std::shared_ptr<ModelData> skeletonModelData;
+    std::unique_ptr<SkinnedMaterial> skeletonMaterial;
+    
+    const float skeletonScale = 0.01f / 3.0f / 2.0f;
+    const glm::quat skeletonRotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    
+    // Wave system variables (must be declared before spawnEnemy lambda)
+    int currentWave = 1;
+    int enemiesAlive = 1;
+    int enemiesPerWave = 1;
+    int enemyDamageMultiplier = 1;
+    int totalEnemiesKilled = 0;
+    bool waveInProgress = true;
+    
+    // Load skeleton model once
+    if (skinnedShader) {
+        skeletonMaterial = std::make_unique<SkinnedMaterial>(skinnedShader, nullptr);
+        skeletonMaterial->set_animated(true);
+        
+        if (std::filesystem::exists(SKELETON_GLTF_PATH)) {
+            std::cout << "Loading skeleton model: " << SKELETON_GLTF_PATH << std::endl;
+            ModelData* rawModel = MeshLoader::load_gltf(SKELETON_GLTF_PATH);
+            if (rawModel && rawModel->skeleton && !rawModel->meshes.empty()) {
+                skeletonModelData = std::shared_ptr<ModelData>(rawModel);
+                if (!skeletonModelData->textures.empty()) {
+                    skeletonMaterial->setTexture(skeletonModelData->textures[0].get());
+                }
+                std::cout << "Skeleton has " << rawModel->animations.size() << " animations" << std::endl;
+            } else {
+                std::cerr << "Failed to load skeleton model.\n";
+                delete rawModel;
+            }
+        }
     }
+    
+    // Function to spawn an enemy at a position
+    auto spawnEnemy = [&](const glm::vec3& pos) {
+        EnemyData data;
+        data.enemy = CreateEnemy(world, root, &cube, &red);
+        data.enemy->setPosition(pos);
+        if (player) {
+            data.enemy->setTarget(player->entity());
+        }
+        
+        data.health.maxHP = 100;
+        data.health.hp = 100;
+        data.health.invulnDuration = 0.35f;
+        data.health.set_spawn_point(pos);
+        data.health.respawnDelay = 2.0f;
+        
+        data.hurtbox.halfExtents = {0.5f, 1.0f, 0.5f};
+        data.hurtbox.localOffset = {0.0f, 1.0f, 0.0f};
+        
+        // Add skeleton model
+        if (skeletonModelData && skeletonMaterial) {
+            data.skeletonEntity = world.createEntityWithParams(
+                data.enemy->entity(),
+                glm::vec3(0.0f),
+                skeletonRotation,
+                {skeletonScale, skeletonScale, skeletonScale},
+                nullptr, nullptr
+            );
+            data.skeletonEntity->setName("Skeleton");
+            data.skeletonEntity->setModelData(skeletonModelData);
+            
+            for (auto& skinnedMesh : skeletonModelData->meshes) {
+                SkinnedMeshRenderer* renderer = new SkinnedMeshRenderer();
+                renderer->upload(skinnedMesh);
+                data.skeletonRenderers.push_back(renderer);
+            }
+            data.skeletonEntity->setSkinnedRenderers(data.skeletonRenderers);
+            data.skeletonEntity->setSkinnedMaterial(skeletonMaterial.get());
+            
+            AnimationComponent* anim = new AnimationComponent(skeletonModelData);
+            data.skeletonEntity->addComponent(anim);
+            if (anim->get_animation_count() > 0) {
+                anim->play_animation(0, true);
+            }
+            
+            // Hide red cube
+            for (Entity* child : data.enemy->entity()->getChildren()) {
+                if (child->getMesh()) {
+                    child->setMesh(nullptr);
+                    child->setMaterial(nullptr);
+                }
+            }
+        }
+        
+        data.enemy->getCombat().damage = 15 * enemyDamageMultiplier;
+        enemies.push_back(std::move(data));
+    };
+    
+    // Spawn initial wave (1 enemy)
+    spawnEnemy({-4.0f, 1.0f, 0.0f});
 
     // ---------------------------
     // XP Orb System
@@ -432,7 +535,13 @@ int main() {
     int playerXP = 0;
     int playerLevel = 1;
     int xpToNextLevel = 100;
-    bool enemyWasDead = false;  // Track enemy death state change
+    bool showUpgradeMenu = false;  // Show upgrade menu on level up
+    int pendingUpgrades = 0;  // Number of upgrades available
+    
+    // Player stats (upgradeable)
+    float playerMoveSpeed = 4.0f;
+    int playerDamage = 25;
+    float playerDodgeSpeed = 10.0f;
     
     // Create a small cube mesh for XP orbs
     Mesh xpOrbMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(0.3f));
@@ -457,17 +566,6 @@ int main() {
     HurtboxComponent playerHurtbox;
     playerHurtbox.halfExtents = {0.4f, 0.9f, 0.4f};
     playerHurtbox.localOffset = {0.0f, 1.0f, 0.0f};
-
-    HealthComponent enemyHealth;
-    enemyHealth.maxHP = 100;
-    enemyHealth.hp = enemyHealth.maxHP;
-    enemyHealth.invulnDuration = 0.35f;
-    enemyHealth.set_spawn_point(enemy->entity()->getPosition());
-    enemyHealth.respawnDelay = 2.0f;
-
-    HurtboxComponent enemyHurtbox;
-    enemyHurtbox.halfExtents = {0.5f, 1.0f, 0.5f};
-    enemyHurtbox.localOffset = {0.0f, 1.0f, 0.0f};
 
     CombatComponent playerCombat;
     playerCombat.damage = 25;
@@ -618,129 +716,183 @@ int main() {
         // Player input + update
         PlayerInput input;
         GLFWwindow* windowHandle = window.get_handle();
-        if (glfwGetKey(windowHandle, GLFW_KEY_W) == GLFW_PRESS) input.move.y -= 1.0f;
-        if (glfwGetKey(windowHandle, GLFW_KEY_S) == GLFW_PRESS) input.move.y += 1.0f;
-        if (glfwGetKey(windowHandle, GLFW_KEY_D) == GLFW_PRESS) input.move.x += 1.0f;
-        if (glfwGetKey(windowHandle, GLFW_KEY_A) == GLFW_PRESS) input.move.x -= 1.0f;
-        input.block = glfwGetKey(windowHandle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
-        input.attack = glfwGetMouseButton(windowHandle, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
-                       || glfwGetKey(windowHandle, GLFW_KEY_J) == GLFW_PRESS;
-        input.dodge = glfwGetKey(windowHandle, GLFW_KEY_SPACE) == GLFW_PRESS;
+        
+        // Only allow input if player is alive
+        if (!playerHealth.dead) {
+            if (glfwGetKey(windowHandle, GLFW_KEY_W) == GLFW_PRESS) input.move.y -= 1.0f;
+            if (glfwGetKey(windowHandle, GLFW_KEY_S) == GLFW_PRESS) input.move.y += 1.0f;
+            if (glfwGetKey(windowHandle, GLFW_KEY_D) == GLFW_PRESS) input.move.x += 1.0f;
+            if (glfwGetKey(windowHandle, GLFW_KEY_A) == GLFW_PRESS) input.move.x -= 1.0f;
+            input.block = glfwGetKey(windowHandle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
+            input.attack = glfwGetMouseButton(windowHandle, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS
+                           || glfwGetKey(windowHandle, GLFW_KEY_J) == GLFW_PRESS;
+            input.dodge = glfwGetKey(windowHandle, GLFW_KEY_SPACE) == GLFW_PRESS;
+        }
 
         if (player) {
             player->setInput(input);
             player->update(delta_time);
         }
 
-        // Combat: player hitbox vs enemy hurtbox
+        // Combat: player vs all enemies
         bool attacking = player && player->isAttacking();
-        enemyHealth.update(delta_time);
         playerHealth.update(delta_time);
-
-        // Update enemy AI
-        if (enemy && !enemyHealth.dead) {
-            enemy->update(delta_time);
+        
+        glm::vec3 playerPos = player ? player->getPosition() : glm::vec3(0.0f);
+        glm::vec3 playerForward = glm::vec3(0.0f, 0.0f, 1.0f);
+        if (player && player->entity()) {
+            glm::mat4 rot = glm::mat4_cast(player->entity()->getRotation());
+            playerForward = glm::normalize(glm::vec3(rot * glm::vec4(playerForward, 0.0f)));
         }
-
-        if (player && enemy && enemy->entity()) {
-            glm::vec3 playerPos = player->getPosition();
-            glm::vec3 forward = glm::vec3(0.0f, 0.0f, 1.0f);
-            if (player->entity()) {
-                glm::mat4 rot = glm::mat4_cast(player->entity()->getRotation());
-                forward = glm::normalize(glm::vec3(rot * glm::vec4(forward, 0.0f)));
-            }
-
-            // Player attacks enemy
-            playerCombat.resolve_attack(
-                attacking,
-                playerPos,
-                forward,
-                enemyHurtbox,
-                enemy->entity()->getPosition(),
-                enemyHealth
-            );
+        
+        // Setup player defense state
+        DefenseState playerDefense;
+        if (player) {
+            playerDefense.blocking = player->isBlocking();
+            playerDefense.dodging = player->isDodging();
+            playerDefense.dodgeTimer = player->isDodging() ? 0.0f : 1.0f;
+            playerDefense.dodgeWindow = 0.5f;
+        }
+        
+        // Count alive enemies
+        enemiesAlive = 0;
+        
+        // Update all enemies
+        for (auto& enemyData : enemies) {
+            if (!enemyData.enemy) continue;
             
-            // Enemy attacks player (with player defense)
-            if (!enemyHealth.dead && !playerHealth.dead) {
-                glm::vec3 enemyPos = enemy->getPosition();
-                glm::vec3 enemyForward = glm::vec3(0.0f, 0.0f, 1.0f);
-                glm::mat4 enemyRot = glm::mat4_cast(enemy->entity()->getRotation());
-                enemyForward = glm::normalize(glm::vec3(enemyRot * glm::vec4(enemyForward, 0.0f)));
-                
-                // Setup player defense state
-                DefenseState playerDefense;
-                playerDefense.blocking = player->isBlocking();
-                playerDefense.dodging = player->isDodging();
-                playerDefense.dodgeTimer = player->isDodging() ? 0.0f : 1.0f; // 0 if currently dodging
-                playerDefense.dodgeWindow = 0.5f;
-                
-                enemy->getCombat().resolve_attack(
-                    enemy->isAttacking(),
-                    enemyPos,
-                    enemyForward,
-                    playerHurtbox,
+            enemyData.health.update(delta_time);
+            
+            // Update AI if alive
+            if (!enemyData.health.dead) {
+                enemyData.enemy->update(delta_time);
+                enemiesAlive++;
+            }
+            
+            // Player attacks this enemy
+            if (player && enemyData.enemy->entity()) {
+                playerCombat.resolve_attack(
+                    attacking,
                     playerPos,
-                    playerHealth,
-                    &playerDefense
+                    playerForward,
+                    enemyData.hurtbox,
+                    enemyData.enemy->entity()->getPosition(),
+                    enemyData.health
                 );
-            }
-        }
-
-        if (enemy && enemy->entity() && enemyHealth.dead) {
-            enemy->entity()->setScale({0.0f, 0.0f, 0.0f});
-            
-            // Spawn XP orbs when enemy dies (only once per death)
-            if (!enemyWasDead) {
-                glm::vec3 deathPos = enemy->getPosition();
-                int numOrbs = 3 + rand() % 3;  // 3-5 orbs
                 
-                for (int i = 0; i < numOrbs; i++) {
-                    XPOrb orb;
-                    orb.entity = world.createEntityWithParams(
-                        root,
-                        deathPos + glm::vec3(0.0f, 1.0f, 0.0f),
-                        glm::quat(),
-                        glm::vec3(0.3f),
-                        &xpOrbRenderer,
-                        &xpOrbMaterial
-                    );
+                // Enemy attacks player
+                if (!enemyData.health.dead && !playerHealth.dead) {
+                    glm::vec3 enemyPos = enemyData.enemy->getPosition();
+                    glm::vec3 enemyForward = glm::vec3(0.0f, 0.0f, 1.0f);
+                    glm::mat4 enemyRot = glm::mat4_cast(enemyData.enemy->entity()->getRotation());
+                    enemyForward = glm::normalize(glm::vec3(enemyRot * glm::vec4(enemyForward, 0.0f)));
                     
-                    // Random upward velocity with spread
-                    float angle = (float)(rand() % 360) * 3.14159f / 180.0f;
-                    float speed = 2.0f + (rand() % 100) / 50.0f;
-                    orb.velocity = glm::vec3(
-                        cos(angle) * speed * 0.5f,
-                        4.0f + (rand() % 100) / 50.0f,
-                        sin(angle) * speed * 0.5f
+                    enemyData.enemy->getCombat().resolve_attack(
+                        enemyData.enemy->isAttacking(),
+                        enemyPos,
+                        enemyForward,
+                        playerHurtbox,
+                        playerPos,
+                        playerHealth,
+                        &playerDefense
                     );
-                    orb.xpValue = 10 + rand() % 15;
-                    orb.lifetime = 15.0f;
-                    xpOrbs.push_back(orb);
                 }
-                enemyWasDead = true;
+            }
+            
+            // Handle enemy death
+            if (enemyData.enemy->entity() && enemyData.health.dead) {
+                enemyData.enemy->entity()->setScale({0.0f, 0.0f, 0.0f});
+                if (enemyData.skeletonEntity) {
+                    enemyData.skeletonEntity->setScale({0.0f, 0.0f, 0.0f});
+                }
+                
+                // Spawn XP orbs (only once per death)
+                if (!enemyData.wasDead) {
+                    glm::vec3 deathPos = enemyData.enemy->getPosition();
+                    int numOrbs = 3 + rand() % 3;
+                    
+                    for (int i = 0; i < numOrbs; i++) {
+                        XPOrb orb;
+                        orb.entity = world.createEntityWithParams(
+                            root,
+                            deathPos + glm::vec3(0.0f, 1.0f, 0.0f),
+                            glm::quat(),
+                            glm::vec3(0.3f),
+                            &xpOrbRenderer,
+                            &xpOrbMaterial
+                        );
+                        
+                        float angle = (float)(rand() % 360) * 3.14159f / 180.0f;
+                        float speed = 2.0f + (rand() % 100) / 50.0f;
+                        orb.velocity = glm::vec3(
+                            cos(angle) * speed * 0.5f,
+                            4.0f + (rand() % 100) / 50.0f,
+                            sin(angle) * speed * 0.5f
+                        );
+                        orb.xpValue = 10 + rand() % 15;
+                        orb.lifetime = 15.0f;
+                        xpOrbs.push_back(orb);
+                    }
+                    
+                    totalEnemiesKilled++;
+                    enemyData.wasDead = true;
+                    std::cout << "Enemy killed! Total: " << totalEnemiesKilled << std::endl;
+                }
+            }
+            
+            // Handle enemy respawn
+            if (enemyData.enemy->entity() && enemyData.health.ready_to_respawn()) {
+                enemyData.health.respawn();
+                enemyData.enemy->setPosition(enemyData.health.spawnPos);
+                enemyData.enemy->entity()->setScale({1.0f, 1.0f, 1.0f});
+                if (enemyData.skeletonEntity) {
+                    enemyData.skeletonEntity->setScale({skeletonScale, skeletonScale, skeletonScale});
+                }
+                enemyData.wasDead = false;
             }
         }
-
-        if (enemy && enemy->entity() && enemyHealth.ready_to_respawn()) {
-            enemyHealth.respawn();
-            enemy->setPosition(enemyHealth.spawnPos);
-            enemy->entity()->setScale({1.0f, 1.0f, 1.0f});
-            enemyWasDead = false;  // Reset for next death
+        
+        // Wave progression - all enemies dead, spawn next wave
+        if (enemiesAlive == 0 && waveInProgress) {
+            currentWave++;
+            enemiesPerWave++;
+            
+            // Every 5 waves, reset count but double damage
+            if (enemiesPerWave > 5) {
+                enemiesPerWave = 1;
+                enemyDamageMultiplier *= 2;
+            }
+            
+            std::cout << "WAVE " << currentWave << " START! Spawning " << enemiesPerWave << " enemies. DMG x" << enemyDamageMultiplier << std::endl;
+            
+            // Clear old enemies and spawn new wave
+            enemies.clear();
+            for (int i = 0; i < enemiesPerWave; i++) {
+                float angle = (float)i / (float)enemiesPerWave * 6.28318f;
+                float radius = 5.0f + (float)(rand() % 30) / 10.0f;
+                glm::vec3 spawnPos = playerPos + glm::vec3(cos(angle) * radius, 1.0f, sin(angle) * radius);
+                spawnEnemy(spawnPos);
+            }
+            enemiesAlive = enemiesPerWave;
         }
 
         // Player respawn
+        static bool playerWasDead = false;
         if (player && playerHealth.dead) {
-            // Could hide player model here if needed
+            if (!playerWasDead) {
+                playerWasDead = true;
+            }
         }
         if (player && playerHealth.ready_to_respawn()) {
             playerHealth.respawn();
             player->setPosition(playerHealth.spawnPos);
+            playerWasDead = false;
         }
 
         // ---------------------------
         // Update XP Orbs
         // ---------------------------
-        glm::vec3 playerPos = player ? player->getPosition() : glm::vec3(0.0f);
+        // playerPos already declared above
         const float pickupRadius = 1.5f;
         const float gravity = 9.8f;
         
@@ -782,6 +934,8 @@ int main() {
                         playerXP -= xpToNextLevel;
                         playerLevel++;
                         xpToNextLevel = 100 * playerLevel;  // Increase XP needed per level
+                        pendingUpgrades++;  // Add an upgrade point
+                        showUpgradeMenu = true;  // Show upgrade menu
                         std::cout << "LEVEL UP! Now level " << playerLevel << std::endl;
                     }
                 }
@@ -913,15 +1067,18 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        if (enemy && enemy->entity()) {
-            HealthBarSystem::draw_over_entity(
-                enemyHealth,
-                enemyHurtbox,
-                *enemy->entity(),
-                VP,
-                width,
-                height
-            );
+        // Draw health bars for all enemies
+        for (auto& enemyData : enemies) {
+            if (enemyData.enemy && enemyData.enemy->entity() && !enemyData.health.dead) {
+                HealthBarSystem::draw_over_entity(
+                    enemyData.health,
+                    enemyData.hurtbox,
+                    *enemyData.enemy->entity(),
+                    VP,
+                    width,
+                    height
+                );
+            }
         }
 
         // --------------------------
@@ -940,14 +1097,16 @@ int main() {
             ImGui::Text("Dodge: %s", player->isDodging() ? "yes" : "no");
         }
         ImGui::Separator();
-        float hpFrac = enemyHealth.maxHP > 0
-            ? static_cast<float>(enemyHealth.hp) / static_cast<float>(enemyHealth.maxHP)
-            : 0.0f;
-        hpFrac = glm::clamp(hpFrac, 0.0f, 1.0f);
-        ImGui::Text("Enemy HP");
-        ImGui::ProgressBar(hpFrac, ImVec2(0.0f, 0.0f));
-        if (enemyHealth.dead) {
-            ImGui::Text("Enemy respawning...");
+        ImGui::Text("Enemies: %d alive", enemiesAlive);
+        for (size_t i = 0; i < enemies.size(); i++) {
+            float hpFrac = enemies[i].health.maxHP > 0
+                ? static_cast<float>(enemies[i].health.hp) / static_cast<float>(enemies[i].health.maxHP)
+                : 0.0f;
+            hpFrac = glm::clamp(hpFrac, 0.0f, 1.0f);
+            char label[32];
+            snprintf(label, sizeof(label), "Enemy %zu", i + 1);
+            ImGui::Text("%s", label);
+            ImGui::ProgressBar(hpFrac, ImVec2(0.0f, 0.0f));
         }
 
         ImGui::End();
@@ -1035,6 +1194,58 @@ int main() {
             ImVec2 textSize = ImGui::CalcTextSize(xpText);
             ImVec2 textPos(barPos.x + (barWidth - textSize.x) * 0.5f, barPos.y + (barHeight - textSize.y) * 0.5f);
             drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), xpText);
+            
+            // Wave info below XP bar
+            char waveText[64];
+            snprintf(waveText, sizeof(waveText), "Wave %d | Enemies: %d/%d | DMG: x%d", currentWave, enemiesAlive, enemiesPerWave, enemyDamageMultiplier);
+            ImVec2 waveSize = ImGui::CalcTextSize(waveText);
+            ImVec2 wavePos(barPos.x + (barWidth - waveSize.x) * 0.5f, barEnd.y + 5.0f);
+            drawList->AddText(wavePos, IM_COL32(200, 200, 200, 255), waveText);
+        }
+        
+        // --------------------------
+        // Upgrade Menu (on level up)
+        // --------------------------
+        if (showUpgradeMenu && pendingUpgrades > 0) {
+            ImGuiIO& io = ImGui::GetIO();
+            ImVec2 windowSize(300, 200);
+            ImVec2 windowPos((io.DisplaySize.x - windowSize.x) * 0.5f, (io.DisplaySize.y - windowSize.y) * 0.5f);
+            
+            ImGui::SetNextWindowPos(windowPos, ImGuiCond_Always);
+            ImGui::SetNextWindowSize(windowSize, ImGuiCond_Always);
+            ImGui::Begin("LEVEL UP!", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+            
+            ImGui::Text("Choose an upgrade! (%d available)", pendingUpgrades);
+            ImGui::Separator();
+            
+            char speedText[64];
+            snprintf(speedText, sizeof(speedText), "Speed (%.1f -> %.1f)", playerMoveSpeed, playerMoveSpeed + 0.5f);
+            if (ImGui::Button(speedText, ImVec2(280, 40))) {
+                playerMoveSpeed += 0.5f;
+                if (player) player->setMoveSpeed(playerMoveSpeed);
+                pendingUpgrades--;
+                if (pendingUpgrades <= 0) showUpgradeMenu = false;
+            }
+            
+            char damageText[64];
+            snprintf(damageText, sizeof(damageText), "Damage (%d -> %d)", playerDamage, playerDamage + 5);
+            if (ImGui::Button(damageText, ImVec2(280, 40))) {
+                playerDamage += 5;
+                playerCombat.damage = playerDamage;
+                pendingUpgrades--;
+                if (pendingUpgrades <= 0) showUpgradeMenu = false;
+            }
+            
+            char dodgeText[64];
+            snprintf(dodgeText, sizeof(dodgeText), "Agility (%.1f -> %.1f)", playerDodgeSpeed, playerDodgeSpeed + 1.0f);
+            if (ImGui::Button(dodgeText, ImVec2(280, 40))) {
+                playerDodgeSpeed += 1.0f;
+                if (player) player->setDodgeSpeed(playerDodgeSpeed);
+                pendingUpgrades--;
+                if (pendingUpgrades <= 0) showUpgradeMenu = false;
+            }
+            
+            ImGui::End();
         }
 
         // --------------------------
@@ -1054,12 +1265,22 @@ int main() {
             delete renderer;
         }
     }
+    // Cleanup enemy skeleton renderers
+    for (auto& enemyData : enemies) {
+        for (SkinnedMeshRenderer* renderer : enemyData.skeletonRenderers) {
+            if (renderer) {
+                renderer->destroy();
+                delete renderer;
+            }
+        }
+    }
     delete swordmanAnim;
     cube.destroy();
     house.destroy();
     glass.destroy();
     skyRenderer.destroy();
     ballRenderer.destroy();
+    xpOrbRenderer.destroy();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
