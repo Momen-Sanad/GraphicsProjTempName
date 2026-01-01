@@ -7,6 +7,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <cstdlib>
 
 // ImGui related headers (for GUI)
 #include "imgui.h"
@@ -416,6 +418,32 @@ int main() {
         enemy->setTarget(player->entity());
     }
 
+    // ---------------------------
+    // XP Orb System
+    // ---------------------------
+    struct XPOrb {
+        Entity* entity = nullptr;
+        glm::vec3 velocity{0.0f};
+        float lifetime = 10.0f;
+        int xpValue = 25;
+        bool collected = false;
+    };
+    std::vector<XPOrb> xpOrbs;
+    int playerXP = 0;
+    int playerLevel = 1;
+    int xpToNextLevel = 100;
+    bool enemyWasDead = false;  // Track enemy death state change
+    
+    // Create a small cube mesh for XP orbs
+    Mesh xpOrbMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(0.3f));
+    MeshRenderer xpOrbRenderer;
+    xpOrbRenderer.upload(xpOrbMesh);
+    
+    // Yellow/gold material for XP orbs
+    TintedMaterial xpOrbMaterial;
+    xpOrbMaterial.setShader(mainShader);
+    xpOrbMaterial.tint = glm::vec4(1.0f, 0.85f, 0.0f, 1.0f);  // Gold color
+
     // Player health
     HealthComponent playerHealth;
     playerHealth.maxHP = 100;
@@ -660,12 +688,44 @@ int main() {
 
         if (enemy && enemy->entity() && enemyHealth.dead) {
             enemy->entity()->setScale({0.0f, 0.0f, 0.0f});
+            
+            // Spawn XP orbs when enemy dies (only once per death)
+            if (!enemyWasDead) {
+                glm::vec3 deathPos = enemy->getPosition();
+                int numOrbs = 3 + rand() % 3;  // 3-5 orbs
+                
+                for (int i = 0; i < numOrbs; i++) {
+                    XPOrb orb;
+                    orb.entity = world.createEntityWithParams(
+                        root,
+                        deathPos + glm::vec3(0.0f, 1.0f, 0.0f),
+                        glm::quat(),
+                        glm::vec3(0.3f),
+                        &xpOrbRenderer,
+                        &xpOrbMaterial
+                    );
+                    
+                    // Random upward velocity with spread
+                    float angle = (float)(rand() % 360) * 3.14159f / 180.0f;
+                    float speed = 2.0f + (rand() % 100) / 50.0f;
+                    orb.velocity = glm::vec3(
+                        cos(angle) * speed * 0.5f,
+                        4.0f + (rand() % 100) / 50.0f,
+                        sin(angle) * speed * 0.5f
+                    );
+                    orb.xpValue = 10 + rand() % 15;
+                    orb.lifetime = 15.0f;
+                    xpOrbs.push_back(orb);
+                }
+                enemyWasDead = true;
+            }
         }
 
         if (enemy && enemy->entity() && enemyHealth.ready_to_respawn()) {
             enemyHealth.respawn();
             enemy->setPosition(enemyHealth.spawnPos);
             enemy->entity()->setScale({1.0f, 1.0f, 1.0f});
+            enemyWasDead = false;  // Reset for next death
         }
 
         // Player respawn
@@ -676,6 +736,71 @@ int main() {
             playerHealth.respawn();
             player->setPosition(playerHealth.spawnPos);
         }
+
+        // ---------------------------
+        // Update XP Orbs
+        // ---------------------------
+        glm::vec3 playerPos = player ? player->getPosition() : glm::vec3(0.0f);
+        const float pickupRadius = 1.5f;
+        const float gravity = 9.8f;
+        
+        for (auto& orb : xpOrbs) {
+            if (!orb.entity || orb.collected) continue;
+            
+            // Apply gravity
+            orb.velocity.y -= gravity * delta_time;
+            
+            // Update position
+            glm::vec3 orbPos = orb.entity->getPosition();
+            orbPos += orb.velocity * delta_time;
+            
+            // Ground collision (y = 0.5 for orb center)
+            if (orbPos.y < 0.5f) {
+                orbPos.y = 0.5f;
+                orb.velocity.y = 0.0f;
+                orb.velocity.x *= 0.8f;  // Friction
+                orb.velocity.z *= 0.8f;
+            }
+            
+            orb.entity->setPosition(orbPos);
+            
+            // Rotate the orb for visual effect
+            glm::quat spin = glm::angleAxis(delta_time * 3.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+            orb.entity->setRotation(spin * orb.entity->getRotation());
+            
+            // Check pickup collision with player
+            if (player) {
+                float dist = glm::length(orbPos - playerPos);
+                if (dist < pickupRadius) {
+                    // Collect the orb
+                    playerXP += orb.xpValue;
+                    orb.collected = true;
+                    orb.entity->setScale(glm::vec3(0.0f));  // Hide it
+                    
+                    // Level up check
+                    while (playerXP >= xpToNextLevel) {
+                        playerXP -= xpToNextLevel;
+                        playerLevel++;
+                        xpToNextLevel = 100 * playerLevel;  // Increase XP needed per level
+                        std::cout << "LEVEL UP! Now level " << playerLevel << std::endl;
+                    }
+                }
+            }
+            
+            // Lifetime
+            orb.lifetime -= delta_time;
+            if (orb.lifetime <= 0.0f) {
+                orb.collected = true;
+                orb.entity->setScale(glm::vec3(0.0f));
+            }
+        }
+        
+        // Clean up collected orbs
+        xpOrbs.erase(
+            std::remove_if(xpOrbs.begin(), xpOrbs.end(), 
+                [](const XPOrb& o) { return o.collected; }),
+            xpOrbs.end()
+        );
 
         if (collisionSphere) {
             glm::vec3 sphereMove(0.0f);
@@ -872,6 +997,44 @@ int main() {
                 ImVec2 deadPos(barPos.x + (barWidth - deadSize.x) * 0.5f, barEnd.y + 5.0f);
                 drawList->AddText(deadPos, IM_COL32(255, 100, 100, 255), deadText);
             }
+        }
+        
+        // --------------------------
+        // XP Bar (below health bar)
+        // --------------------------
+        {
+            ImGuiIO& io = ImGui::GetIO();
+            float barWidth = 200.0f;
+            float barHeight = 20.0f;
+            float padding = 20.0f;
+            float yOffset = 55.0f;  // Below health bar
+            
+            ImVec2 barPos(io.DisplaySize.x - barWidth - padding, padding + yOffset);
+            ImVec2 barEnd(barPos.x + barWidth, barPos.y + barHeight);
+            
+            float xpFrac = xpToNextLevel > 0
+                ? static_cast<float>(playerXP) / static_cast<float>(xpToNextLevel)
+                : 0.0f;
+            xpFrac = glm::clamp(xpFrac, 0.0f, 1.0f);
+            
+            ImDrawList* drawList = ImGui::GetForegroundDrawList();
+            
+            // Background
+            drawList->AddRectFilled(barPos, barEnd, IM_COL32(40, 40, 40, 200), 4.0f);
+            
+            // XP fill (gold/yellow color)
+            ImVec2 fillEnd(barPos.x + barWidth * xpFrac, barEnd.y);
+            drawList->AddRectFilled(barPos, fillEnd, IM_COL32(255, 215, 0, 220), 4.0f);
+            
+            // Border
+            drawList->AddRect(barPos, barEnd, IM_COL32(255, 255, 255, 180), 4.0f, 0, 2.0f);
+            
+            // Text
+            char xpText[48];
+            snprintf(xpText, sizeof(xpText), "LVL %d | XP: %d / %d", playerLevel, playerXP, xpToNextLevel);
+            ImVec2 textSize = ImGui::CalcTextSize(xpText);
+            ImVec2 textPos(barPos.x + (barWidth - textSize.x) * 0.5f, barPos.y + (barHeight - textSize.y) * 0.5f);
+            drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), xpText);
         }
 
         // --------------------------
