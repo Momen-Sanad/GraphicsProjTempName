@@ -574,7 +574,7 @@ int main() {
     Entity* asphalt = world.createEntityWithParams(root, {0.0f, 0.0f, 0.0f}, glm::quat(), {100.0f, 100.0f, 100.0f}, &planeRenderer, &AsphaltMaterial);
     // Test house entity with mixed textures
     Entity* testhouse = world.createEntityWithParams(root, {10.f, 1.f, 1.f}, glm::quat(), {1.f, 1.f, 1.f}, &house, &houseMixedMaterial);
-    Entity* collisionSphere = world.createEntityWithParams(root, {4.f, 2.0f, -3.f}, glm::quat(), {0.6f, 0.6f, 0.6f}, &ballRenderer, &blue);
+    Entity* collisionSphere = world.createEntityWithParams(root, {4.f, 2.0f, -3.f}, glm::quat(), {0.6f, 0.6f, 0.6f}, &ballRenderer, &AsphaltMaterial);
     Collider playerCollider;
     Collider houseCollider;
     Collider sphereCollider;

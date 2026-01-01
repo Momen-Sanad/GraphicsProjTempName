@@ -148,5 +148,4 @@ void main() {
 
     // frag_color = vec4(1, 0, 1, 1);
     frag_color = fs_in.color * vec4(accumulated_light, sampled.alpha);
-
 }
