@@ -506,7 +506,6 @@ int main() {
         );
     }
 
-
     // Create tree base and trunk, and position leaves with offsets.
     Entity* tree = world.createEntityWithParams(island);
     Entity* tree_trunk = world.createEntityWithParams(tree, {0.f, 2.5f, 0.f}, glm::quat(), {0.5f, 5.f, 0.5f}, &cube, &brown);

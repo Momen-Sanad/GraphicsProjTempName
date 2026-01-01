@@ -22,6 +22,7 @@ Texture* TextureLoader::load(const std::string& path, GLenum min_filter, GLenum 
     int width, height, channels;
     stbi_set_flip_vertically_on_load(true);  // Flip the image vertically (common in OpenGL)
     stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 0);  // Load the image into data
+    stbi_set_flip_vertically_on_load(false);  // Reset to avoid affecting GLTF/stb_image loads elsewhere
 
     // If loading fails, print an error and return nullptr
     if (!data)
