@@ -1,10 +1,14 @@
-// enemy/collectible spawning
-/*
+#pragma once
 
-Spawn & level design
+class World;
+class Entity;
+class SpawnPointComponent;
 
-Implement SpawnSystem which reads spawn points (entities with SpawnPointComponent) and spawns enemies on timers or waves.
+class SpawnSystem {
+public:
+    void update(World& world, float deltaTime);
 
-For collectibles, use CollectibleComponent + OnPickup event that PickupSystem handles (increase score, grant item).
-
-*/
+private:
+    void update_entity_recursive(Entity& entity, World& world, float deltaTime);
+    void update_spawn_point(Entity& entity, World& world, SpawnPointComponent& spawnPoint, float deltaTime);
+};

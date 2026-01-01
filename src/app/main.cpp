@@ -23,7 +23,9 @@
 #include "../engine/utils/Im_GUI_Inspector.hpp"
 #include "../engine/assets/MeshLoader.hpp"
 #include "../engine/assets/TexturedMaterial.hpp"
+#include "../engine/assets/LitMaterial.hpp"
 #include "../engine/assets/TextureLoader.hpp"
+#include "../engine/systems/LightSystem.hpp"
 
 // Window size definition
 #define WINDOW_W 1280
@@ -93,10 +95,18 @@ int main() {
         std::string(SHADER_DIR) + "/blended.vert",
         std::string(SHADER_DIR) + "/blended.frag"
     );
+    auto lightShader = shaderManager.loadShader("light",
+        std::string(SHADER_DIR) + "/light.vert",
+        std::string(SHADER_DIR) + "/light.frag"
+    );
 
     if (!mainShader) {
         fprintf(stderr, "Failed to load main shader\n");
         return 1;  // Exit if shader loading fails.
+    }
+    if (!lightShader) {
+        fprintf(stderr, "Failed to load light shader\n");
+        return 1;
     }
 
     // ---------------------------
@@ -104,6 +114,7 @@ int main() {
     // ---------------------------
     // Create some colored materials with different tint values.
     TintedMaterial blue, brown, green, yellow;
+    TintedMaterial dirLightMat, pointLightMat, spotLightMat;
 
     blue.setShader(mainShader);
     blue.tint  = glm::vec4(0.2f, 0.4f, 1.0f, 1.0f);  // Blue tint
@@ -116,6 +127,15 @@ int main() {
 
     green.setShader(mainShader);
     green.tint = glm::vec4(0.4f, 1.0f, 0.2f, 1.0f);  // Green tint
+
+    dirLightMat.setShader(mainShader);
+    dirLightMat.tint = glm::vec4(1.0f);  // White directional light marker
+
+    pointLightMat.setShader(mainShader);
+    pointLightMat.tint = glm::vec4(1.0f, 0.25f, 0.25f, 1.0f);  // Red point light marker
+
+    spotLightMat.setShader(mainShader);
+    spotLightMat.tint = glm::vec4(0.2f, 0.4f, 1.0f, 1.0f);  // Blue spot light marker
 
     // ---------------------------
     // Create Textures
@@ -140,6 +160,22 @@ int main() {
         std::cerr << "Warning: failed to load sky texture: " << SkyText << " (sky will be blank)\n";
     }
 
+    std::string BallAlbedoPath = std::string(TEXTURES_DIR) + "/metal/albedo.jpg";
+    Texture* BallAlbedo = TextureLoader::load(BallAlbedoPath);
+    std::cout << "Attempting to load texture: " << BallAlbedoPath << std::endl;
+
+    std::string BallSpecularPath = std::string(TEXTURES_DIR) + "/metal/specular.jpg";
+    Texture* BallSpecular = TextureLoader::load(BallSpecularPath);
+    std::cout << "Attempting to load texture: " << BallSpecularPath << std::endl;
+
+    std::string BallRoughnessPath = std::string(TEXTURES_DIR) + "/metal/roughness.jpg";
+    Texture* BallRoughness = TextureLoader::load(BallRoughnessPath);
+    std::cout << "Attempting to load texture: " << BallRoughnessPath << std::endl;
+
+    std::string BallAOPath = std::string(TEXTURES_DIR) + "/suzanne/ambient_occlusion.jpg";
+    Texture* BallAO = TextureLoader::load(BallAOPath);
+    std::cout << "Attempting to load texture: " << BallAOPath << std::endl;
+
     // Material setup for house, blending textures.
     TexturedMaterial houseMaterial(houseShader, HouseTexture);
     TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
@@ -151,6 +187,13 @@ int main() {
     // House glass material
     TexturedMaterial GlassMaterial(houseMixedShader, GlassTexture);
 
+    LitMaterial ballMaterial(lightShader,
+                             BallAlbedo,
+                             BallSpecular,
+                             BallRoughness,
+                             nullptr,
+                             BallAO);
+
     // Load mesh from .obj file
     std::string meshPath = std::string(MODELS_DIR) + "/house/house.obj";
     std::cout << "Attempting to load mesh: " << meshPath << std::endl;
@@ -160,15 +203,19 @@ int main() {
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh skySphere = Mesh::create_sphere();
+    Mesh ballMesh = Mesh::create_sphere({64, 32}, glm::vec3(0.0f), 1.0f);
+    Mesh lightVizMesh = Mesh::create_sphere({16, 8}, glm::vec3(0.0f), 0.2f);
 
     // Create MeshRenderers to upload and render these meshes
-    MeshRenderer cube, house, glass, skyRenderer;
+    MeshRenderer cube, house, glass, skyRenderer, ballRenderer, lightVizRenderer;
 
     // Upload mesh data to the GPU
     cube.upload(cubeMesh);
     house.upload(*loadedMesh);
     glass.upload(glass_mesh);
     skyRenderer.upload(skySphere);
+    ballRenderer.upload(ballMesh);
+    lightVizRenderer.upload(lightVizMesh);
 
     // ---------------------------
     // World + Camera Setup
@@ -183,11 +230,57 @@ int main() {
     world.get_camera().near      = 0.1f;  // Near clipping plane
     world.get_camera().far       = 100.0f;  // Far clipping plane
 
+    LightSystem lightManager;
+    const glm::vec3 ballPosition(0.0f, 1.5f, 0.0f);
+    const glm::vec3 dirLightDir = glm::normalize(glm::vec3(-1.0f, -1.0f, -0.3f));
+    const glm::vec3 dirLightVizPos = ballPosition - dirLightDir * 5.0f;
+
+    Light dirLight(LightType::DIRECTIONAL, glm::vec3(1.0f), dirLightVizPos, dirLightDir);
+    Light pointLight(LightType::POINT, glm::vec3(1.0f, 0.25f, 0.25f), glm::vec3(4.0f, 3.0f, 0.0f));
+    Light spotLight(LightType::SPOT,
+                    glm::vec3(0.2f, 0.4f, 1.0f),
+                    glm::vec3(-3.0f, 4.0f, 2.0f),
+                    glm::normalize(glm::vec3(0.6f, -1.0f, -0.4f)),
+                    glm::radians(15.0f),
+                    glm::radians(25.0f));
+
+    lightManager.addLight(dirLight);
+    lightManager.addLight(pointLight);
+    lightManager.addLight(spotLight);
+
     // ---------------------------
     // Scene Graph (Entity Creation)
     // ---------------------------
     // Root entity for the scene
     Entity* root = world.createEntityWithParams(nullptr);
+
+    Entity* ball = world.createEntityWithParams(root,
+        ballPosition,
+        glm::quat(),
+        {1.5f, 1.5f, 1.5f},
+        &ballRenderer,
+        &ballMaterial);
+
+    Entity* dirLightMarker = world.createEntityWithParams(root,
+        dirLightVizPos,
+        glm::quat(),
+        {1.0f, 1.0f, 1.0f},
+        &lightVizRenderer,
+        &dirLightMat);
+
+    Entity* pointLightMarker = world.createEntityWithParams(root,
+        pointLight.position,
+        glm::quat(),
+        {1.0f, 1.0f, 1.0f},
+        &lightVizRenderer,
+        &pointLightMat);
+
+    Entity* spotLightMarker = world.createEntityWithParams(root,
+        spotLight.position,
+        glm::quat(),
+        {1.0f, 1.0f, 1.0f},
+        &lightVizRenderer,
+        &spotLightMat);
 
     // Create entities for water, island, sand, tree, house, windows, etc.
     Entity* water = world.createEntityWithParams(root, {0.f, 0.f, 0.f}, glm::quat(), {10.f, 1.f, 10.f}, &cube, &blue);
@@ -305,6 +398,19 @@ int main() {
         water->setScale({10.f, 1.0f + 0.1f * glm::sin(time), 10.f});
         glm::quat delta_rot = glm::angleAxis(glm::radians(30.f) * delta_time, glm::vec3(0.f,1.f,0));
         island->setRotation(delta_rot * island->getRotation());
+        if (ball) {
+            glm::quat ball_rot = glm::angleAxis(glm::radians(45.0f) * delta_time, glm::vec3(0.f, 1.f, 0.f));
+            ball->setRotation(ball_rot * ball->getRotation());
+        }
+        if (dirLightMarker) {
+            dirLightMarker->setPosition(dirLightVizPos);
+        }
+        if (pointLightMarker) {
+            pointLightMarker->setPosition(pointLight.position);
+        }
+        if (spotLightMarker) {
+            spotLightMarker->setPosition(spotLight.position);
+        }
 
         // Update the controller and perform rendering.
         controller.update(delta_time);
@@ -322,6 +428,10 @@ int main() {
         glfwGetFramebufferSize(window.get_handle(), &width, &height);
 
         glm::mat4 VP = world.get_camera().get_view_projection_matrix(glm::vec2(width, height));
+
+        lightManager.setupLightsInShader(lightShader);
+        lightShader->setUniform("camera_pos", world.get_camera().position);
+        lightShader->setUniform("ambient", glm::vec3(0.05f));
 
         // ---------------------------
         // Draw sky (before other objects)
@@ -397,6 +507,8 @@ int main() {
     house.destroy();
     glass.destroy();
     skyRenderer.destroy();
+    ballRenderer.destroy();
+    lightVizRenderer.destroy();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
