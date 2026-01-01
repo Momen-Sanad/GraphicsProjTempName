@@ -47,3 +47,6 @@ we want data-driven loading (JSON)
 we introduce Systems (RenderSystem, CameraSystem, CombatSystem, etc.,)
 
 ---
+### Merging animations onto basic rn
+
+please check Entity.cpp cuz Draw() has a lighting-aware version and an animations-aware version
