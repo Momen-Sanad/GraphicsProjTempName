@@ -160,6 +160,7 @@ if (ENGINE_BUILD_EXAMPLES)
         _CRT_SECURE_NO_WARNINGS
         SHADER_DIR="${CMAKE_SOURCE_DIR}/shaders"
         ASSET_DIR="${CMAKE_SOURCE_DIR}/assets"
+        SOURCE_DIR="${CMAKE_SOURCE_DIR}"
     )
 
     set_target_properties(OpenGLEngine PROPERTIES

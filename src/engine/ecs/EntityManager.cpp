@@ -121,10 +121,10 @@ void EntityManager::renderEntityRecursive(Entity* e, const glm::mat4& VP)
     Material* material = e->getMaterial();
 
     if (mesh && material) {
-    std::shared_ptr<Shader> shader = material->getShader();
-    if (!shader) return;
+        std::shared_ptr<Shader> shader = material->getShader();
+        if (!shader) return;
 
-    shader->use();
+        shader->use();
 
         // -----------------------------
         // Material (textures, params)
@@ -159,6 +159,45 @@ void EntityManager::renderEntityRecursive(Entity* e, const glm::mat4& VP)
         // Draw
         // -----------------------------
         mesh->draw();
+    }
+
+    // -----------------------------
+    // Skinned meshes
+    // -----------------------------
+    if (e->hasSkinnedRendering()) {
+        SkinnedMaterial* skinned_material = e->getSkinnedMaterial();
+        if (skinned_material) {
+            GLboolean cull_enabled = glIsEnabled(GL_CULL_FACE);
+            if (cull_enabled) {
+                glDisable(GL_CULL_FACE);
+            }
+
+            skinned_material->setup();
+
+            glm::mat4 model = e->getWorldMatrix();
+            glm::mat4 MVP = VP * model;
+
+            GLint mvp_loc = skinned_material->getUniform("MVP");
+            if (mvp_loc != -1)
+                glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, &MVP[0][0]);
+
+            GLint model_loc = skinned_material->getUniform("model");
+            if (model_loc != -1)
+                glUniformMatrix4fv(model_loc, 1, GL_FALSE, &model[0][0]);
+
+            GLint animated_loc = skinned_material->getUniform("uIsAnimated");
+            if (animated_loc != -1)
+                glUniform1i(animated_loc, GL_TRUE);
+
+            for (SkinnedMeshRenderer* renderer : e->getSkinnedRenderers()) {
+                if (renderer)
+                    renderer->draw();
+            }
+
+            if (cull_enabled) {
+                glEnable(GL_CULL_FACE);
+            }
+        }
     }
 
     // -----------------------------

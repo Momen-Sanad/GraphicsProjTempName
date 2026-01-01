@@ -16,6 +16,11 @@ struct HitboxComponent {
     CollisionLayer layer = CollisionLayer::Player;
     uint32_t mask = static_cast<uint32_t>(CollisionLayer::Enemy) | static_cast<uint32_t>(CollisionLayer::Terrain);
     bool enabled = true;
+
+    void get_world_aabb(const glm::vec3& ownerPos,
+                        const glm::vec3& forward,
+                        glm::vec3& outMin,
+                        glm::vec3& outMax) const;
 };
 
 

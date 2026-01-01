@@ -3,8 +3,10 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <filesystem>
 #include <iostream>
 #include <string>
+#include <vector>
 
 // ImGui related headers (for GUI)
 #include "imgui.h"
@@ -17,15 +19,23 @@
 #include "../engine/ecs/World.hpp"
 #include "../engine/ecs/ShaderManager.hpp"
 #include "../engine/assets/MaterialManager.hpp"
+#include "../engine/ecs/AnimationComponent.hpp"
+#include "../engine/components/CombatComponent.hpp"
+#include "../engine/components/HealthComponent.hpp"
+#include "../engine/components/HitboxComponent.hpp"
+#include "../engine/components/HurtboxComponent.hpp"
 #include "../engine/components/MeshRenderer.hpp"
+#include "../engine/components/SkinnedMeshRenderer.hpp"
 #include "../engine/gl/Mesh.hpp"
 #include "../engine/ecs/Collider.hpp"
 #include "../engine/utils/Im_GUI_Inspector.hpp"
 #include "../engine/assets/MeshLoader.hpp"
+#include "../engine/assets/SkinnedMaterial.hpp"
 #include "../engine/assets/TexturedMaterial.hpp"
 #include "../engine/assets/TextureLoader.hpp"
 #include "../engine/assets/LitMaterial.hpp"
 #include "../engine/systems/PhysicsCollisionSystem.hpp"
+#include "../engine/systems/HealthBarSystem.hpp"
 #include "../engine/systems/LightSystem.hpp"
 #include "Entities/Player.hpp"
 #include "Entities/Crusader.hpp"
@@ -45,6 +55,11 @@
 #endif
 #ifndef SHADER_DIR
 #define SHADER_DIR "../../shaders"
+#endif
+#ifdef SOURCE_DIR
+#define SWORDMAN_GLTF_PATH SOURCE_DIR "/tests/loading_files/the_swordman/scene.gltf"
+#else
+#define SWORDMAN_GLTF_PATH "tests/loading_files/the_swordman/scene.gltf"
 #endif
 
 /* 
@@ -116,6 +131,11 @@ int main() {
         std::string(SHADER_DIR) + "/light.frag"
     );
 
+    auto skinnedShader = shaderManager.loadShader("skinned",
+        std::string(SHADER_DIR) + "/skinned.vert",
+        std::string(SHADER_DIR) + "/skinned.frag"
+    );
+
     if (!mainShader) {
         fprintf(stderr, "Failed to load main shader\n");
         return 1;  // Exit if shader loading fails.
@@ -129,6 +149,10 @@ int main() {
     if (!houseMixedShader) {
         fprintf(stderr, "Failed to load houseMixed shader\n");
         return 1;  // Exit if shader loading fails.
+    }
+
+    if (!skinnedShader) {
+        fprintf(stderr, "Warning: failed to load skinned shader (swordman will not render)\n");
     }
 
 
@@ -297,6 +321,12 @@ int main() {
     // Root entity for the scene
     Entity* root = world.createEntityWithParams(nullptr);
 
+    std::shared_ptr<ModelData> swordmanModelData;
+    std::vector<SkinnedMeshRenderer*> swordmanRenderers;
+    std::unique_ptr<SkinnedMaterial> swordmanMaterial;
+    AnimationComponent* swordmanAnim = nullptr;
+    Entity* swordmanEntity = nullptr;
+
     // ---------------------------
     // Player + Enemy Setup
     // ---------------------------
@@ -309,11 +339,88 @@ int main() {
     // std::unique_ptr<Player> player = std::make_unique<Crusader>(world, root, &cube, &green, &cube, &brown);
     
     player->setPosition({0.0f, 1.0f, 0.0f});
-    player->attachCamera(&world.get_camera(), {0.0f, 2.5f, 6.0f}, {0.0f, 1.0f, 0.0f});
+    player->attachCamera(&world.get_camera(), {0.0f, 2.0f, 4.0f}, {0.0f, 1.0f, 0.0f});
+
+    const float swordmanScale = 0.01f;
+    const glm::vec3 swordmanLocalOffset{0.0f, 0.9f, 0.0f};
+    if (skinnedShader) {
+        swordmanMaterial = std::make_unique<SkinnedMaterial>(skinnedShader, nullptr);
+        swordmanMaterial->set_animated(true);
+    }
+
+    if (player && swordmanMaterial) {
+        if (std::filesystem::exists(SWORDMAN_GLTF_PATH)) {
+            std::cout << "Loading swordman model: " << SWORDMAN_GLTF_PATH << std::endl;
+            ModelData* rawModel = MeshLoader::load_gltf(SWORDMAN_GLTF_PATH);
+            if (rawModel && rawModel->skeleton && !rawModel->meshes.empty()) {
+                swordmanModelData = std::shared_ptr<ModelData>(rawModel);
+                swordmanEntity = world.createEntityWithParams(
+                    player->entity(),
+                    swordmanLocalOffset,
+                    glm::quat(),
+                    {swordmanScale, swordmanScale, swordmanScale},
+                    nullptr,
+                    nullptr
+                );
+                swordmanEntity->setName("Swordman");
+                swordmanEntity->setModelData(swordmanModelData);
+
+                for (auto& skinnedMesh : swordmanModelData->meshes) {
+                    SkinnedMeshRenderer* renderer = new SkinnedMeshRenderer();
+                    renderer->upload(skinnedMesh);
+                    swordmanRenderers.push_back(renderer);
+                }
+                swordmanEntity->setSkinnedRenderers(swordmanRenderers);
+                swordmanEntity->setSkinnedMaterial(swordmanMaterial.get());
+
+                swordmanAnim = new AnimationComponent(swordmanModelData);
+                swordmanEntity->addComponent(swordmanAnim);
+                if (swordmanAnim->get_animation_count() > 0) {
+                    swordmanAnim->play_animation(0, true);
+                } else {
+                    std::cerr << "Swordman model loaded but has no animations.\n";
+                }
+
+                if (!swordmanModelData->textures.empty()) {
+                    swordmanMaterial->setTexture(swordmanModelData->textures[0].get());
+                }
+
+                if (player->getBody()) {
+                    player->getBody()->setMesh(nullptr);
+                    player->getBody()->setMaterial(nullptr);
+                }
+                if (player->getWeapon()) {
+                    player->getWeapon()->setMesh(nullptr);
+                    player->getWeapon()->setMaterial(nullptr);
+                }
+            } else {
+                std::cerr << "Failed to load swordman model or missing skeleton/meshes.\n";
+                delete rawModel;
+            }
+        } else {
+            std::cerr << "Swordman model not found: " << SWORDMAN_GLTF_PATH << std::endl;
+        }
+    }
 
     // is a unique ptr cuz we have many enemies that are unrelated
     std::unique_ptr<Enemy> enemy = CreateEnemy(world, root, &cube, &red);
     enemy->setPosition({-4.0f, 1.0f, 0.0f});
+
+    HealthComponent enemyHealth;
+    enemyHealth.maxHP = 100;
+    enemyHealth.hp = enemyHealth.maxHP;
+    enemyHealth.invulnDuration = 0.35f;
+    enemyHealth.set_spawn_point(enemy->entity()->getPosition());
+    enemyHealth.respawnDelay = 2.0f;
+
+    HurtboxComponent enemyHurtbox;
+    enemyHurtbox.halfExtents = {0.5f, 1.0f, 0.5f};
+    enemyHurtbox.localOffset = {0.0f, 1.0f, 0.0f};
+
+    CombatComponent playerCombat;
+    playerCombat.damage = 25;
+    playerCombat.hitbox.halfExtents = {0.6f, 0.8f, 0.6f};
+    playerCombat.hitbox.localOffset = {0.0f, 1.0f, 0.9f};
 
     // Create entities for water, island, sand, tree, house, windows, etc.
     Entity* water = world.createEntityWithParams(root, {0.f, 0.f, 0.f}, glm::quat(), {10.f, 1.f, 10.f}, &cube, &blue);
@@ -474,6 +581,38 @@ int main() {
             player->update(delta_time);
         }
 
+        // Combat: player hitbox vs enemy hurtbox
+        bool attacking = player && player->isAttacking();
+        enemyHealth.update(delta_time);
+
+        if (player && enemy && enemy->entity()) {
+            glm::vec3 playerPos = player->getPosition();
+            glm::vec3 forward = glm::vec3(0.0f, 0.0f, 1.0f);
+            if (player->entity()) {
+                glm::mat4 rot = glm::mat4_cast(player->entity()->getRotation());
+                forward = glm::normalize(glm::vec3(rot * glm::vec4(forward, 0.0f)));
+            }
+
+            playerCombat.resolve_attack(
+                attacking,
+                playerPos,
+                forward,
+                enemyHurtbox,
+                enemy->entity()->getPosition(),
+                enemyHealth
+            );
+        }
+
+        if (enemy && enemy->entity() && enemyHealth.dead) {
+            enemy->entity()->setScale({0.0f, 0.0f, 0.0f});
+        }
+
+        if (enemy && enemy->entity() && enemyHealth.ready_to_respawn()) {
+            enemyHealth.respawn();
+            enemy->setPosition(enemyHealth.spawnPos);
+            enemy->entity()->setScale({1.0f, 1.0f, 1.0f});
+        }
+
         if (collisionSphere) {
             glm::vec3 sphereMove(0.0f);
             if (glfwGetKey(windowHandle, GLFW_KEY_UP) == GLFW_PRESS) sphereMove.z -= 1.0f;
@@ -510,6 +649,13 @@ int main() {
                 playerCollider,
                 sphereCollider
             );
+        }
+
+        for (Entity* rootEntity : world.getEntityManager().getRoots()) {
+            if (rootEntity->getParent()) {
+                continue;
+            }
+            rootEntity->updateComponents(delta_time);
         }
 
         // Rendering setup: clear color and depth buffers
@@ -564,8 +710,11 @@ int main() {
         // ---------------------------
         // Render all entities in the world
         // ---------------------------
-        for (Entity* root : world.getEntityManager().getRoots()) {
-            world.getEntityManager().renderEntityRecursive(root, VP);
+        for (Entity* rootEntity : world.getEntityManager().getRoots()) {
+            if (rootEntity->getParent()) {
+                continue;
+            }
+            world.getEntityManager().renderEntityRecursive(rootEntity, VP);
         }
 
         // --------------------------
@@ -574,6 +723,17 @@ int main() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        if (enemy && enemy->entity()) {
+            HealthBarSystem::draw_over_entity(
+                enemyHealth,
+                enemyHurtbox,
+                *enemy->entity(),
+                VP,
+                width,
+                height
+            );
+        }
 
         // --------------------------
         // Example UI Window
@@ -590,6 +750,16 @@ int main() {
             ImGui::Text("Attack: %s", player->isAttacking() ? "yes" : "no");
             ImGui::Text("Dodge: %s", player->isDodging() ? "yes" : "no");
         }
+        ImGui::Separator();
+        float hpFrac = enemyHealth.maxHP > 0
+            ? static_cast<float>(enemyHealth.hp) / static_cast<float>(enemyHealth.maxHP)
+            : 0.0f;
+        hpFrac = glm::clamp(hpFrac, 0.0f, 1.0f);
+        ImGui::Text("Enemy HP");
+        ImGui::ProgressBar(hpFrac, ImVec2(0.0f, 0.0f));
+        if (enemyHealth.dead) {
+            ImGui::Text("Enemy respawning...");
+        }
 
         ImGui::End();
 
@@ -604,6 +774,13 @@ int main() {
     }
 
     // Cleanup resources at the end
+    for (SkinnedMeshRenderer* renderer : swordmanRenderers) {
+        if (renderer) {
+            renderer->destroy();
+            delete renderer;
+        }
+    }
+    delete swordmanAnim;
     cube.destroy();
     house.destroy();
     glass.destroy();
