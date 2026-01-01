@@ -228,6 +228,6 @@ void Shader::setUniform(const std::string& name, const bool& b) {
     if (location != -1) glUniform1i(location, b ? 1 : 0);
 }
 
-void Shader::set_mat4_array(const std::string& name, const glm::mat4* values, int count) const {
-    glUniformMatrix4fv(getUniformLocation(name), count, GL_FALSE, glm::value_ptr(values[0]));
-}
+// void Shader::set_mat4_array(const std::string& name, const glm::mat4* values, int count) const {
+//     glUniformMatrix4fv(getUniformLocation(name), count, GL_FALSE, glm::value_ptr(values[0]));
+// }

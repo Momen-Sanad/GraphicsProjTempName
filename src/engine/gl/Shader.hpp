@@ -41,6 +41,8 @@ public:
 
     bool hasUniform(const std::string& name) const;
     
+    // void set_mat4_array(const std::string& name, const glm::mat4* values, int count) const;
+
 private:
     static GLuint compileShader(const std::string& source, GLenum type);
     static std::string readFile(const std::string& path);

@@ -13,15 +13,15 @@ public:
 
     Entity* getOwner() const { return owner; }
 
-    // Called every frame by a System
-    virtual void update(float deltaTime) {}
+    // // Called every frame by a System
+    virtual void update(Entity& entity, float deltaTime) = 0;
     virtual void render(Entity& entity) = 0;
 
-    // lifecycle hooks
+    // // lifecycle hooks
     virtual void onAdded() {}
     virtual void onRemoved() {}
 
-protected:
+// protected:
     Entity* owner;
 };
 

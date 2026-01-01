@@ -440,3 +440,23 @@ void Vertex::operator=(const Vertex& other)
     color = other.color;
     tex_coord = other.tex_coord;
 }
+
+const Vertex& Mesh::get_vertex(size_t index) const
+{
+    return verticies.at(index);
+}
+
+const void* Mesh::get_vertex_data() const
+{
+    return verticies.data();
+}
+
+size_t Mesh::get_vertex_data_size() const
+{
+    return verticies.size() * sizeof(Vertex);
+}
+
+size_t Mesh::get_vertex_stride() const
+{
+    return sizeof(Vertex);
+}

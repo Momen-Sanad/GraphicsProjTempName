@@ -102,27 +102,22 @@ const AnimationComponent* Entity::getAnimationComponent() const {
 }
 
 // ------------------------------------------------------------
-// Draw entity (uses Material's uniform accessor to set MVP)
+// Unified draw() : supports static + skinned meshes in one call
 // ------------------------------------------------------------
 void Entity::draw(const glm::mat4& viewProj) {
-    // Draw basic mesh if available
+    glm::mat4 M   = getWorldMatrix();
+    glm::mat4 MVP = viewProj * M;
+
+    // --- Draw Static Mesh (if exists) ---
     if (material && mesh) {
-        // Let the material bind the shader and common uniforms
         material->setup();
 
-        // Compute world matrix + MVP
-        glm::mat4 M  = getWorldMatrix();
-        glm::mat4 MVP = viewProj * M;
-
-        // Use Material's public method to get uniform location if available.
         GLint loc = -1;
         try {
             loc = material->getUniform("MVP");
-        } catch(...) {
-            // fallback: try shader directly if your Material exposes it
-            if (material->getShader()) {
+        } catch (...) {
+            if (material->getShader())
                 loc = material->getShader()->getUniformLocation("MVP");
-            }
         }
 
         if (loc != -1)
@@ -131,47 +126,34 @@ void Entity::draw(const glm::mat4& viewProj) {
         mesh->draw();
     }
 
-    // Draw skinned meshes if available
-    drawSkinned(viewProj);
+    // --- Draw Skinned Meshes (if exist) ---
+    if (hasSkinnedRendering()) {
+        skinned_material->setup();
 
-    // Draw children recursively
-    for (Entity* c : children)
-        c->draw(viewProj);
-}
+        // MVP
+        GLint mvp_loc = skinned_material->getUniform("MVP");
+        if (mvp_loc != -1)
+            glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, &MVP[0][0]);
 
-void Entity::draw(const glm::mat4& viewProj) {
-    if (material && mesh) {
-        // Let the material bind the shader and common uniforms
-        material->setup();
+        // Model matrix for lighting
+        GLint model_loc = skinned_material->getUniform("model");
+        if (model_loc != -1)
+            glUniformMatrix4fv(model_loc, 1, GL_FALSE, &M[0][0]);
 
-        // Compute world matrix + MVP
-        glm::mat4 M  = getWorldMatrix();
-        glm::mat4 MVP = viewProj * M;
+        // Mark animated
+        GLint animated_loc = skinned_material->getUniform("uIsAnimated");
+        if (animated_loc != -1)
+            glUniform1i(animated_loc, GL_TRUE);
 
-        // Use Material's public method to get uniform location if available.
-        // Many of your files use "MVP" as the uniform name in main.cpp — use that.
-        GLint loc = -1;
-        // Try Material's public uniform getter if it exists
-        // (we assume Material exposes getUniform(const std::string&) -> GLint)
-        // If not present, you can fallback to accessing shader's uniform (less preferred).
-        try {
-            loc = material->getUniform("MVP");
-        } catch(...) {
-            // fallback: try shader directly if your Material exposes it
-            if (material->getShader()) {
-                loc = material->getShader()->getUniformLocation("MVP");
-            }
+        // Draw all skinned renderers
+        for (SkinnedMeshRenderer* renderer : skinned_renderers) {
+            if (renderer) renderer->draw();
         }
-
-        if (loc != -1)
-            glUniformMatrix4fv(loc, 1, GL_FALSE, &MVP[0][0]);
-
-        mesh->draw();
     }
 
-    // Draw children recursively
-    for (Entity* c : children)
-        c->draw(viewProj);
+    // --- Draw children recursively ---
+    for (Entity* child : children)
+        child->draw(viewProj);
 }
 
 // ------------------------------------------------------------

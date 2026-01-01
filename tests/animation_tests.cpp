@@ -502,6 +502,14 @@ public:
     int render_count = 0;
     float last_delta = 0.0f;
 
+    // allow default construction in tests
+    TestComponent()
+        : Component(nullptr) {}
+
+    // allow construction with an owner if needed later
+    explicit TestComponent(Entity* owner)
+        : Component(owner) {}
+
     void update(Entity& entity, float deltaTime) override {
         update_count++;
         last_delta = deltaTime;
@@ -511,6 +519,7 @@ public:
         render_count++;
     }
 };
+
 
 TEST(entity_add_component) {
     Entity entity;
@@ -1042,7 +1051,6 @@ static const char* SWORDMAN_GLTF_PATH = SOURCE_DIR "/tests/loading_files/the_swo
 #else
 static const char* SWORDMAN_GLTF_PATH = "tests/loading_files/the_swordman/scene.gltf";
 #endif
-
 TEST(gltf_load_swordman_model) {
     if (!std::filesystem::exists(SWORDMAN_GLTF_PATH)) {
         std::cout << "  [SKIP] Test file not found: " << SWORDMAN_GLTF_PATH << std::endl;

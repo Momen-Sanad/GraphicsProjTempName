@@ -28,21 +28,21 @@ void SkinnedMaterial::setup() {
         // Set bone matrices as uniforms
         for (int i = 0; i < MAX_BONES; ++i) {
             std::string uniform_name = "uBoneMatrices[" + std::to_string(i) + "]";
-            shader->set_mat4(uniform_name, bone_matrices[i]);
+            shader->setUniform(uniform_name, bone_matrices[i]);
         }
 
-        shader->set_int("uNumBones", static_cast<int>(bone_matrices.size()));
-        shader->set_bool("uIsAnimated", true);
+        shader->setUniform("uNumBones", static_cast<int>(bone_matrices.size()));
+        shader->setUniform("uIsAnimated", true);
         
         // Set texture flag
         bool hasTexture = (getTexture() != nullptr);
-        shader->set_bool("u_hasTexture", hasTexture);
+        shader->setUniform("u_hasTexture", hasTexture);
     }
 }
 
 void SkinnedMaterial::set_bone_count(int count) {
     if (shader) {
         shader->use();
-        shader->set_int("uNumActiveBones", std::min(count, MAX_BONES));
+        shader->setUniform("uNumActiveBones", std::min(count, MAX_BONES));
     }
 }

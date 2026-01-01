@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(ENGINE_BUILD_SHARED "Build Engine as a shared library instead of static" OFF)
 option(ENGINE_BUILD_EXAMPLES "Build example apps (src/Game)" ON)
-option(ENGINE_ENABLE_TESTS "Enable building tests (tests/)" OFF)
+option(ENGINE_ENABLE_TESTS "Enable building tests (tests/)" ON)
 
 # ==========================================================
 # ================== GLFW CONFIGURATION ====================
@@ -58,7 +58,7 @@ add_library(imgui STATIC ${IMGUI_SOURCES})
 target_include_directories(imgui PUBLIC
     ${IMGUI_DIR}
     ${IMGUI_DIR}/backends
-    ${CMAKE_SOURCE_DIR}/vendor/glfw/include   # ← Add this
+    ${CMAKE_SOURCE_DIR}/vendor/glfw/include
 )
 
 # Link GLFW + OpenGL (needed by backends)
@@ -109,6 +109,7 @@ target_include_directories(Engine
         ${CMAKE_SOURCE_DIR}/vendor/json/single_include
         ${CMAKE_SOURCE_DIR}/vendor/glm
         ${CMAKE_SOURCE_DIR}/vendor/stb
+        ${CMAKE_SOURCE_DIR}/vendor/tinygltf
         ${CMAKE_SOURCE_DIR}/vendor                  # for tiny_obj_loader.h and tinygltf
 )
 

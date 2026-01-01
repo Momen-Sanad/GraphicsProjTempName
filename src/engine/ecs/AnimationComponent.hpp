@@ -48,6 +48,7 @@ public:
     void set_model_data(std::shared_ptr<ModelData> model_data);
 
     // Component interface
+    // Forwarding update from base class
     void update(Entity& entity, float deltaTime) override;
     void render(Entity& entity) override;
 

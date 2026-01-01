@@ -154,7 +154,7 @@ int main() {
     // Load mesh from .obj file
     std::string meshPath = std::string(MODELS_DIR) + "/house/house.obj";
     std::cout << "Attempting to load mesh: " << meshPath << std::endl;
-    Mesh* loadedMesh = MeshLoader::load_obj(meshPath.c_str());
+    Mesh* loadedMesh = MeshLoader::load(meshPath.c_str());
 
     // Create some primitive meshes (cube, glass plane, sky sphere)
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));

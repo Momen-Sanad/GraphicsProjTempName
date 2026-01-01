@@ -86,8 +86,6 @@ public:
     size_t get_index_count() const { return indices.size(); }
     size_t get_count() const { return count; }
 
-    std::vector<glm::vec3> get_positions() const;
-
     // Attribute getters
     glm::vec3 get_position(size_t index) const;
     Color get_color(size_t index) const;
@@ -101,5 +99,6 @@ public:
     const void* get_vertex_data() const;
     size_t get_vertex_data_size() const;
     size_t get_vertex_stride() const;
-
+    const Vertex& get_vertex(size_t index) const;
+    
 };

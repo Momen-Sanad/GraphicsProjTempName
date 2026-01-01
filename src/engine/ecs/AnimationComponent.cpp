@@ -5,13 +5,14 @@
 
 
 AnimationComponent::AnimationComponent()
-    : model_data(nullptr)
+    : Component(nullptr)
+    , model_data(nullptr)
     , auto_update(true)
-{
-}
+{}
 
 AnimationComponent::AnimationComponent(std::shared_ptr<ModelData> data)
-    : model_data(data)
+    : Component(nullptr)
+    , model_data(data)
     , auto_update(true)
 {
     if (model_data && model_data->skeleton) {

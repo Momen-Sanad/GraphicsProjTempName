@@ -16,8 +16,8 @@ public:
         const std::span<SkeletonVertex>& skel_verticies);
 
     // Destructor
-    ~SkinnedMesh() override;
-    void destroy() override;
+    ~SkinnedMesh();
+    void destroy();
 
     // ============== SKELETON SETTERS ==============
     void set_skeleton_vertices(const std::span<SkeletonVertex>& skel_vertices);

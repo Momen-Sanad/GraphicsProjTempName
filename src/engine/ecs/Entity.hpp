@@ -167,11 +167,12 @@ public:
 
     // Add this method to the Entity class public section
 
-// Sets all skinned mesh renderers at once (replaces current list)
+    // Sets all skinned mesh renderers at once (replaces current list)
     void setSkinnedRenderers(const std::vector<SkinnedMeshRenderer*>& renderers) {
         skinned_renderers = renderers;
     }
 
     // Draw skinned meshes (called internally or can be called externally)
     void drawSkinned(const glm::mat4& viewProj);
+
 };
