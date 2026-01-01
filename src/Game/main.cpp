@@ -198,12 +198,6 @@ int main() {
     Texture* GlassTexture = TextureLoader::load(GlassText);
     std::cout << "Attempting to load texture: " << GlassText << std::endl;
 
-    std::string SkyText = std::string(TEXTURES_DIR) + "/sky.jpg";
-    Texture* SkyTexture = TextureLoader::load(SkyText);
-    if (!SkyTexture) {
-        std::cerr << "Warning: failed to load sky texture: " << SkyText << " (sky will be blank)\n";
-    }
-
     std::string AsphaltSpecularPath = std::string(TEXTURES_DIR) + "/asphalt/specular.jpg";
     auto AsphaltSpecular = TextureLoader::load(AsphaltSpecularPath);
     std::cout << "Attempting to load texture: " << AsphaltSpecularPath << std::endl;
@@ -239,8 +233,6 @@ int main() {
     TexturedMaterial houseMixedMaterial(houseMixedShader, HouseTexture);
     houseMixedMaterial.addTextureLayer(MoonTexture, BlendMode::Lerp, 0.4f);  // Add blended texture
 
-    TexturedMaterial skyMaterial(houseShader, SkyTexture);
-    skyMaterial.setShader(houseShader);
 
     // House glass material
     TexturedMaterial GlassMaterial(houseMixedShader, GlassTexture);
@@ -272,13 +264,12 @@ int main() {
     // Create some primitive meshes (cube, glass plane, sky sphere)
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh glass_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
-    Mesh skySphere = Mesh::create_sphere({32, 16}, glm::vec3(0.0f), 1.0f, true);
     Mesh ballSphere = Mesh::create_sphere();
     Mesh plane_mesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec3(1.0f));
 
 
     // Create MeshRenderers to upload and render these meshes
-    MeshRenderer cube, house, glass, skyRenderer, ballRenderer, planeRenderer;
+    MeshRenderer cube, house, glass, ballRenderer, planeRenderer;
 
     // Upload mesh data to the GPU
     cube.upload(cubeMesh);
@@ -289,7 +280,6 @@ int main() {
         house.upload(cubeMesh);
     }
     glass.upload(glass_mesh);
-    skyRenderer.upload(skySphere);
     ballRenderer.upload(ballSphere);
     planeRenderer.upload(plane_mesh);
 
@@ -821,7 +811,7 @@ int main() {
             for (int i = 0; i < enemiesPerWave; i++) {
                 float angle = (float)i / (float)enemiesPerWave * 6.28318f;
                 float radius = 5.0f + (float)(rand() % 30) / 10.0f;
-                glm::vec3 spawnPos = playerPos + glm::vec3(cos(angle) * radius, 1.0f, sin(angle) * radius);
+                glm::vec3 spawnPos = playerPos + glm::vec3(cos(angle) * radius, 0.0f, sin(angle) * radius);
                 spawnEnemy(spawnPos);
             }
             enemiesAlive = enemiesPerWave;
@@ -951,7 +941,7 @@ int main() {
         int w, h;
         window.get_framebuffer_size(w, h);
         glViewport(0, 0, w, h);
-        glClearColor(0.90f, 0.95f, 1.0f, 1.0f);  // Sky background color
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  // Sky background color
         glClearDepth(1.0f);  // Clear depth buffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // Clear buffers
 
@@ -961,40 +951,6 @@ int main() {
         
         glm::mat4 VP = world.get_camera().get_view_projection_matrix(glm::vec2(width, height));
 
-        // ---------------------------
-        // Draw sky (before other objects)
-        // ---------------------------
-        if (skySphere.get_vertex_count() > 0 && SkyTexture) {
-            glm::mat4 M = glm::translate(glm::mat4(1.0f), world.get_camera().position)
-                        * glm::scale(glm::mat4(1.0f), glm::vec3(500.0f));  // Scale sky sphere
-
-            glm::mat4 MVP = VP * M;
-            MVP[0][2] = MVP[0][3];  // Push sky sphere to the far plane
-            MVP[1][2] = MVP[1][3];
-            MVP[2][2] = MVP[2][3];
-            MVP[3][2] = MVP[3][3];
-
-            // Render sky sphere with the house shader
-            glUseProgram(houseShader->getProgram());
-            skyMaterial.setShader(houseShader);
-            skyMaterial.setup();
-
-            glUniform1i(houseShader->getUniformLocation("u_texture"), 0);  // Set texture unit 0
-            glUniformMatrix4fv(houseShader->getUniformLocation("MVP"), 1, GL_FALSE, &MVP[0][0]);
-
-            // Sky rendering settings
-            glEnable(GL_CULL_FACE);
-            glCullFace(GL_BACK);  // Sky sphere is wound inward; cull the outside
-            glDepthFunc(GL_LEQUAL);  // Allow sky at far plane
-            glDepthMask(GL_FALSE);  // Don't write depth buffer
-
-            skyRenderer.draw();  // Render the sky sphere mesh
-
-            // Restore render settings
-            glDepthMask(GL_TRUE);
-            glCullFace(GL_BACK);
-            glDepthFunc(GL_LESS);
-        }
 
         // ---------------------------
         // Render all entities in the world
@@ -1224,7 +1180,7 @@ int main() {
     cube.destroy();
     house.destroy();
     glass.destroy();
-    skyRenderer.destroy();
+    // skyRenderer.destroy();
     ballRenderer.destroy();
     xpOrbRenderer.destroy();
     ImGui_ImplOpenGL3_Shutdown();
