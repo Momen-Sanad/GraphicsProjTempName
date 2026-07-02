@@ -3,8 +3,13 @@
 #include <glm/glm.hpp>
 
 #include "../ecs/Collider.hpp"
-#include "../ecs/Entity.hpp"
+#include "../ecs/EcsComponents.hpp"
+#include "../ecs/EntityId.hpp"
 #include "../gl/Mesh.hpp"
+
+namespace engine::ecs {
+class Registry;
+}
 
 class PhysicsCollisionSystem {
 public:
@@ -14,7 +19,13 @@ public:
     };
 
     static bool computeMeshBounds(const Mesh& mesh, MeshBounds& outBounds);
-    static bool resolveStaticCollision(Entity* mover,
-                                       const Collider& moverCollider,
-                                       const Collider& staticCollider);
+    static AABB computeWorldAABB(const engine::ecs::Transform& transform,
+                                 const engine::ecs::ColliderData& collider);
+    static bool intersects(const engine::ecs::Transform& aTransform,
+                           const engine::ecs::ColliderData& aCollider,
+                           const engine::ecs::Transform& bTransform,
+                           const engine::ecs::ColliderData& bCollider);
+    static bool resolveStaticCollision(engine::ecs::Registry& registry,
+                                       engine::ecs::EntityId mover,
+                                       engine::ecs::EntityId obstacle);
 };

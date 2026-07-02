@@ -28,7 +28,7 @@ private:
     World* world;
     PrefabLoader* prefabLoader;
     LevelData currentLevel;
-    std::vector<Entity*> levelEntities;
+    std::vector<engine::ecs::EntityId> levelEntities;
 
 public:
     LevelBuilder(World* world, PrefabLoader* prefabLoader);
@@ -49,5 +49,5 @@ public:
     glm::vec3 getCameraStart() const { return currentLevel.cameraStart; }
     
     // Get spawned entities
-    const std::vector<Entity*>& getLevelEntities() const { return levelEntities; }
+    const std::vector<engine::ecs::EntityId>& getLevelEntities() const { return levelEntities; }
 };

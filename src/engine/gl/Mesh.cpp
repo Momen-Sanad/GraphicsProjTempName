@@ -8,7 +8,7 @@
 namespace {
     // Helper: compute per-vertex normals from triangles (indices).
     // Accumulate face normals to each vertex then normalize.
-    void compute_normals(std::vector<Vertex>& verts, const std::vector<uint16_t>& indices) {
+    void compute_normals(std::vector<Vertex>& verts, const std::vector<MeshIndex>& indices) {
         if (verts.empty() || indices.empty()) {
             // nothing to do
             return;
@@ -22,9 +22,9 @@ namespace {
         // accumulate face normals
         size_t triCount = indices.size() / 3;
         for (size_t t = 0; t < triCount; ++t) {
-            uint16_t i0 = indices[t*3 + 0];
-            uint16_t i1 = indices[t*3 + 1];
-            uint16_t i2 = indices[t*3 + 2];
+            MeshIndex i0 = indices[t*3 + 0];
+            MeshIndex i1 = indices[t*3 + 1];
+            MeshIndex i2 = indices[t*3 + 2];
 
             // guard against bad indices
             if (i0 >= verts.size() || i1 >= verts.size() || i2 >= verts.size()) continue;
@@ -64,9 +64,9 @@ Mesh::Mesh()
     count = 0;
 }
 
-Mesh::Mesh(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices)
+Mesh::Mesh(const std::span<Vertex>& vertices, const std::span<MeshIndex>& meshIndices)
 {
-    create(vertices, indices);
+    create(vertices, meshIndices);
 }
 
 Mesh::~Mesh()
@@ -74,16 +74,16 @@ Mesh::~Mesh()
     destroy();
 }
 
-void Mesh::create(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices)
+void Mesh::create(const std::span<Vertex>& vertices, const std::span<MeshIndex>& meshIndices)
 {
     // Copy the vertices and indices into the member vectors.
     verticies.assign(vertices.begin(), vertices.end());
-    this->indices.assign(indices.begin(), indices.end());
+    indices.assign(meshIndices.begin(), meshIndices.end());
     
     // Compute normals from the geometry we just stored.
-    compute_normals(verticies, this->indices);
+    compute_normals(verticies, indices);
 
-    count = static_cast<GLsizei>(indices.size());
+    count = static_cast<GLsizei>(meshIndices.size());
 }
 
 void Mesh::destroy() {
@@ -94,7 +94,7 @@ void Mesh::destroy() {
 Mesh Mesh::create_cuboid(glm::vec3 center, glm::vec3 size)
 {
     std::vector<Vertex> vertices;
-    std::vector<uint16_t> indices;
+    std::vector<MeshIndex> indices;
 
     glm::vec3 h = size * 0.5f;
     glm::vec3 c = center;
@@ -155,7 +155,7 @@ Mesh Mesh::create_cuboid(glm::vec3 center, glm::vec3 size)
 Mesh Mesh::create_plane(glm::vec3 center, glm::vec2 size, glm::vec2 tiling)
 {
     std::vector<Vertex> vertices;
-    std::vector<uint16_t> indices;
+    std::vector<MeshIndex> indices;
 
     glm::vec3 h = glm::vec3(size.x, 0.0f, size.y) * 0.5f;
     glm::vec3 c = center;
@@ -180,7 +180,7 @@ Mesh Mesh::create_plane(glm::vec3 center, glm::vec2 size, glm::vec2 tiling)
 Mesh Mesh::create_sphere(glm::ivec2 segments, glm::vec3 center, float radius, bool invert_winding)
 {
     std::vector<Vertex> vertices;
-    std::vector<uint16_t> indices;
+    std::vector<MeshIndex> indices;
 
     // populating the sphere vertices by looping over its longitude and latitude
     for (int lat = 0; lat <= segments.y; lat++)
@@ -207,12 +207,12 @@ Mesh Mesh::create_sphere(glm::ivec2 segments, glm::vec3 center, float radius, bo
         for (int lng = 1; lng <= segments.x; lng++)
         {
             int prev_lng = lng - 1;
-            indices.push_back(lng + start);
-            indices.push_back(lng + start - segments.x - 1);
-            indices.push_back(prev_lng + start - segments.x - 1);
-            indices.push_back(prev_lng + start - segments.x - 1);
-            indices.push_back(prev_lng + start);
-            indices.push_back(lng + start);
+            indices.push_back(static_cast<MeshIndex>(lng + start));
+            indices.push_back(static_cast<MeshIndex>(lng + start - segments.x - 1));
+            indices.push_back(static_cast<MeshIndex>(prev_lng + start - segments.x - 1));
+            indices.push_back(static_cast<MeshIndex>(prev_lng + start - segments.x - 1));
+            indices.push_back(static_cast<MeshIndex>(prev_lng + start));
+            indices.push_back(static_cast<MeshIndex>(lng + start));
         }
     }
 
@@ -237,7 +237,7 @@ Mesh Mesh::create_cylinder(int segments, glm::vec3 center, float height, float r
     Mesh mesh;
     std::vector<glm::vec3> positions;
     std::vector<glm::vec2> tex_coords;
-    std::vector<uint16_t> indices;
+    std::vector<MeshIndex> indices;
     float halfH = height * 0.5f;
 
     // Side vertices
@@ -267,18 +267,18 @@ Mesh Mesh::create_cylinder(int segments, glm::vec3 center, float height, float r
         int i3 = base + 3;
 
         // triangle 1
-        indices.push_back(static_cast<uint16_t>(i0));
-        indices.push_back(static_cast<uint16_t>(i2));
-        indices.push_back(static_cast<uint16_t>(i1));
+        indices.push_back(static_cast<MeshIndex>(i0));
+        indices.push_back(static_cast<MeshIndex>(i2));
+        indices.push_back(static_cast<MeshIndex>(i1));
 
         // triangle 2
-        indices.push_back(static_cast<uint16_t>(i1));
-        indices.push_back(static_cast<uint16_t>(i2));
-        indices.push_back(static_cast<uint16_t>(i3));
+        indices.push_back(static_cast<MeshIndex>(i1));
+        indices.push_back(static_cast<MeshIndex>(i2));
+        indices.push_back(static_cast<MeshIndex>(i3));
     }
 
     // Top cap
-    int topCenterIndex = positions.size();
+    size_t topCenterIndex = positions.size();
     positions.push_back(center + glm::vec3(0, +halfH, 0));
     tex_coords.push_back(glm::vec2(0.5f, 0.5f)); // center of cap
 
@@ -298,17 +298,17 @@ Mesh Mesh::create_cylinder(int segments, glm::vec3 center, float height, float r
 
     for (int i = 0; i < segments; i++)
     {
-        int i0 = topCenterIndex;
-        int i1 = topCenterIndex + 1 + i;
-        int i2 = topCenterIndex + 2 + i;
+        size_t i0 = topCenterIndex;
+        size_t i1 = topCenterIndex + 1 + i;
+        size_t i2 = topCenterIndex + 2 + i;
 
-        indices.push_back(static_cast<uint16_t>(i0));
-        indices.push_back(static_cast<uint16_t>(i1));
-        indices.push_back(static_cast<uint16_t>(i2));
+        indices.push_back(static_cast<MeshIndex>(i0));
+        indices.push_back(static_cast<MeshIndex>(i1));
+        indices.push_back(static_cast<MeshIndex>(i2));
     }
 
     // Bottom cap
-    int bottomCenterIndex = positions.size();
+    size_t bottomCenterIndex = positions.size();
     positions.push_back(center + glm::vec3(0, -halfH, 0));
     tex_coords.push_back(glm::vec2(0.5f, 0.5f)); // center of cap
 
@@ -328,13 +328,13 @@ Mesh Mesh::create_cylinder(int segments, glm::vec3 center, float height, float r
 
     for (int i = 0; i < segments; i++)
     {
-        int i0 = bottomCenterIndex;
-        int i1 = bottomCenterIndex + 2 + i;
-        int i2 = bottomCenterIndex + 1 + i;
+        size_t i0 = bottomCenterIndex;
+        size_t i1 = bottomCenterIndex + 2 + i;
+        size_t i2 = bottomCenterIndex + 1 + i;
 
-        indices.push_back(static_cast<uint16_t>(i0));
-        indices.push_back(static_cast<uint16_t>(i1));
-        indices.push_back(static_cast<uint16_t>(i2));
+        indices.push_back(static_cast<MeshIndex>(i0));
+        indices.push_back(static_cast<MeshIndex>(i1));
+        indices.push_back(static_cast<MeshIndex>(i2));
     }
 
     // Build mesh
@@ -375,18 +375,18 @@ void Mesh::set_positions(const std::span<glm::vec3>& positions)
     }
 }
 
-void Mesh::set_indices(const std::span<uint16_t>& indices)
+void Mesh::set_indices(const std::span<MeshIndex>& meshIndices)
 {
-    this->indices.resize(indices.size());
+    indices.resize(meshIndices.size());
 
-    for (size_t i = 0; i < indices.size(); i++)
-        this->indices[i] = indices[i];
+    for (size_t i = 0; i < meshIndices.size(); i++)
+        indices[i] = meshIndices[i];
 
-    count = static_cast<GLsizei>(indices.size());
+    count = static_cast<GLsizei>(meshIndices.size());
 
     // compute normals now that indices are available
     if (!verticies.empty()) {
-        compute_normals(verticies, this->indices);
+        compute_normals(verticies, indices);
     }
 }
 
@@ -408,6 +408,56 @@ void Mesh::set_tex_coords(const std::span<glm::vec2>& tex_coords)
         verticies[i].tex_coord = tex_coords[i];
 }
 
+void Mesh::set_position(size_t index, const glm::vec3& position)
+{
+    verticies.at(index).position = position;
+    if (!indices.empty()) {
+        compute_normals(verticies, indices);
+    }
+}
+
+void Mesh::set_color(size_t index, const Color& color)
+{
+    verticies.at(index).color = color;
+}
+
+void Mesh::set_tex_coord(size_t index, const glm::vec2& tex_coord)
+{
+    verticies.at(index).tex_coord = tex_coord;
+}
+
+void Mesh::set_index(size_t index, MeshIndex value)
+{
+    indices.at(index) = value;
+    if (!verticies.empty()) {
+        compute_normals(verticies, indices);
+    }
+}
+
+void Mesh::add_vertex(const Vertex& vertex)
+{
+    verticies.push_back(vertex);
+}
+
+void Mesh::add_index(MeshIndex index)
+{
+    indices.push_back(index);
+    count = indices.size();
+    if (!verticies.empty()) {
+        compute_normals(verticies, indices);
+    }
+}
+
+void Mesh::reserve_vertices(size_t capacity)
+{
+    verticies.reserve(capacity);
+}
+
+void Mesh::reserve_indices(size_t capacity)
+{
+    indices.reserve(capacity);
+}
+
 std::vector<glm::vec3> Mesh::get_positions() const
 {
     std::vector<glm::vec3> positions;
@@ -417,6 +467,32 @@ std::vector<glm::vec3> Mesh::get_positions() const
         positions.push_back(vertex.position);
 
     return positions;
+}
+
+std::vector<glm::vec2> Mesh::get_tex_coords() const
+{
+    std::vector<glm::vec2> tex_coords;
+
+    tex_coords.reserve(verticies.size());
+    for (const auto& vertex : verticies)
+        tex_coords.push_back(vertex.tex_coord);
+
+    return tex_coords;
+}
+
+glm::vec3 Mesh::get_position(size_t index) const
+{
+    return verticies.at(index).position;
+}
+
+Color Mesh::get_color(size_t index) const
+{
+    return verticies.at(index).color;
+}
+
+glm::vec2 Mesh::get_tex_coord(size_t index) const
+{
+    return verticies.at(index).tex_coord;
 }
 
 bool operator==(const Color& a, const Color& b) {

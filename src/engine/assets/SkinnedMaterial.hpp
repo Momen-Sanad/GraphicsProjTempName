@@ -15,14 +15,16 @@ private:
 
     // Is this material currently using skeletal animation?
     bool is_animated = false;
+    int active_bone_count = 0;
 
 public:
     SkinnedMaterial();
-    SkinnedMaterial(std::shared_ptr<Shader> shader, Texture* tex);
+    SkinnedMaterial(std::shared_ptr<Shader> shader, std::shared_ptr<Texture> tex);
 
     // Bone matrix management
     void set_bone_matrices(const std::vector<glm::mat4>& matrices);
     const std::vector<glm::mat4>& get_bone_matrices() const { return bone_matrices; }
+    int get_active_bone_count() const { return active_bone_count; }
 
     void set_animated(bool animated) { is_animated = animated; }
     bool get_is_animated() const { return is_animated; }

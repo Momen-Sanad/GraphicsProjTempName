@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ecs/Entity.hpp"
+#include "../ecs/EntityId.hpp"
 #include "../ecs/World.hpp"
 #include <string>
 #include <unordered_map>
@@ -25,7 +25,7 @@ class PrefabLoader {
 private:
     World* world;
     std::unordered_map<std::string, PrefabData> prefabs;
-    std::unordered_map<std::string, std::shared_ptr<ModelData>> cachedModels;
+    std::unordered_map<std::string, std::shared_ptr<ModelAsset>> cachedModels;
 
 public:
     PrefabLoader(World* world);
@@ -38,8 +38,15 @@ public:
     bool loadPrefabsFromFile(const std::string& filePath);
     
     // Instantiate a prefab at position
-    Entity* instantiate(const std::string& prefabName, const glm::vec3& position, Entity* parent = nullptr);
-    Entity* instantiate(const std::string& prefabName, const glm::vec3& position, const glm::quat& rotation, Entity* parent = nullptr);
+    engine::ecs::EntityId instantiate(
+        const std::string& prefabName,
+        const glm::vec3& position,
+        engine::ecs::EntityId parent = engine::ecs::InvalidEntity);
+    engine::ecs::EntityId instantiate(
+        const std::string& prefabName,
+        const glm::vec3& position,
+        const glm::quat& rotation,
+        engine::ecs::EntityId parent = engine::ecs::InvalidEntity);
     
     // Check if prefab exists
     bool hasPrefab(const std::string& name) const;

@@ -1,5 +1,4 @@
 #include "PrefabLoader.hpp"
-#include "MeshLoader.hpp"
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -50,36 +49,40 @@ bool PrefabLoader::loadPrefabsFromFile(const std::string& filePath) {
     }
 }
 
-Entity* PrefabLoader::instantiate(const std::string& prefabName, const glm::vec3& position, Entity* parent) {
+engine::ecs::EntityId PrefabLoader::instantiate(
+    const std::string& prefabName,
+    const glm::vec3& position,
+    engine::ecs::EntityId parent) {
     return instantiate(prefabName, position, glm::quat(1, 0, 0, 0), parent);
 }
 
-Entity* PrefabLoader::instantiate(const std::string& prefabName, const glm::vec3& position, const glm::quat& rotation, Entity* parent) {
+engine::ecs::EntityId PrefabLoader::instantiate(
+    const std::string& prefabName,
+    const glm::vec3& position,
+    const glm::quat& rotation,
+    engine::ecs::EntityId parent) {
     auto it = prefabs.find(prefabName);
     if (it == prefabs.end()) {
         std::cerr << "[PrefabLoader] Prefab not found: " << prefabName << std::endl;
-        return nullptr;
+        return engine::ecs::InvalidEntity;
     }
 
     const PrefabData& data = it->second;
     
-    // Create entity
-    Entity* entity = world->createEntityWithParams(parent, position, rotation, data.defaultScale);
-    entity->setName(data.name);
+    engine::ecs::EntityId entity = world->createEntity(data.name, position, rotation, data.defaultScale);
+    world->setParent(entity, parent);
 
     // Load model if specified
     if (!data.modelPath.empty()) {
-        // Check cache first
         if (cachedModels.find(data.modelPath) == cachedModels.end()) {
-            ModelData* model = MeshLoader::load_gltf(data.modelPath.c_str());
-            if (model) {
-                cachedModels[data.modelPath] = std::shared_ptr<ModelData>(model);
-            }
+            cachedModels[data.modelPath] = world->assets().loadModel(data.modelPath);
         }
         
         auto modelIt = cachedModels.find(data.modelPath);
-        if (modelIt != cachedModels.end()) {
-            entity->setModelData(modelIt->second);
+        if (modelIt != cachedModels.end() && modelIt->second) {
+            auto& skinned = world->registry().ensure<engine::ecs::SkinnedRenderable>(entity);
+            skinned.model = modelIt->second;
+            skinned.modelData = modelIt->second->legacyModel;
         }
     }
 

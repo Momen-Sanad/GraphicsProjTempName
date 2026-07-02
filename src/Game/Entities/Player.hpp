@@ -1,93 +1,58 @@
 #pragma once
 
-#include <memory>
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
+#include "../GameComponents.hpp"
 
-#include "../../engine/ecs/World.hpp"
-#include "../../engine/components/CameraFollowComponent.hpp"
 #include "../../engine/assets/Material.hpp"
+#include "../../engine/components/CameraFollowComponent.hpp"
+#include "../../engine/components/MeshRenderer.hpp"
+#include "../../engine/ecs/World.hpp"
 
-struct PlayerInput {
-    glm::vec2 move{0.0f};
-    bool block = false;
-    bool attack = false;
-    bool dodge = false;
-};
+#include <glm/glm.hpp>
+
+#include <memory>
 
 class Player {
 public:
-    Player(World& world,
-           Entity* parent,
-           MeshRenderer* bodyMesh,
-           Material* bodyMaterial,
-           MeshRenderer* weaponMesh,
-           Material* weaponMaterial);
+    Player(
+        World& world,
+        engine::ecs::EntityId parent,
+        std::shared_ptr<MeshRenderer> bodyMesh,
+        std::shared_ptr<Material> bodyMaterial,
+        std::shared_ptr<MeshRenderer> weaponMesh,
+        std::shared_ptr<Material> weaponMaterial);
 
     virtual ~Player() = default;
 
-    // Core
-    Entity* entity() const { return root; }
-    Entity* getBody() const { return body; }
-    Entity* getWeapon() const { return weapon; }
+    engine::ecs::EntityId entity() const { return root; }
+    engine::ecs::EntityId getBody() const { return body; }
+    engine::ecs::EntityId getWeapon() const { return weapon; }
 
-    // Input & update
-    void setInput(const PlayerInput& input) { inputState = input; }
+    void setInput(const PlayerInput& input);
     virtual void update(float deltaTime);
 
-    // Transform
-    void setPosition(const glm::vec3& p);
+    void setPosition(const glm::vec3& position);
     glm::vec3 getPosition() const;
 
-    // Tunables
-    void setMoveSpeed(float speed) { moveSpeed = speed; }
+    void setMoveSpeed(float speed);
     void setBlockSpeedMultiplier(float multiplier);
-    void setDodgeSpeed(float speed) { dodgeSpeed = speed; }
+    void setDodgeSpeed(float speed);
     void setAttackTimings(float duration, float cooldown);
     void setDodgeTimings(float duration, float cooldown);
 
-    // Camera
-    void attachCamera(Camera* camera,
-                      const glm::vec3& offset,
-                      const glm::vec3& lookOffset);
+    void attachCamera(Camera* camera, const glm::vec3& offset, const glm::vec3& lookOffset);
 
-    // State queries
-    bool isBlocking() const { return blocking; }
-    bool isAttacking() const { return attackTimer > 0.0f; }
-    bool isDodging() const { return dodgeTimer > 0.0f; }
+    bool isBlocking() const;
+    bool isAttacking() const;
+    bool isDodging() const;
 
 protected:
+    game::PlayerController* controller();
+    const game::PlayerController* controller() const;
+
     World& worldRef;
+    engine::ecs::EntityId root = engine::ecs::InvalidEntity;
+    engine::ecs::EntityId body = engine::ecs::InvalidEntity;
+    engine::ecs::EntityId weapon = engine::ecs::InvalidEntity;
 
-    Entity* root = nullptr;
-    Entity* body = nullptr;
-    Entity* weapon = nullptr;
-
-    PlayerInput inputState{};
-    glm::vec3 facing{0.0f, 0.0f, 1.0f};
-
-    bool blocking = false;
-
-    float moveSpeed = 4.0f;
-    float blockSpeedMultiplier = 0.4f;
-
-    float dodgeSpeed = 10.0f;
-    float dodgeDuration = 0.2f;
-    float dodgeCooldown = 0.7f;
-    float dodgeTimer = 0.0f;
-    float dodgeCooldownTimer = 0.0f;
-
-    float attackDuration = 0.25f;
-    float attackCooldown = 0.35f;
-    float attackTimer = 0.0f;
-    float attackCooldownTimer = 0.0f;
-
-    glm::quat weaponRestRotation{1, 0, 0, 0};
-
-    // Camera behavior (NOT ECS)
     std::unique_ptr<CameraFollowPlayer> cameraFollow;
-
-private:
-    void updateMovement(float dt);
-    void updateAttack(float dt);
 };

@@ -85,9 +85,12 @@ bool LevelBuilder::buildLevel() {
     for (const auto& sp : currentLevel.spawnPoints) {
         if (sp.prefabName.empty()) continue;
         
-        Entity* entity = prefabLoader->instantiate(sp.prefabName, sp.position, sp.rotation);
-        if (entity) {
-            entity->setScale(sp.scale);
+        engine::ecs::EntityId entity = prefabLoader->instantiate(sp.prefabName, sp.position, sp.rotation);
+        if (world->registry().isAlive(entity)) {
+            if (auto* transform = world->transform(entity)) {
+                transform->scale = sp.scale;
+                transform->dirty = true;
+            }
             levelEntities.push_back(entity);
         }
     }
@@ -99,10 +102,8 @@ bool LevelBuilder::buildLevel() {
 void LevelBuilder::unloadLevel() {
     std::cout << "[LevelBuilder] Unloading level: " << currentLevel.name << std::endl;
     
-    for (Entity* entity : levelEntities) {
-        if (entity) {
-            world->getEntityManager().destroyEntity(entity);
-        }
+    for (engine::ecs::EntityId entity : levelEntities) {
+        world->destroyEntity(entity, DestroyMode::Recursive);
     }
     
     levelEntities.clear();

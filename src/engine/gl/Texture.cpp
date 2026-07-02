@@ -1,5 +1,6 @@
 #include "Texture.hpp"
 #include <cstdio>
+#include <utility>
 
 // ----------------------------------------------------
 // Default constructor: Initializes the texture with default values
@@ -11,18 +12,58 @@ Texture::Texture() : id(0), sampler(0), width(0), height(0), format(GL_RGBA) {}
 // ----------------------------------------------------
 Texture::~Texture()
 {
-    if (id != 0) glDeleteTextures(1, &id);  // Deletes the texture if it's valid
-    if (sampler != 0) glDeleteSamplers(1, &sampler);  // Deletes the sampler if it's valid
+    destroy();
+}
+
+Texture::Texture(Texture&& other) noexcept {
+    *this = std::move(other);
+}
+
+Texture& Texture::operator=(Texture&& other) noexcept {
+    if (this != &other) {
+        destroy();
+
+        id = other.id;
+        sampler = other.sampler;
+        width = other.width;
+        height = other.height;
+        format = other.format;
+
+        other.id = 0;
+        other.sampler = 0;
+        other.width = 0;
+        other.height = 0;
+        other.format = GL_RGBA;
+    }
+    return *this;
+}
+
+void Texture::destroy()
+{
+    if (id != 0 && glad_glDeleteTextures) glDeleteTextures(1, &id);
+    if (sampler != 0 && glad_glDeleteSamplers) glDeleteSamplers(1, &sampler);
+
+    id = 0;
+    sampler = 0;
+    width = 0;
+    height = 0;
+    format = GL_RGBA;
 }
 
 // ----------------------------------------------------
 // Creates a texture from raw data, specifying width, height, and format
 // ----------------------------------------------------
-void Texture::create(int width, int height, const unsigned char* data, GLenum format)
+void Texture::create(int textureWidth, int textureHeight, const unsigned char* data, GLenum textureFormat)
 {
-    this->width = width;  // Store the texture's width
-    this->height = height;  // Store the texture's height
-    this->format = format;  // Store the texture's format (e.g., GL_RGBA)
+    destroy();
+
+    width = textureWidth;  // Store the texture's width
+    height = textureHeight;  // Store the texture's height
+    format = textureFormat;  // Store the texture's format (e.g., GL_RGBA)
+
+    if (!glad_glGenTextures || !glad_glGenSamplers) {
+        return;
+    }
 
     // Generate the OpenGL texture ID
     glGenTextures(1, &id);
@@ -30,17 +71,17 @@ void Texture::create(int width, int height, const unsigned char* data, GLenum fo
 
     // Choose internal format based on the input format
     GLenum internal_format;
-    if (format == GL_RED)
+    if (textureFormat == GL_RED)
         internal_format = GL_R8;  // Single channel (red) format
-    else if (format == GL_RGB)
+    else if (textureFormat == GL_RGB)
         internal_format = GL_RGB8;  // RGB format with 8 bits per channel
-    else if (format == GL_RGBA)
+    else if (textureFormat == GL_RGBA)
         internal_format = GL_RGBA8;  // RGBA format with 8 bits per channel
     else
-        internal_format = format;  // Use the provided format for internal format
+        internal_format = textureFormat;  // Use the provided format for internal format
 
     // Specify the texture image data
-    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, internal_format, textureWidth, textureHeight, 0, textureFormat, GL_UNSIGNED_BYTE, data);
 
     // Generate mipmaps for the texture
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -55,9 +96,11 @@ void Texture::create(int width, int height, const unsigned char* data, GLenum fo
     glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, GL_REPEAT);  // Wrap mode for the T axis (vertical)
 
     // Set anisotropic filtering if supported
-    float max_aniso;
-    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &max_aniso);  // Get the maximum anisotropy value supported by the hardware
-    glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY, max_aniso);  // Set the anisotropic filtering level
+    if (glad_glGetFloatv) {
+        float max_aniso = 1.0f;
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &max_aniso);  // Get the maximum anisotropy value supported by the hardware
+        glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY, max_aniso);  // Set the anisotropic filtering level
+    }
 }
 
 // ----------------------------------------------------
@@ -65,6 +108,7 @@ void Texture::create(int width, int height, const unsigned char* data, GLenum fo
 // ----------------------------------------------------
 void Texture::set_filters(GLenum min_filter, GLenum mag_filter)
 {
+    if (sampler == 0 || !glad_glSamplerParameteri) return;
     glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, min_filter);  // Set minification filter
     glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, mag_filter);  // Set magnification filter
 }
@@ -74,6 +118,7 @@ void Texture::set_filters(GLenum min_filter, GLenum mag_filter)
 // ----------------------------------------------------
 void Texture::set_wrap(GLenum wrap_s, GLenum wrap_t)
 {
+    if (sampler == 0 || !glad_glSamplerParameteri) return;
     glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, wrap_s);  // Set the wrap mode for the S axis (horizontal)
     glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, wrap_t);  // Set the wrap mode for the T axis (vertical)
 }
@@ -83,23 +128,41 @@ void Texture::set_wrap(GLenum wrap_s, GLenum wrap_t)
 // ----------------------------------------------------
 void Texture::bind(int unit) const
 {
+    if (!glad_glActiveTexture || !glad_glBindTexture) return;
     glActiveTexture(GL_TEXTURE0 + unit);  // Activate the specified texture unit (GL_TEXTURE0 + unit)
 
     glBindTexture(GL_TEXTURE_2D, id);  // Bind the texture to the GL_TEXTURE_2D target
 
-    glBindSampler(unit, sampler);  // Bind the sampler to the texture unit
-
-    glUniform1i(sampler, unit);
+    if (sampler != 0 && glad_glBindSampler) {
+        glBindSampler(unit, sampler);  // Bind the sampler to the texture unit
+    }
 }
 
+void Texture::bind(int unit, const char* samp) const
+{
+    bind(unit);
+    if (samp && glad_glGetIntegerv && glad_glGetUniformLocation && glad_glUniform1i) {
+        GLint current_program = 0;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &current_program);
+        if (current_program != 0) {
+            GLint location = glGetUniformLocation(static_cast<GLuint>(current_program), samp);
+            if (location != -1) {
+                glUniform1i(location, unit);
+            }
+        }
+    }
+}
 
 // ----------------------------------------------------
 // Unbinds the texture and sampler
 // ----------------------------------------------------
 void Texture::unbind() const
 {
+    if (!glad_glBindTexture) return;
     glBindTexture(GL_TEXTURE_2D, 0);  // Unbind the texture from the GL_TEXTURE_2D target
-    glBindSampler(0, 0);  // Unbind the sampler
+    if (glad_glBindSampler) {
+        glBindSampler(0, 0);  // Unbind the sampler
+    }
 }
 
 GLuint Texture::get_id() const { return id; }

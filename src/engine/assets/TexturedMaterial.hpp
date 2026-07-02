@@ -2,6 +2,7 @@
 #include "Material.hpp"
 #include "../gl/Texture.hpp"
 #include <memory>
+#include <utility>
 #include <vector>
 
 enum class BlendMode 
@@ -15,13 +16,13 @@ enum class BlendMode
 
 struct TextureLayer
 {
-    Texture* texture;
+    std::shared_ptr<Texture> texture;
     BlendMode blendMode;
     int unit;
     float blendWeight;  // 0.0 to 1.0
 
-    TextureLayer(Texture* tex = nullptr, int u = 0, BlendMode blmod = BlendMode::Lerp, float weight = 1.0f)
-        : texture(tex), unit(u), blendWeight(weight), blendMode(blmod) {}
+    TextureLayer(std::shared_ptr<Texture> tex = nullptr, int u = 0, BlendMode blmod = BlendMode::Lerp, float weight = 1.0f)
+        : texture(std::move(tex)), blendMode(blmod), unit(u), blendWeight(weight) {}
 };
 
 class TexturedMaterial : public Material
@@ -32,18 +33,18 @@ private:
 
 public:
     TexturedMaterial();
-    TexturedMaterial(std::shared_ptr<Shader> shader, Texture* tex);
+    TexturedMaterial(std::shared_ptr<Shader> shader, std::shared_ptr<Texture> tex);
 
-    // Single texture methods (backward compatibility)
-    void setTexture(Texture* tex);
+    void setTexture(std::shared_ptr<Texture> tex);
     Texture* getTexture() const;
+    std::shared_ptr<Texture> getTextureHandle() const;
     void setTextureUnit(int unit);
     int getTextureUnit() const;
 
     // Multi-texture methods
-    void addTextureLayer(Texture* tex, BlendMode blmod = BlendMode::Lerp, float blendWeight = 1.0f);
-    void addTextureLayer(Texture* tex, int unit, BlendMode blmod = BlendMode::Lerp, float blendWeight = 1.0f);
-    void setTextureLayer(int index, Texture* tex, BlendMode blmod, float blendWeight);
+    void addTextureLayer(std::shared_ptr<Texture> tex, BlendMode blmod = BlendMode::Lerp, float blendWeight = 1.0f);
+    void addTextureLayer(std::shared_ptr<Texture> tex, int unit, BlendMode blmod = BlendMode::Lerp, float blendWeight = 1.0f);
+    void setTextureLayer(int index, std::shared_ptr<Texture> tex, BlendMode blmod, float blendWeight);
     void removeTextureLayer(int index);
     void clearTextureLayers();
 
@@ -57,9 +58,9 @@ public:
     void setup() override;
 
     // New methods for maps
-    void setAlbedoTexture          (Texture* tex);
-    void setSpecularTexture        (Texture* tex);
-    void setRoughnessTexture       (Texture* tex);
-    void setEmissiveTexture        (Texture* tex);
-    void setAmbientOcclusionTexture(Texture* tex);
+    void setAlbedoTexture          (std::shared_ptr<Texture> tex);
+    void setSpecularTexture        (std::shared_ptr<Texture> tex);
+    void setRoughnessTexture       (std::shared_ptr<Texture> tex);
+    void setEmissiveTexture        (std::shared_ptr<Texture> tex);
+    void setAmbientOcclusionTexture(std::shared_ptr<Texture> tex);
 };

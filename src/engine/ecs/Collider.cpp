@@ -1,13 +1,11 @@
 #include "Collider.hpp"
 
-#include "Entity.hpp"
-
 #include <limits>
 
 Collider::Collider(const glm::vec3& extents, const glm::vec3& offset)
     : halfExtents(extents), localOffset(offset) {}
 
-AABB Collider::getWorldAABB() const {
+AABB Collider::getLocalAABB() const {
     glm::vec3 center = localOffset;
     glm::vec3 extents = halfExtents;
 
@@ -22,13 +20,6 @@ AABB Collider::getWorldAABB() const {
         center + glm::vec3( extents.x,  extents.y,  extents.z),
     };
 
-    if (parent) {
-        glm::mat4 world = parent->getWorldMatrix();
-        for (auto& corner : corners) {
-            corner = glm::vec3(world * glm::vec4(corner, 1.0f));
-        }
-    }
-
     glm::vec3 minPos(std::numeric_limits<float>::infinity());
     glm::vec3 maxPos(-std::numeric_limits<float>::infinity());
     for (const auto& corner : corners) {
@@ -42,8 +33,8 @@ AABB Collider::getWorldAABB() const {
 bool Collider::intersects(const Collider& other) const {
     if (!enabled || !other.enabled) return false;
 
-    AABB a = getWorldAABB();
-    AABB b = other.getWorldAABB();
+    AABB a = getLocalAABB();
+    AABB b = other.getLocalAABB();
 
     return (a.min.x <= b.max.x && a.max.x >= b.min.x) &&
            (a.min.y <= b.max.y && a.max.y >= b.min.y) &&

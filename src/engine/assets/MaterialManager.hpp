@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <string>
 #include <memory>
+#include <utility>
 #include "Material.hpp"
 #include "TintedMaterial.hpp"
 
@@ -19,7 +20,11 @@ public:
     // Args are the constructor arguments for T 
     // (variadic templates -> accepts any amount of args and expands them upon usage)
     template<typename T, typename... Args>
-    std::shared_ptr<T> create(const std::string& name, Args&&... args);
+    std::shared_ptr<T> create(const std::string& name, Args&&... args) {
+        auto mat = std::make_shared<T>(std::forward<Args>(args)...);
+        materials[name] = mat;
+        return mat;
+    }
 
     // Function to retrieve a material by name from the materials map
     // Returns a shared pointer to the Material, or nullptr if not found

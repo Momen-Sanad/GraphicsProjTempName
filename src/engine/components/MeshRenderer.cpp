@@ -92,18 +92,12 @@ void MeshRenderer::upload(const Mesh& data) {
     // ------------------------
     // Attribute 3 : COLOR
     // ------------------------
-    if constexpr (std::is_same_v<decltype(Vertex::color), glm::u8vec4>) {
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(
-            3, 4, GL_UNSIGNED_BYTE, GL_TRUE,
-            sizeof(Vertex),
-            (void*)offsetof(Vertex, color)
-        );
-    } else {
-        // Fallback: constant white if mesh has no colors
-        glDisableVertexAttribArray(3);
-        glVertexAttrib4f(3, 1.f, 1.f, 1.f, 1.f);
-    }
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(
+        3, 4, GL_UNSIGNED_BYTE, GL_TRUE,
+        sizeof(Vertex),
+        (void*)offsetof(Vertex, color)
+    );
 
     // ------------------------
     // EBO
@@ -112,14 +106,14 @@ void MeshRenderer::upload(const Mesh& data) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(
         GL_ELEMENT_ARRAY_BUFFER,
-        data.get_index_count() * sizeof(uint16_t),
+        data.get_index_count() * sizeof(MeshIndex),
         data.get_indices().data(),
         GL_STATIC_DRAW
     );
 
     glBindVertexArray(0);
 
-    count = data.get_index_count();
+    count = static_cast<GLsizei>(data.get_index_count());
 }
 
 
@@ -130,7 +124,7 @@ void MeshRenderer::draw() const {
     if (!vao) return;  // If no VAO exists, return early
 
     glBindVertexArray(vao);  // Bind the VAO to the OpenGL context
-    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, nullptr);  // Draw the mesh using indices
+    glDrawElements(GL_TRIANGLES, count, MESH_INDEX_GL_TYPE, nullptr);  // Draw the mesh using indices
     glBindVertexArray(0);  // Unbind the VAO after drawing
 }
 

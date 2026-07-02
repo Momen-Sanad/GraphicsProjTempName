@@ -149,6 +149,8 @@ set_target_properties(Engine PROPERTIES
 if (ENGINE_BUILD_EXAMPLES)
     add_executable(OpenGLEngine
         src/Game/main.cpp
+        src/Game/GameApplication.cpp
+        src/Game/GameSystems.cpp
         src/Game/Entities/Player.cpp
         src/Game/Entities/Enemy.cpp
         src/Game/Entities/Crusader.cpp
@@ -179,6 +181,9 @@ if (ENGINE_ENABLE_TESTS)
         ${CMAKE_SOURCE_DIR}/tests/animation_tests.cpp
     )
     target_link_libraries(animation_tests PRIVATE Engine)
+    target_compile_definitions(animation_tests PRIVATE
+        SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+    )
     add_test(NAME animation_tests COMMAND animation_tests)
 
     # ----- Asset tests -----
@@ -188,12 +193,31 @@ if (ENGINE_ENABLE_TESTS)
     target_link_libraries(asset_tests PRIVATE Engine)
     add_test(NAME asset_tests COMMAND asset_tests)
 
+    # ----- Hidden-window renderer smoke tests -----
+    add_executable(render_smoke_tests
+        ${CMAKE_SOURCE_DIR}/tests/render_smoke_tests.cpp
+    )
+    target_link_libraries(render_smoke_tests PRIVATE Engine glfw glad)
+    add_test(NAME render_smoke_tests COMMAND render_smoke_tests)
+    set_tests_properties(render_smoke_tests PROPERTIES TIMEOUT 10)
+
     # ----- ECS tests -----
     add_executable(ecs_tests
         ${CMAKE_SOURCE_DIR}/tests/ecs_tests.cpp
     )
     target_link_libraries(ecs_tests PRIVATE Engine)
     add_test(NAME ecs_tests COMMAND ecs_tests)
+
+    # ----- Game ECS tests -----
+    add_executable(game_tests
+        ${CMAKE_SOURCE_DIR}/tests/game_tests.cpp
+        ${CMAKE_SOURCE_DIR}/src/Game/GameSystems.cpp
+        ${CMAKE_SOURCE_DIR}/src/Game/Entities/Player.cpp
+        ${CMAKE_SOURCE_DIR}/src/Game/Entities/Enemy.cpp
+        ${CMAKE_SOURCE_DIR}/src/Game/Entities/Crusader.cpp
+    )
+    target_link_libraries(game_tests PRIVATE Engine)
+    add_test(NAME game_tests COMMAND game_tests)
 
     # ----- Animation demo (has its own main) -----
     add_executable(animation_demo
@@ -206,5 +230,4 @@ if (ENGINE_ENABLE_TESTS)
         ASSET_DIR="${CMAKE_SOURCE_DIR}/assets"
         SOURCE_DIR="${CMAKE_SOURCE_DIR}"
     )
-    add_test(NAME animation_demo COMMAND animation_demo)
 endif()

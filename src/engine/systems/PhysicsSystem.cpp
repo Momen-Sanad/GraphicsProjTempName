@@ -1,12 +1,12 @@
 #include "PhysicsSystem.hpp"
-#include "../ecs/EntityManager.hpp"
-#include "../ecs/Entity.hpp"
+#include "../ecs/EcsComponents.hpp"
+#include "../ecs/Registry.hpp"
 
 namespace gproj::physics {
 
-PhysicsSystem::PhysicsSystem(EntityManager& entityManager,
+PhysicsSystem::PhysicsSystem(engine::ecs::Registry& registry,
                              PhysicsBackend& backend)
-   : m_entityManager(entityManager)
+   : m_registry(registry)
    , m_backend(backend) {}
 
 void PhysicsSystem::initialize() {
@@ -32,10 +32,10 @@ void PhysicsSystem::update(float dtSeconds) {
 }
 
 PhysicsBodyId PhysicsSystem::createRigidBodyForEntity(
-   Entity* entity,
+   engine::ecs::EntityId entity,
    const RigidBodyDesc& desc) {
 
-   if (!entity) return 0; // 0 = invalid body
+   if (!m_registry.isAlive(entity)) return 0; // 0 = invalid body
 
    PhysicsBodyId bodyId = m_backend.createRigidBody(desc);
    m_entityToBody[entity] = bodyId;
@@ -45,7 +45,7 @@ PhysicsBodyId PhysicsSystem::createRigidBodyForEntity(
    return bodyId;
 }
 
-void PhysicsSystem::removeRigidBodyForEntity(Entity* entity) {
+void PhysicsSystem::removeRigidBodyForEntity(engine::ecs::EntityId entity) {
    auto it = m_entityToBody.find(entity);
    if (it == m_entityToBody.end()) return;
 
@@ -53,45 +53,48 @@ void PhysicsSystem::removeRigidBodyForEntity(Entity* entity) {
    m_entityToBody.erase(it);
 }
 
-bool PhysicsSystem::hasRigidBody(Entity* entity) const {
+bool PhysicsSystem::hasRigidBody(engine::ecs::EntityId entity) const {
    return m_entityToBody.find(entity) != m_entityToBody.end();
 }
 
-void PhysicsSystem::onEntityDestroyed(Entity* entity) {
+void PhysicsSystem::onEntityDestroyed(engine::ecs::EntityId entity) {
    removeRigidBodyForEntity(entity);
 }
 
-void PhysicsSystem::syncEntityToPhysics(Entity* entity) {
+void PhysicsSystem::syncEntityToPhysics(engine::ecs::EntityId entity) {
    auto it = m_entityToBody.find(entity);
    if (it == m_entityToBody.end()) return;
    syncEntityTransformToPhysics(entity, it->second);
 }
 
-void PhysicsSystem::syncPhysicsToEntity(Entity* entity) {
+void PhysicsSystem::syncPhysicsToEntity(engine::ecs::EntityId entity) {
    auto it = m_entityToBody.find(entity);
    if (it == m_entityToBody.end()) return;
    syncPhysicsToEntityTransform(entity, it->second);
 }
 
-void PhysicsSystem::syncEntityTransformToPhysics(Entity* entity,
+void PhysicsSystem::syncEntityTransformToPhysics(engine::ecs::EntityId entity,
                                                 PhysicsBodyId bodyId) {
-   if (!entity) return;
+   auto* transform = m_registry.get<engine::ecs::Transform>(entity);
+   if (!transform) return;
 
    PhysicsTransform pt;
-   pt.position = entity->getPosition();
-   pt.rotation = entity->getRotation();
+   pt.position = transform->position;
+   pt.rotation = transform->rotation;
 
    m_backend.setBodyTransform(bodyId, pt);
 }
 
-void PhysicsSystem::syncPhysicsToEntityTransform(Entity* entity,
+void PhysicsSystem::syncPhysicsToEntityTransform(engine::ecs::EntityId entity,
                                                 PhysicsBodyId bodyId) {
-   if (!entity) return;
+   auto* transform = m_registry.get<engine::ecs::Transform>(entity);
+   if (!transform) return;
 
    PhysicsTransform pt = m_backend.getBodyTransform(bodyId);
 
-   entity->setPosition(pt.position);
-   entity->setRotation(pt.rotation);
+   transform->position = pt.position;
+   transform->rotation = pt.rotation;
+   transform->dirty = true;
 }
 
 }

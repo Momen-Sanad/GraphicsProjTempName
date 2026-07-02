@@ -4,17 +4,17 @@ SkinnedMesh::SkinnedMesh() : Mesh()
 {
 }
 
-SkinnedMesh::SkinnedMesh(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices,
-    const std::span<SkeletonVertex>& skel_verticies)
+SkinnedMesh::SkinnedMesh(const std::span<Vertex>& vertices, const std::span<MeshIndex>& meshIndices,
+    const std::span<SkeletonVertex>& skeletonVertices)
 {
-    create(vertices, indices, skel_verticies);
+    create(vertices, meshIndices, skeletonVertices);
 }
 
-void SkinnedMesh::create(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices,
-    const std::span<SkeletonVertex>& skel_verticies)
+void SkinnedMesh::create(const std::span<Vertex>& vertices, const std::span<MeshIndex>& meshIndices,
+    const std::span<SkeletonVertex>& skeletonVertices)
 {
-    Mesh::create(vertices, indices);
-    this->skel_verticies.assign(skel_verticies.begin(), skel_verticies.end());
+    Mesh::create(vertices, meshIndices);
+    skel_verticies.assign(skeletonVertices.begin(), skeletonVertices.end());
 }
 
 SkinnedMesh::~SkinnedMesh()
@@ -108,9 +108,9 @@ void SkinnedMesh::add_skeleton_vertex(const SkeletonVertex& vertex)
     skel_verticies.push_back(vertex);
 }
 
-void SkinnedMesh::reserve_skeleton_vertices(size_t count)
+void SkinnedMesh::reserve_skeleton_vertices(size_t capacity)
 {
-    skel_verticies.reserve(count);
+    skel_verticies.reserve(capacity);
 }
 
 // ============================================================

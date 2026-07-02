@@ -1,164 +1,145 @@
 #include "Player.hpp"
 
+#include "../GameSystems.hpp"
+
+#include "../../engine/ecs/EcsComponents.hpp"
+#include "../../engine/ecs/Registry.hpp"
+#include "../../engine/systems/TransformSystem.hpp"
+
 #include <algorithm>
-#include <cmath>
 
-#include "../../engine/components/MeshRenderer.hpp"
-#include "../../engine/components/Camera.hpp"
-#include "../../engine/ecs/Entity.hpp"
+Player::Player(
+    World& world,
+    engine::ecs::EntityId parent,
+    std::shared_ptr<MeshRenderer> bodyMesh,
+    std::shared_ptr<Material> bodyMaterial,
+    std::shared_ptr<MeshRenderer> weaponMesh,
+    std::shared_ptr<Material> weaponMaterial)
+    : worldRef(world)
+{
+    root = worldRef.createEntity("Player", glm::vec3(0.0f));
+    worldRef.setParent(root, parent);
+    worldRef.registry().emplace<game::PlayerTag>(root);
 
-// Helper: get world position from an entity's world matrix.
-// (glm uses column-major; translation is in the 4th column)
-static glm::vec3 getEntityWorldPosition(const Entity* e) {
-    if (!e) return glm::vec3(0.0f);
-    glm::mat4 wm = e->getWorldMatrix();
-    return glm::vec3(wm[3]);
-}
-
-// Constructor: create root, body and weapon entities using World API
-Player::Player(World& world,
-               Entity* parent,
-               MeshRenderer* bodyMesh,
-               Material* bodyMaterial,
-               MeshRenderer* weaponMesh,
-               Material* weaponMaterial)
-    : worldRef(world) {
-
-    // create root as a simple (empty) entity and set parent if provided
-    root = worldRef.add_entity();
-    if (parent) {
-        root->setParent(parent);
-    }
-
-    // create body as a child of root, with a local offset and the provided mesh/material
-    body = worldRef.createEntityWithParams(
+    body = worldRef.createRenderable(
+        "PlayerBody",
+        std::move(bodyMesh),
+        std::move(bodyMaterial),
         root,
-        /* position */ glm::vec3{0.0f, 1.0f, 0.0f},
-        /* rotation */ glm::quat{1.0f, 0.0f, 0.0f, 0.0f},
-        /* scale    */ glm::vec3{1.0f, 2.0f, 1.0f},
-        /* mesh     */ bodyMesh,
-        /* material */ bodyMaterial
-    );
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 2.0f, 1.0f));
 
-    // create weapon as a child of body, with its own transform and mesh/material
-    weapon = worldRef.createEntityWithParams(
+    weapon = worldRef.createRenderable(
+        "PlayerWeapon",
+        std::move(weaponMesh),
+        std::move(weaponMaterial),
         body,
-        /* position */ glm::vec3{0.75f, 0.75f, 0.0f},
-        /* rotation */ glm::quat{1.0f, 0.0f, 0.0f, 0.0f},
-        /* scale    */ glm::vec3{0.2f, 0.8f, 0.2f},
-        /* mesh     */ weaponMesh,
-        /* material */ weaponMaterial
-    );
+        glm::vec3(0.75f, 0.75f, 0.0f),
+        glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+        glm::vec3(0.2f, 0.8f, 0.2f));
 
-    // remember weapon rest rotation (local)
-    if (weapon) {
-        weaponRestRotation = weapon->getRotation();
-    }
-
-}
-
-void Player::setPosition(const glm::vec3& p) {
-    if (root) {
-        root->setPosition(p);
+    auto& data = worldRef.registry().emplace<game::PlayerController>(root);
+    data.body = body;
+    data.weapon = weapon;
+    if (const auto* weaponTransform = worldRef.registry().get<engine::ecs::Transform>(weapon)) {
+        data.weaponRestRotation = weaponTransform->rotation;
     }
 }
 
-glm::vec3 Player::getPosition() const {
-    if (!root) return glm::vec3(0.0f);
-    // Use world position (safer if root ever has a parent)
-    return getEntityWorldPosition(root);
+void Player::setInput(const PlayerInput& input)
+{
+    if (auto* data = controller()) {
+        data->input = input;
+    }
 }
 
-void Player::setBlockSpeedMultiplier(float multiplier) {
-    blockSpeedMultiplier = std::clamp(multiplier, 0.0f, 1.0f);
+void Player::update(float deltaTime)
+{
+    game::updatePlayerController(worldRef, root, deltaTime);
+    TransformSystem::updateWorldTransforms(worldRef.registry());
+    if (cameraFollow) {
+        cameraFollow->update(deltaTime);
+    }
 }
 
-void Player::setAttackTimings(float duration, float cooldown) {
-    attackDuration = std::max(0.01f, duration);
-    attackCooldown = std::max(0.0f, cooldown);
+void Player::setPosition(const glm::vec3& position)
+{
+    game::setLocalPosition(worldRef, root, position);
 }
 
-void Player::setDodgeTimings(float duration, float cooldown) {
-    dodgeDuration = std::max(0.01f, duration);
-    dodgeCooldown = std::max(0.0f, cooldown);
+glm::vec3 Player::getPosition() const
+{
+    return game::worldPosition(const_cast<World&>(worldRef), root);
 }
 
+void Player::setMoveSpeed(float speed)
+{
+    if (auto* data = controller()) {
+        data->moveSpeed = std::max(0.0f, speed);
+    }
+}
 
-void Player::attachCamera(Camera* camera,
-                          const glm::vec3& offset,
-                          const glm::vec3& lookOffset) {
+void Player::setBlockSpeedMultiplier(float multiplier)
+{
+    if (auto* data = controller()) {
+        data->blockSpeedMultiplier = std::clamp(multiplier, 0.0f, 1.0f);
+    }
+}
 
-    // create the non-ECS camera follow behavior (no Entity changes)
-    cameraFollow = std::make_unique<CameraFollowPlayer>(camera, root);
+void Player::setDodgeSpeed(float speed)
+{
+    if (auto* data = controller()) {
+        data->dodgeSpeed = std::max(0.0f, speed);
+    }
+}
+
+void Player::setAttackTimings(float duration, float cooldown)
+{
+    if (auto* data = controller()) {
+        data->attackDuration = std::max(0.01f, duration);
+        data->attackCooldown = std::max(0.0f, cooldown);
+    }
+}
+
+void Player::setDodgeTimings(float duration, float cooldown)
+{
+    if (auto* data = controller()) {
+        data->dodgeDuration = std::max(0.01f, duration);
+        data->dodgeCooldown = std::max(0.0f, cooldown);
+    }
+}
+
+void Player::attachCamera(Camera* camera, const glm::vec3& offset, const glm::vec3& lookOffset)
+{
+    cameraFollow = std::make_unique<CameraFollowPlayer>(camera, &worldRef.registry(), root);
     cameraFollow->setOffsets(offset, lookOffset);
 }
 
-void Player::update(float dt) {
-    if (!root) return;
-
-    blocking = inputState.block;
-
-    attackTimer = std::max(0.0f, attackTimer - dt);
-    dodgeTimer = std::max(0.0f, dodgeTimer - dt);
-    attackCooldownTimer = std::max(0.0f, attackCooldownTimer - dt);
-    dodgeCooldownTimer = std::max(0.0f, dodgeCooldownTimer - dt);
-
-    // Can't attack while blocking
-    if (inputState.attack && !blocking && attackCooldownTimer <= 0.0f && attackTimer <= 0.0f) {
-        attackTimer = attackDuration;
-        attackCooldownTimer = attackCooldown;
-    }
-
-    if (inputState.dodge && dodgeCooldownTimer <= 0.0f && dodgeTimer <= 0.0f) {
-        dodgeTimer = dodgeDuration;
-        dodgeCooldownTimer = dodgeCooldown;
-    }
-
-    updateMovement(dt);
-    updateAttack(dt);
-
-    if (cameraFollow) {
-        cameraFollow->update(dt); // use dt
-    }
+bool Player::isBlocking() const
+{
+    const auto* data = controller();
+    return data ? data->blocking : false;
 }
 
-void Player::updateMovement(float dt) {
-    glm::vec3 move(inputState.move.x, 0.0f, inputState.move.y);
-    float len = glm::length(move);
-
-    if (len > 0.001f) {
-        move /= len;
-        facing = move;
-    }
-
-    float speed = blocking ? moveSpeed * blockSpeedMultiplier : moveSpeed;
-
-    if (dodgeTimer > 0.0f) {
-        // translate local position by dodge amount
-        glm::vec3 localPos = root->getPosition();
-        root->setPosition(localPos + facing * dodgeSpeed * dt);
-    } else if (len > 0.001f) {
-        glm::vec3 localPos = root->getPosition();
-        root->setPosition(localPos + move * speed * dt);
-    }
-
-    if (len > 0.001f) {
-        float yaw = std::atan2(facing.x, facing.z);
-        root->setRotation(glm::angleAxis(yaw, glm::vec3(0.0f, 1.0f, 0.0f)));
-    }
+bool Player::isAttacking() const
+{
+    const auto* data = controller();
+    return data ? data->attackTimer > 0.0f : false;
 }
 
-void Player::updateAttack(float) {
-    if (!weapon) return;
+bool Player::isDodging() const
+{
+    const auto* data = controller();
+    return data ? data->dodgeTimer > 0.0f : false;
+}
 
-    if (attackTimer > 0.0f) {
-        float t = 1.0f - (attackTimer / attackDuration);
-        float swing = std::sin(t * 3.1415926f);
-        weapon->setRotation(
-            weaponRestRotation *
-            glm::angleAxis(-swing * 1.2f, glm::vec3(0.0f, 1.0f, 0.0f))
-        );
-    } else {
-        weapon->setRotation(weaponRestRotation);
-    }
+game::PlayerController* Player::controller()
+{
+    return worldRef.registry().get<game::PlayerController>(root);
+}
+
+const game::PlayerController* Player::controller() const
+{
+    return worldRef.registry().get<game::PlayerController>(root);
 }

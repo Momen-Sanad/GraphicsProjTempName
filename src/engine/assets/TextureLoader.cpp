@@ -6,12 +6,12 @@
 // ------------------------------------------------------
 // Texture Cache
 // ------------------------------------------------------
-std::unordered_map<std::string, Texture*> TextureLoader::texture_cache;  // Cache to store loaded textures
+std::unordered_map<std::string, std::shared_ptr<Texture>> TextureLoader::texture_cache;  // Cache to store loaded textures
 
 // ------------------------------------------------------
 // Load a texture from file (if not already cached)
 // ------------------------------------------------------
-Texture* TextureLoader::load(const std::string& path, GLenum min_filter, GLenum mag_filter, GLenum wrap_s, GLenum wrap_t)
+std::shared_ptr<Texture> TextureLoader::readTexture(const std::string& path, GLenum min_filter, GLenum mag_filter, GLenum wrap_s, GLenum wrap_t)
 {
     // Check if the texture is already in the cache
     auto it = texture_cache.find(path);
@@ -38,7 +38,7 @@ Texture* TextureLoader::load(const std::string& path, GLenum min_filter, GLenum 
     else if (channels == 4) format = GL_RGBA;  // RGBA image (with alpha)
 
     // Create a new texture and initialize it with the image data
-    Texture* texture = new Texture();
+    auto texture = std::make_shared<Texture>();
     texture->create(width, height, data, format);  // Create the texture with the image dimensions and data
     texture->set_filters(min_filter, mag_filter);  // Set texture minification and magnification filters
     texture->set_wrap(wrap_s, wrap_t);  // Set the texture wrapping parameters for S and T coordinates
@@ -57,10 +57,6 @@ Texture* TextureLoader::load(const std::string& path, GLenum min_filter, GLenum 
 // ------------------------------------------------------
 void TextureLoader::clear_cache()
 {
-    // Iterate through all textures in the cache and delete them
-    for (auto& pair : texture_cache)
-        delete pair.second;
-
     texture_cache.clear();  // Clear the cache
 }
 
@@ -92,7 +88,6 @@ void TextureLoader::unload(const std::string& path)
     // If found, delete the texture and remove it from the cache
     if (it != texture_cache.end())
     {
-        delete it->second;  // Delete the texture object
         texture_cache.erase(it);  // Remove it from the cache
     }
 }
@@ -102,9 +97,5 @@ void TextureLoader::unload(const std::string& path)
 // ------------------------------------------------------
 void TextureLoader::unload_all()
 {
-    // Iterate through all textures in the cache and delete them
-    for (auto& pair : texture_cache)
-        delete pair.second;
-
     texture_cache.clear();  // Clear the cache
 }

@@ -1,56 +1,51 @@
 #pragma once
 
-#include <memory>
+#include "../GameComponents.hpp"
+
+#include "../../engine/assets/Material.hpp"
+#include "../../engine/components/CombatComponent.hpp"
+#include "../../engine/components/MeshRenderer.hpp"
+#include "../../engine/ecs/World.hpp"
+
 #include <glm/glm.hpp>
 
-#include "../../engine/ecs/World.hpp"
-#include "../../engine/components/HealthComponent.hpp"
-#include "../../engine/components/CombatComponent.hpp"
-#include "../../engine/components/HurtboxComponent.hpp"
-
-class Player;
+#include <memory>
 
 class Enemy {
 public:
-    Enemy(World& world, Entity* parent, MeshRenderer* bodyMesh, Material* bodyMaterial);
+    Enemy(
+        World& world,
+        engine::ecs::EntityId parent,
+        std::shared_ptr<MeshRenderer> bodyMesh,
+        std::shared_ptr<Material> bodyMaterial);
 
-    Entity* entity() const { return root; }
-    void setPosition(const glm::vec3& p);
+    engine::ecs::EntityId entity() const { return root; }
+    engine::ecs::EntityId getBody() const { return body; }
+
+    void setPosition(const glm::vec3& position);
     glm::vec3 getPosition() const;
-    
-    // AI behavior
-    void setTarget(Entity* target) { targetEntity = target; }
+
+    void setTarget(engine::ecs::EntityId target);
     void update(float deltaTime);
-    
-    // Combat
-    bool isAttacking() const { return attackTimer > 0.0f; }
-    CombatComponent& getCombat() { return combat; }
-    
-    // Settings
-    void setMoveSpeed(float speed) { moveSpeed = speed; }
-    void setAttackRange(float range) { attackRange = range; }
-    void setDetectionRange(float range) { detectionRange = range; }
+
+    bool isAttacking() const;
+    CombatComponent& getCombat();
+
+    void setMoveSpeed(float speed);
+    void setAttackRange(float range);
+    void setDetectionRange(float range);
 
 private:
+    game::EnemyAI* ai();
+    const game::EnemyAI* ai() const;
+
     World& worldRef;
-    Entity* root = nullptr;
-    Entity* body = nullptr;
-    Entity* targetEntity = nullptr;
-    
-    // AI params
-    float moveSpeed = 2.5f;
-    float attackRange = 2.0f;
-    float detectionRange = 15.0f;
-    
-    // Combat
-    CombatComponent combat;
-    float attackDuration = 0.3f;
-    float attackCooldown = 1.0f;
-    float attackTimer = 0.0f;
-    float attackCooldownTimer = 0.0f;
+    engine::ecs::EntityId root = engine::ecs::InvalidEntity;
+    engine::ecs::EntityId body = engine::ecs::InvalidEntity;
 };
 
-std::unique_ptr<Enemy> CreateEnemy(World& world,
-                                   Entity* parent,
-                                   MeshRenderer* bodyMesh,
-                                   Material* bodyMaterial);
+std::unique_ptr<Enemy> CreateEnemy(
+    World& world,
+    engine::ecs::EntityId parent,
+    std::shared_ptr<MeshRenderer> bodyMesh,
+    std::shared_ptr<Material> bodyMaterial);

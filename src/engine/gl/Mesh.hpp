@@ -10,6 +10,9 @@
 #include <vector>
 #include <cstdint>
 
+using MeshIndex = uint32_t;
+constexpr GLenum MESH_INDEX_GL_TYPE = GL_UNSIGNED_INT;
+
 // Color structure
 struct Color {
     uint8_t r, g, b, a;
@@ -33,14 +36,14 @@ class Mesh
 {
 protected:
     std::vector<Vertex> verticies;  // Vertex data
-    std::vector<uint16_t> indices;  // Index data
+    std::vector<MeshIndex> indices; // Index data
     size_t count;                   // Number of elements to draw
 
 public:
     // Constructors
     Mesh();
-    Mesh(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices);
-    void create(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices);
+    Mesh(const std::span<Vertex>& vertices, const std::span<MeshIndex>& indices);
+    void create(const std::span<Vertex>& vertices, const std::span<MeshIndex>& indices);
 
     // Destructor
     ~Mesh();
@@ -54,7 +57,7 @@ public:
 
     // Setters for mesh data
     void set_vertices(const std::span<Vertex>& positions);
-    void set_indices(const std::span<uint16_t>& indices);
+    void set_indices(const std::span<MeshIndex>& indices);
     void set_positions(const std::span<glm::vec3>& positions);
     void set_color(const Color& color);
     void set_colors(const std::span<Color>& colors);
@@ -64,11 +67,11 @@ public:
     void set_position(size_t index, const glm::vec3& position);
     void set_color(size_t index, const Color& color);
     void set_tex_coord(size_t index, const glm::vec2& tex_coord);
-    void set_index(size_t index, uint16_t value);
+    void set_index(size_t index, MeshIndex value);
 
     // Add methods
     void add_vertex(const Vertex& vertex);
-    void add_index(uint16_t index);
+    void add_index(MeshIndex index);
 
     // Reserve capacity
     void reserve_vertices(size_t count);
@@ -78,8 +81,8 @@ public:
     std::vector<Vertex>& get_vertices() { return verticies; }
     const std::vector<Vertex>& get_vertices() const { return verticies; }
 
-    std::vector<uint16_t>& get_indices() { return indices; }
-    const std::vector<uint16_t>& get_indices() const { return indices; }
+    std::vector<MeshIndex>& get_indices() { return indices; }
+    const std::vector<MeshIndex>& get_indices() const { return indices; }
 
     // ============== GETTERS ==============
     size_t get_vertex_count() const { return verticies.size(); }

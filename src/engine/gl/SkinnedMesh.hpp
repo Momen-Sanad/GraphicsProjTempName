@@ -10,10 +10,10 @@ private:
 public:
     // Constructors
     SkinnedMesh();
-    SkinnedMesh(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices,
-        const std::span<SkeletonVertex>& skel_verticies);
-    void create(const std::span<Vertex>& vertices, const std::span<uint16_t>& indices,
-        const std::span<SkeletonVertex>& skel_verticies);
+    SkinnedMesh(const std::span<Vertex>& vertices, const std::span<MeshIndex>& meshIndices,
+        const std::span<SkeletonVertex>& skeletonVertices);
+    void create(const std::span<Vertex>& vertices, const std::span<MeshIndex>& meshIndices,
+        const std::span<SkeletonVertex>& skeletonVertices);
 
     // Destructor
     ~SkinnedMesh();

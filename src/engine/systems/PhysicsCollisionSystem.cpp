@@ -1,5 +1,9 @@
 #include "PhysicsCollisionSystem.hpp"
 
+#include "../ecs/Registry.hpp"
+
+#include <limits>
+
 bool PhysicsCollisionSystem::computeMeshBounds(const Mesh& mesh, MeshBounds& outBounds) {
     const auto positions = mesh.get_positions();
     if (positions.empty()) return false;
@@ -17,14 +21,70 @@ bool PhysicsCollisionSystem::computeMeshBounds(const Mesh& mesh, MeshBounds& out
     return true;
 }
 
-bool PhysicsCollisionSystem::resolveStaticCollision(Entity* mover,
-                                                    const Collider& moverCollider,
-                                                    const Collider& staticCollider) {
-    if (!mover) return false;
-    if (!moverCollider.intersects(staticCollider)) return false;
+AABB PhysicsCollisionSystem::computeWorldAABB(
+    const engine::ecs::Transform& transform,
+    const engine::ecs::ColliderData& collider)
+{
+    glm::vec3 center = collider.localOffset;
+    glm::vec3 extents = collider.halfExtents;
 
-    AABB a = moverCollider.getWorldAABB();
-    AABB b = staticCollider.getWorldAABB();
+    glm::vec3 corners[8] = {
+        center + glm::vec3(-extents.x, -extents.y, -extents.z),
+        center + glm::vec3( extents.x, -extents.y, -extents.z),
+        center + glm::vec3(-extents.x,  extents.y, -extents.z),
+        center + glm::vec3( extents.x,  extents.y, -extents.z),
+        center + glm::vec3(-extents.x, -extents.y,  extents.z),
+        center + glm::vec3( extents.x, -extents.y,  extents.z),
+        center + glm::vec3(-extents.x,  extents.y,  extents.z),
+        center + glm::vec3( extents.x,  extents.y,  extents.z),
+    };
+
+    glm::mat4 world = transform.worldMatrix;
+    glm::vec3 minPos(std::numeric_limits<float>::infinity());
+    glm::vec3 maxPos(-std::numeric_limits<float>::infinity());
+    for (auto& corner : corners) {
+        corner = glm::vec3(world * glm::vec4(corner, 1.0f));
+        minPos = glm::min(minPos, corner);
+        maxPos = glm::max(maxPos, corner);
+    }
+
+    return {minPos, maxPos};
+}
+
+bool PhysicsCollisionSystem::intersects(
+    const engine::ecs::Transform& aTransform,
+    const engine::ecs::ColliderData& aCollider,
+    const engine::ecs::Transform& bTransform,
+    const engine::ecs::ColliderData& bCollider)
+{
+    AABB a = computeWorldAABB(aTransform, aCollider);
+    AABB b = computeWorldAABB(bTransform, bCollider);
+
+    return (a.min.x <= b.max.x && a.max.x >= b.min.x) &&
+           (a.min.y <= b.max.y && a.max.y >= b.min.y) &&
+           (a.min.z <= b.max.z && a.max.z >= b.min.z);
+}
+
+bool PhysicsCollisionSystem::resolveStaticCollision(
+    engine::ecs::Registry& registry,
+    engine::ecs::EntityId mover,
+    engine::ecs::EntityId obstacle)
+{
+    auto* moverTransform = registry.get<engine::ecs::Transform>(mover);
+    auto* moverCollider = registry.get<engine::ecs::ColliderData>(mover);
+    auto* obstacleTransform = registry.get<engine::ecs::Transform>(obstacle);
+    auto* obstacleCollider = registry.get<engine::ecs::ColliderData>(obstacle);
+
+    if (!moverTransform || !moverCollider || !obstacleTransform || !obstacleCollider) {
+        return false;
+    }
+
+    if (!intersects(*moverTransform, *moverCollider, *obstacleTransform, *obstacleCollider)) {
+        return false;
+    }
+
+    AABB a = computeWorldAABB(*moverTransform, *moverCollider);
+    AABB b = computeWorldAABB(*obstacleTransform, *obstacleCollider);
 
     glm::vec3 aCenter = (a.min + a.max) * 0.5f;
     glm::vec3 bCenter = (b.min + b.max) * 0.5f;
@@ -47,6 +107,7 @@ bool PhysicsCollisionSystem::resolveStaticCollision(Entity* mover,
         correction.z = (delta.z < 0.0f) ? -overlap.z : overlap.z;
     }
 
-    mover->setPosition(mover->getPosition() + correction);
+    moverTransform->position += correction;
+    moverTransform->dirty = true;
     return true;
 }

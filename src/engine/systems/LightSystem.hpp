@@ -20,6 +20,7 @@ public:
 
     // Update the GPU UBO with current light values (call whenever lights change, or every frame)
     void updateUBO();
+    void bindToShader(std::shared_ptr<class Shader> shader);
 
     // For legacy compatibility - still available if you want to send to individual shader
     void setupLightsInShader(std::shared_ptr<class Shader> shader);

@@ -80,6 +80,7 @@ out vec4 frag_color;
 
 uniform vec3 camera_pos;
 uniform vec3 ambient;
+uniform int u_debugMode;
 
 // This will define the maximum number of lights we can receive.
 #define MAX_LIGHT_COUNT 8
@@ -95,6 +96,21 @@ void main() {
     vec3 normal = normalize(fs_in.normal); // Although the normal was already normalized, it may become shorter during interpolation.
     vec3 view = normalize(camera_pos - fs_in.world);
 
+    if (u_debugMode == 1) {
+        frag_color = fs_in.color * vec4(sampled.diffuse, sampled.alpha);
+        return;
+    }
+    if (u_debugMode == 2) {
+        frag_color = vec4(normal * 0.5 + 0.5, sampled.alpha);
+        return;
+    }
+    if (u_debugMode == 5) {
+        float roughness = texture(material.roughness_map, fs_in.tex_coord).r;
+        float ao = texture(material.ambient_occlusion_map, fs_in.tex_coord).r;
+        frag_color = vec4(roughness, ao, length(sampled.emissive), sampled.alpha);
+        return;
+    }
+
     // Initially the accumulated light will hold the ambient light and the emissive light (light coming out of the object).
     vec3 accumulated_light = sampled.emissive + sampled.ambient * ambient;
 
@@ -105,11 +121,7 @@ void main() {
         Light light = lights[index];
         vec3 Ldir;
         float attenuation = 1.0;
-        float intensity = 1.0;
-        // if light struct had intensity, you can use it:
-        #ifdef LIGHT_HAS_INTENSITY
-            intensity = light.intensity; // if defined in GLSL
-        #endif
+        float intensity = light.intensity;
 
         if(light.type == TYPE_DIRECTIONAL) {
             // For directional lights, we treat light.direction as the direction the light is pointing.
@@ -131,7 +143,7 @@ void main() {
             if(light.type == TYPE_SPOT){
                 // ensure light.direction is normalized
                 vec3 spotDir = normalize(light.direction);
-                float cos_angle = dot(spotDir, Ldir);
+                float cos_angle = dot(spotDir, -Ldir);
                 attenuation *= smoothstep(light.cos_outer_angle, light.cos_inner_angle, cos_angle);
             }
         }
@@ -145,6 +157,10 @@ void main() {
         accumulated_light += (diffuse + specular) * attenuation * intensity;
     }
 
+    if (u_debugMode == 3) {
+        frag_color = vec4(accumulated_light, sampled.alpha);
+        return;
+    }
 
     // frag_color = vec4(1, 0, 1, 1);
     frag_color = fs_in.color * vec4(accumulated_light, sampled.alpha);

@@ -30,37 +30,32 @@ bool SceneManager::loadScene(const string& filePath) {
 
    // Create a cube mesh for scene entities
    Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));
-   MeshRenderer* cubeRenderer = new MeshRenderer();
-   cubeRenderer->upload(cubeMesh);
+   auto cubeRenderer = world->assets().createMeshRenderer("scene:cube", cubeMesh);
 
    // Create entities
-   unordered_map<string, Entity*> entityMap;
+   unordered_map<string, engine::ecs::EntityId> entityMap;
    
    // First pass: create all entities
    for (const auto& entityData : scene->entities) {
-       Entity* entity = world->createEntityWithParams(nullptr);
+       engine::ecs::EntityId entity = world->createEntity(
+           entityData.name,
+           arrayToVec3(entityData.position),
+           eulerToQuat(entityData.rotation),
+           arrayToVec3(entityData.scale));
        entityMap[entityData.name] = entity;
-       
-       // Set transform
-       entity->setPosition(arrayToVec3(entityData.position));
-       entity->setRotation(eulerToQuat(entityData.rotation));
-       entity->setScale(arrayToVec3(entityData.scale));
-       
-       // Assign cube mesh to all entities
-       entity->setMesh(cubeRenderer);
-       // it shouldn't "cube" to all entities
-       // rather it should have one of the primitive shapes we have
-       // like plane, cylinder, sphere etc..
-       
+
+       world->registry().emplace<engine::ecs::Renderable>(
+           entity,
+           engine::ecs::Renderable{cubeRenderer, nullptr});
    }
    
    // Second pass: set up hierarchy
    for (const auto& entityData : scene->entities) {
-       Entity* entity = entityMap[entityData.name];
+       engine::ecs::EntityId entity = entityMap[entityData.name];
        
        // Set parent
        if (!entityData.parent.empty() && entityMap.find(entityData.parent) != entityMap.end()) {
-           entity->setParent(entityMap[entityData.parent]);
+           world->setParent(entity, entityMap[entityData.parent]);
        }
        
        // Create simple tinted material if tint is specified
@@ -71,11 +66,13 @@ bool SceneManager::loadScene(const string& filePath) {
            );
 
            if (shader) {
-               TintedMaterial* tintedMat = new TintedMaterial();
+               auto tintedMat = std::make_shared<TintedMaterial>();
                tintedMat->setShader(shader);
                tintedMat->tint = glm::vec4(entityData.tint[0], entityData.tint[1], 
                                           entityData.tint[2], entityData.tint[3]);
-               entity->setMaterial(tintedMat);
+               if (auto* renderable = world->registry().get<engine::ecs::Renderable>(entity)) {
+                   renderable->material = tintedMat;
+               }
            }
        }
    }

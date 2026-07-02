@@ -10,9 +10,11 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "tinygltf/tiny_gltf.h"
 #include <glm/gtc/type_ptr.hpp>
+#include <algorithm>
+#include <cstring>
 
 
-Mesh* MeshLoader::get_mesh(const std::string& filepath)
+std::shared_ptr<Mesh> MeshLoader::get_mesh(const std::string& filepath)
 {
     auto it = mesh_cache.find(filepath);
 
@@ -47,9 +49,229 @@ struct VertexHash
     }
 };
 
+namespace {
+    template <typename T>
+    T read_pod(const unsigned char* ptr) {
+        T value{};
+        std::memcpy(&value, ptr, sizeof(T));
+        return value;
+    }
+
+    size_t component_size(int component_type) {
+        switch (component_type) {
+        case TINYGLTF_COMPONENT_TYPE_BYTE:
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+            return 1;
+        case TINYGLTF_COMPONENT_TYPE_SHORT:
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+            return 2;
+        case TINYGLTF_COMPONENT_TYPE_INT:
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+        case TINYGLTF_COMPONENT_TYPE_FLOAT:
+            return 4;
+        case TINYGLTF_COMPONENT_TYPE_DOUBLE:
+            return 8;
+        default:
+            return 0;
+        }
+    }
+
+    size_t component_count(int accessor_type) {
+        switch (accessor_type) {
+        case TINYGLTF_TYPE_SCALAR:
+            return 1;
+        case TINYGLTF_TYPE_VEC2:
+            return 2;
+        case TINYGLTF_TYPE_VEC3:
+            return 3;
+        case TINYGLTF_TYPE_VEC4:
+            return 4;
+        case TINYGLTF_TYPE_MAT4:
+            return 16;
+        default:
+            return 0;
+        }
+    }
+
+    size_t accessor_stride(const tinygltf::Model& model, const tinygltf::Accessor& accessor) {
+        if (accessor.bufferView < 0 ||
+            accessor.bufferView >= static_cast<int>(model.bufferViews.size())) {
+            return 0;
+        }
+
+        const tinygltf::BufferView& buffer_view = model.bufferViews[accessor.bufferView];
+        const size_t packed_size = component_size(accessor.componentType) * component_count(accessor.type);
+        return buffer_view.byteStride > 0 ? buffer_view.byteStride : packed_size;
+    }
+
+    const unsigned char* accessor_element_ptr(
+        const tinygltf::Model& model,
+        const tinygltf::Accessor& accessor,
+        size_t index)
+    {
+        if (accessor.bufferView < 0 ||
+            accessor.bufferView >= static_cast<int>(model.bufferViews.size())) {
+            return nullptr;
+        }
+
+        const tinygltf::BufferView& buffer_view = model.bufferViews[accessor.bufferView];
+        if (buffer_view.buffer < 0 ||
+            buffer_view.buffer >= static_cast<int>(model.buffers.size())) {
+            return nullptr;
+        }
+
+        const tinygltf::Buffer& buffer = model.buffers[buffer_view.buffer];
+        const size_t stride = accessor_stride(model, accessor);
+        const size_t elem_size = component_size(accessor.componentType) * component_count(accessor.type);
+        if (stride == 0 || elem_size == 0) {
+            return nullptr;
+        }
+
+        const size_t offset = buffer_view.byteOffset + accessor.byteOffset + index * stride;
+        if (offset > buffer.data.size() || elem_size > buffer.data.size() - offset) {
+            return nullptr;
+        }
+
+        return buffer.data.data() + offset;
+    }
+
+    float read_component_float(const unsigned char* ptr, int component_type, bool normalized) {
+        switch (component_type) {
+        case TINYGLTF_COMPONENT_TYPE_BYTE: {
+            const int8_t value = read_pod<int8_t>(ptr);
+            return normalized ? std::max(value / 127.0f, -1.0f) : static_cast<float>(value);
+        }
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE: {
+            const uint8_t value = read_pod<uint8_t>(ptr);
+            return normalized ? value / 255.0f : static_cast<float>(value);
+        }
+        case TINYGLTF_COMPONENT_TYPE_SHORT: {
+            const int16_t value = read_pod<int16_t>(ptr);
+            return normalized ? std::max(value / 32767.0f, -1.0f) : static_cast<float>(value);
+        }
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT: {
+            const uint16_t value = read_pod<uint16_t>(ptr);
+            return normalized ? value / 65535.0f : static_cast<float>(value);
+        }
+        case TINYGLTF_COMPONENT_TYPE_INT:
+            return static_cast<float>(read_pod<int32_t>(ptr));
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+            return static_cast<float>(read_pod<uint32_t>(ptr));
+        case TINYGLTF_COMPONENT_TYPE_FLOAT:
+            return read_pod<float>(ptr);
+        case TINYGLTF_COMPONENT_TYPE_DOUBLE:
+            return static_cast<float>(read_pod<double>(ptr));
+        default:
+            return 0.0f;
+        }
+    }
+
+    uint32_t read_component_uint(const unsigned char* ptr, int component_type) {
+        switch (component_type) {
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+            return read_pod<uint8_t>(ptr);
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+            return read_pod<uint16_t>(ptr);
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+            return read_pod<uint32_t>(ptr);
+        case TINYGLTF_COMPONENT_TYPE_BYTE:
+            return static_cast<uint32_t>(std::max<int8_t>(read_pod<int8_t>(ptr), 0));
+        case TINYGLTF_COMPONENT_TYPE_SHORT:
+            return static_cast<uint32_t>(std::max<int16_t>(read_pod<int16_t>(ptr), 0));
+        case TINYGLTF_COMPONENT_TYPE_INT:
+            return static_cast<uint32_t>(std::max<int32_t>(read_pod<int32_t>(ptr), 0));
+        default:
+            return 0;
+        }
+    }
+
+    glm::vec4 read_accessor_vec4(
+        const tinygltf::Model& model,
+        const tinygltf::Accessor& accessor,
+        size_t index,
+        const glm::vec4& fallback = glm::vec4(0.0f))
+    {
+        const unsigned char* ptr = accessor_element_ptr(model, accessor, index);
+        if (!ptr) {
+            return fallback;
+        }
+
+        glm::vec4 result = fallback;
+        const size_t count = std::min<size_t>(4, component_count(accessor.type));
+        const size_t size = component_size(accessor.componentType);
+        for (size_t component = 0; component < count; ++component) {
+            result[static_cast<int>(component)] =
+                read_component_float(ptr + component * size, accessor.componentType, accessor.normalized);
+        }
+        return result;
+    }
+
+    glm::ivec4 read_accessor_ivec4(
+        const tinygltf::Model& model,
+        const tinygltf::Accessor& accessor,
+        size_t index,
+        const glm::ivec4& fallback = glm::ivec4(0))
+    {
+        const unsigned char* ptr = accessor_element_ptr(model, accessor, index);
+        if (!ptr) {
+            return fallback;
+        }
+
+        glm::ivec4 result = fallback;
+        const size_t count = std::min<size_t>(4, component_count(accessor.type));
+        const size_t size = component_size(accessor.componentType);
+        for (size_t component = 0; component < count; ++component) {
+            result[static_cast<int>(component)] =
+                static_cast<int>(read_component_uint(ptr + component * size, accessor.componentType));
+        }
+        return result;
+    }
+
+    MeshIndex read_accessor_index(
+        const tinygltf::Model& model,
+        const tinygltf::Accessor& accessor,
+        size_t index)
+    {
+        const unsigned char* ptr = accessor_element_ptr(model, accessor, index);
+        if (!ptr) {
+            return 0;
+        }
+        return static_cast<MeshIndex>(read_component_uint(ptr, accessor.componentType));
+    }
+
+    glm::mat4 read_accessor_mat4(
+        const tinygltf::Model& model,
+        const tinygltf::Accessor& accessor,
+        size_t index)
+    {
+        const unsigned char* ptr = accessor_element_ptr(model, accessor, index);
+        if (!ptr) {
+            return glm::mat4(1.0f);
+        }
+
+        glm::mat4 matrix(1.0f);
+        const size_t size = component_size(accessor.componentType);
+        for (size_t component = 0; component < 16; ++component) {
+            matrix[static_cast<int>(component / 4)][static_cast<int>(component % 4)] =
+                read_component_float(ptr + component * size, accessor.componentType, accessor.normalized);
+        }
+        return matrix;
+    }
+
+    bool has_required_unsupported_extensions(const tinygltf::Model& model) {
+        if (!model.extensionsRequired.empty()) {
+            std::cerr << "Unsupported required glTF extension: "
+                      << model.extensionsRequired.front() << std::endl;
+            return true;
+        }
+
+        return false;
+    }
+}
+
 
 // supports loading a mesh from an .obj file
-Mesh* MeshLoader::load(const char* path)
+std::shared_ptr<Mesh> MeshLoader::readObjMesh(const char* path)
 {
     // Check file extension
     std::string filepath = path;
@@ -60,14 +282,14 @@ Mesh* MeshLoader::load(const char* path)
     if (ext != ".obj")
     {
         printf("Unsupported mesh format: %s\n", ext.c_str());
-        return {};
+        return nullptr;
     }
 
     std::vector<Vertex> vertices;
-    std::vector<uint16_t> indices;
+    std::vector<MeshIndex> indices;
 
     // Map to remove duplicate vertices
-    std::unordered_map<Vertex, uint16_t, VertexHash> vertex_map;
+    std::unordered_map<Vertex, MeshIndex, VertexHash> vertex_map;
 
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -78,7 +300,7 @@ Mesh* MeshLoader::load(const char* path)
     if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, path))
     {
         printf("Failed to load obj file \"%s\" due to error: %s\n", path, err.c_str());
-        return {};
+        return nullptr;
     }
     if (!warn.empty())
         printf("Warning while loading obj file \"%s\" due to error: %s\n", path, warn.c_str());
@@ -88,31 +310,39 @@ Mesh* MeshLoader::load(const char* path)
     {
         for (const auto& index : shape.mesh.indices)
         {
-            Vertex vertex =
-            {
-                .position = {
-                    attrib.vertices[3 * index.vertex_index + 0],
-                    attrib.vertices[3 * index.vertex_index + 1],
-                    attrib.vertices[3 * index.vertex_index + 2]
-                },
-                .color = {
-                    uint8_t(attrib.colors[3 * index.vertex_index + 0] * 255),
-                    uint8_t(attrib.colors[3 * index.vertex_index + 1] * 255),
-                    uint8_t(attrib.colors[3 * index.vertex_index + 2] * 255),
+            Vertex vertex{};
+            vertex.position = {
+                attrib.vertices[3 * index.vertex_index + 0],
+                attrib.vertices[3 * index.vertex_index + 1],
+                attrib.vertices[3 * index.vertex_index + 2]
+            };
+            vertex.color = WHITE;
+            vertex.tex_coord = glm::vec2(0.0f);
+
+            if (index.vertex_index >= 0 &&
+                (3 * index.vertex_index + 2) < static_cast<int>(attrib.colors.size())) {
+                vertex.color = {
+                    static_cast<uint8_t>(glm::clamp(attrib.colors[3 * index.vertex_index + 0], 0.0f, 1.0f) * 255.0f),
+                    static_cast<uint8_t>(glm::clamp(attrib.colors[3 * index.vertex_index + 1], 0.0f, 1.0f) * 255.0f),
+                    static_cast<uint8_t>(glm::clamp(attrib.colors[3 * index.vertex_index + 2], 0.0f, 1.0f) * 255.0f),
                     255
-                },
-                .tex_coord = {
+                };
+            }
+
+            if (index.texcoord_index >= 0 &&
+                (2 * index.texcoord_index + 1) < static_cast<int>(attrib.texcoords.size())) {
+                vertex.tex_coord = {
                     attrib.texcoords[2 * index.texcoord_index + 0],
                     attrib.texcoords[2 * index.texcoord_index + 1]
-                }
-            };
+                };
+            }
 
             // Check if vertex already exists
             auto it = vertex_map.find(vertex);
             if (it == vertex_map.end())
             {
                 // Add new unique vertex
-                auto new_vertex_index = static_cast<uint16_t>(vertices.size());
+                auto new_vertex_index = static_cast<MeshIndex>(vertices.size());
                 vertex_map[vertex] = new_vertex_index;
                 indices.push_back(new_vertex_index);
                 vertices.push_back(vertex);
@@ -123,13 +353,13 @@ Mesh* MeshLoader::load(const char* path)
         }
     }
 
-    Mesh* mesh = new Mesh();
+    auto mesh = std::make_shared<Mesh>();
     mesh->create(vertices, indices);
     return mesh;
 }
 
 // Initialize static members
-std::unordered_map<std::string, Mesh*> MeshLoader::mesh_cache;
+std::unordered_map<std::string, std::shared_ptr<Mesh>> MeshLoader::mesh_cache;
 
 // Memory management
 void MeshLoader::unload(const std::string& filepath)
@@ -137,8 +367,6 @@ void MeshLoader::unload(const std::string& filepath)
     auto cache_it = mesh_cache.find(filepath);
     if (cache_it != mesh_cache.end())
     {
-        // Simply delete the Mesh object
-        delete cache_it->second;
         mesh_cache.erase(cache_it);
 
         std::cout << "Unloaded mesh from cache: " << filepath << std::endl;
@@ -153,13 +381,6 @@ void MeshLoader::unload_all()
 {
     std::cout << "Unloading all cached meshes..." << std::endl;
 
-    // Delete all Mesh objects
-    for (auto& pair : mesh_cache)
-    {
-        delete pair.second;
-    }
-
-    // Clear the cache
     mesh_cache.clear();
 
     std::cout << "All cached meshes unloaded. Total: " << mesh_cache.size() << " meshes remaining." << std::endl;
@@ -176,7 +397,7 @@ size_t MeshLoader::get_loaded_count()
     return mesh_cache.size();
 }
 
-ModelData* MeshLoader::load_gltf(const char* path)
+std::shared_ptr<ModelData> MeshLoader::readGltfModel(const char* path)
 {
     std::string filepath = path;
 
@@ -207,7 +428,13 @@ ModelData* MeshLoader::load_gltf(const char* path)
         return nullptr;
     }
 
-    ModelData* model_data = new ModelData();
+    if (has_required_unsupported_extensions(gltf_model)) {
+        std::cerr << "Failed to load GLTF because it requires unsupported extensions: "
+                  << filepath << std::endl;
+        return nullptr;
+    }
+
+    auto model_data = std::make_shared<ModelData>();
 
     // Load skeleton if present
     if (!gltf_model.skins.empty()) {
@@ -218,16 +445,9 @@ ModelData* MeshLoader::load_gltf(const char* path)
         std::vector<glm::mat4> inverse_bind_matrices;
         if (skin.inverseBindMatrices >= 0) {
             const tinygltf::Accessor& accessor = gltf_model.accessors[skin.inverseBindMatrices];
-            const tinygltf::BufferView& buffer_view = gltf_model.bufferViews[accessor.bufferView];
-            const tinygltf::Buffer& buffer = gltf_model.buffers[buffer_view.buffer];
-
-            const float* data = reinterpret_cast<const float*>(
-                &buffer.data[buffer_view.byteOffset + accessor.byteOffset]);
 
             for (size_t i = 0; i < accessor.count; ++i) {
-                glm::mat4 mat;
-                memcpy(glm::value_ptr(mat), &data[i * 16], 16 * sizeof(float));
-                inverse_bind_matrices.push_back(mat);
+                inverse_bind_matrices.push_back(read_accessor_mat4(gltf_model, accessor, i));
             }
         }
 
@@ -272,28 +492,19 @@ ModelData* MeshLoader::load_gltf(const char* path)
         for (const auto& primitive : gltf_mesh.primitives) {
             std::vector<Vertex> vertices;
             std::vector<SkeletonVertex> skel_vertices;
-            std::vector<uint16_t> indices;
+            std::vector<MeshIndex> indices;
 
             size_t vertex_count = 0;
 
             // Load positions (required)
             if (primitive.attributes.find("POSITION") != primitive.attributes.end()) {
                 const tinygltf::Accessor& accessor = gltf_model.accessors[primitive.attributes.at("POSITION")];
-                const tinygltf::BufferView& buffer_view = gltf_model.bufferViews[accessor.bufferView];
-                const tinygltf::Buffer& buffer = gltf_model.buffers[buffer_view.buffer];
-
-                const float* positions = reinterpret_cast<const float*>(
-                    &buffer.data[buffer_view.byteOffset + accessor.byteOffset]);
 
                 vertex_count = accessor.count;
                 vertices.resize(vertex_count);
 
                 for (size_t i = 0; i < vertex_count; ++i) {
-                    vertices[i].position = glm::vec3(
-                        positions[i * 3 + 0],
-                        positions[i * 3 + 1],
-                        positions[i * 3 + 2]
-                    );
+                    vertices[i].position = glm::vec3(read_accessor_vec4(gltf_model, accessor, i));
                     vertices[i].color = WHITE;  // Default color
                     vertices[i].tex_coord = glm::vec2(0.0f);  // Default UV
                 }
@@ -302,17 +513,27 @@ ModelData* MeshLoader::load_gltf(const char* path)
             // Load texture coordinates
             if (primitive.attributes.find("TEXCOORD_0") != primitive.attributes.end()) {
                 const tinygltf::Accessor& accessor = gltf_model.accessors[primitive.attributes.at("TEXCOORD_0")];
-                const tinygltf::BufferView& buffer_view = gltf_model.bufferViews[accessor.bufferView];
-                const tinygltf::Buffer& buffer = gltf_model.buffers[buffer_view.buffer];
-
-                const float* tex_coords = reinterpret_cast<const float*>(
-                    &buffer.data[buffer_view.byteOffset + accessor.byteOffset]);
 
                 for (size_t i = 0; i < vertex_count && i < accessor.count; ++i) {
-                    vertices[i].tex_coord = glm::vec2(
-                        tex_coords[i * 2 + 0],
-                        tex_coords[i * 2 + 1]
-                    );
+                    vertices[i].tex_coord = glm::vec2(read_accessor_vec4(gltf_model, accessor, i));
+                }
+            }
+
+            if (primitive.attributes.find("COLOR_0") != primitive.attributes.end()) {
+                const tinygltf::Accessor& accessor = gltf_model.accessors[primitive.attributes.at("COLOR_0")];
+
+                for (size_t i = 0; i < vertex_count && i < accessor.count; ++i) {
+                    glm::vec4 color = read_accessor_vec4(
+                        gltf_model,
+                        accessor,
+                        i,
+                        glm::vec4(1.0f));
+                    vertices[i].color = {
+                        static_cast<uint8_t>(glm::clamp(color.r, 0.0f, 1.0f) * 255.0f),
+                        static_cast<uint8_t>(glm::clamp(color.g, 0.0f, 1.0f) * 255.0f),
+                        static_cast<uint8_t>(glm::clamp(color.b, 0.0f, 1.0f) * 255.0f),
+                        static_cast<uint8_t>(glm::clamp(color.a, 0.0f, 1.0f) * 255.0f)
+                    };
                 }
             }
 
@@ -335,18 +556,10 @@ ModelData* MeshLoader::load_gltf(const char* path)
                 // Load normals
                 if (primitive.attributes.find("NORMAL") != primitive.attributes.end()) {
                     const tinygltf::Accessor& accessor = gltf_model.accessors[primitive.attributes.at("NORMAL")];
-                    const tinygltf::BufferView& buffer_view = gltf_model.bufferViews[accessor.bufferView];
-                    const tinygltf::Buffer& buffer = gltf_model.buffers[buffer_view.buffer];
-
-                    const float* normals = reinterpret_cast<const float*>(
-                        &buffer.data[buffer_view.byteOffset + accessor.byteOffset]);
 
                     for (size_t i = 0; i < vertex_count && i < accessor.count; ++i) {
-                        skel_vertices[i].normal = glm::vec3(
-                            normals[i * 3 + 0],
-                            normals[i * 3 + 1],
-                            normals[i * 3 + 2]
-                        );
+                        skel_vertices[i].normal = glm::normalize(
+                            glm::vec3(read_accessor_vec4(gltf_model, accessor, i, glm::vec4(0.0f, 1.0f, 0.0f, 0.0f))));
                     }
                 }
 
@@ -357,46 +570,23 @@ ModelData* MeshLoader::load_gltf(const char* path)
 
                     // Load joint indices
                     const tinygltf::Accessor& joint_accessor = gltf_model.accessors[primitive.attributes.at("JOINTS_0")];
-                    const tinygltf::BufferView& joint_buffer_view = gltf_model.bufferViews[joint_accessor.bufferView];
-                    const tinygltf::Buffer& joint_buffer = gltf_model.buffers[joint_buffer_view.buffer];
 
                     // Load weights
                     const tinygltf::Accessor& weight_accessor = gltf_model.accessors[primitive.attributes.at("WEIGHTS_0")];
-                    const tinygltf::BufferView& weight_buffer_view = gltf_model.bufferViews[weight_accessor.bufferView];
-                    const tinygltf::Buffer& weight_buffer = gltf_model.buffers[weight_buffer_view.buffer];
 
                     for (size_t i = 0; i < vertex_count; ++i) {
-                        // Joint indices (can be UNSIGNED_BYTE or UNSIGNED_SHORT)
-                        if (joint_accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT) {
-                            const uint16_t* joints = reinterpret_cast<const uint16_t*>(
-                                &joint_buffer.data[joint_buffer_view.byteOffset + joint_accessor.byteOffset]);
-                            skel_vertices[i].bone_ids = glm::ivec4(
-                                joints[i * 4 + 0],
-                                joints[i * 4 + 1],
-                                joints[i * 4 + 2],
-                                joints[i * 4 + 3]
-                            );
-                        }
-                        else {
-                            const uint8_t* joints = reinterpret_cast<const uint8_t*>(
-                                &joint_buffer.data[joint_buffer_view.byteOffset + joint_accessor.byteOffset]);
-                            skel_vertices[i].bone_ids = glm::ivec4(
-                                joints[i * 4 + 0],
-                                joints[i * 4 + 1],
-                                joints[i * 4 + 2],
-                                joints[i * 4 + 3]
-                            );
-                        }
+                        skel_vertices[i].bone_ids = read_accessor_ivec4(
+                            gltf_model,
+                            joint_accessor,
+                            i,
+                            glm::ivec4(-1));
 
-                        // Weights
-                        const float* weights = reinterpret_cast<const float*>(
-                            &weight_buffer.data[weight_buffer_view.byteOffset + weight_accessor.byteOffset]);
-                        skel_vertices[i].bone_weights = glm::vec4(
-                            weights[i * 4 + 0],
-                            weights[i * 4 + 1],
-                            weights[i * 4 + 2],
-                            weights[i * 4 + 3]
-                        );
+                        glm::vec4 weights = read_accessor_vec4(gltf_model, weight_accessor, i);
+                        const float weight_sum = weights.x + weights.y + weights.z + weights.w;
+                        if (weight_sum > 0.0f) {
+                            weights /= weight_sum;
+                        }
+                        skel_vertices[i].bone_weights = weights;
                     }
                 }
             }
@@ -404,31 +594,15 @@ ModelData* MeshLoader::load_gltf(const char* path)
             // Load indices
             if (primitive.indices >= 0) {
                 const tinygltf::Accessor& accessor = gltf_model.accessors[primitive.indices];
-                const tinygltf::BufferView& buffer_view = gltf_model.bufferViews[accessor.bufferView];
-                const tinygltf::Buffer& buffer = gltf_model.buffers[buffer_view.buffer];
 
                 indices.resize(accessor.count);
-
-                if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT) {
-                    const uint16_t* data = reinterpret_cast<const uint16_t*>(
-                        &buffer.data[buffer_view.byteOffset + accessor.byteOffset]);
-                    for (size_t i = 0; i < accessor.count; ++i) {
-                        indices[i] = data[i];
-                    }
+                for (size_t i = 0; i < accessor.count; ++i) {
+                    indices[i] = read_accessor_index(gltf_model, accessor, i);
                 }
-                else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT) {
-                    const uint32_t* data = reinterpret_cast<const uint32_t*>(
-                        &buffer.data[buffer_view.byteOffset + accessor.byteOffset]);
-                    for (size_t i = 0; i < accessor.count; ++i) {
-                        indices[i] = static_cast<uint16_t>(data[i]);
-                    }
-                }
-                else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE) {
-                    const uint8_t* data = reinterpret_cast<const uint8_t*>(
-                        &buffer.data[buffer_view.byteOffset + accessor.byteOffset]);
-                    for (size_t i = 0; i < accessor.count; ++i) {
-                        indices[i] = static_cast<uint16_t>(data[i]);
-                    }
+            } else {
+                indices.resize(vertex_count);
+                for (size_t i = 0; i < vertex_count; ++i) {
+                    indices[i] = static_cast<MeshIndex>(i);
                 }
             }
 
@@ -450,17 +624,9 @@ ModelData* MeshLoader::load_gltf(const char* path)
 
             // Get time values
             const tinygltf::Accessor& time_accessor = gltf_model.accessors[sampler.input];
-            const tinygltf::BufferView& time_buffer_view = gltf_model.bufferViews[time_accessor.bufferView];
-            const tinygltf::Buffer& time_buffer = gltf_model.buffers[time_buffer_view.buffer];
-            const float* times = reinterpret_cast<const float*>(
-                &time_buffer.data[time_buffer_view.byteOffset + time_accessor.byteOffset]);
 
             // Get output values
             const tinygltf::Accessor& output_accessor = gltf_model.accessors[sampler.output];
-            const tinygltf::BufferView& output_buffer_view = gltf_model.bufferViews[output_accessor.bufferView];
-            const tinygltf::Buffer& output_buffer = gltf_model.buffers[output_buffer_view.buffer];
-            const float* outputs = reinterpret_cast<const float*>(
-                &output_buffer.data[output_buffer_view.byteOffset + output_accessor.byteOffset]);
 
             // Find bone index
             int bone_id = -1;
@@ -494,28 +660,39 @@ ModelData* MeshLoader::load_gltf(const char* path)
             // Add keyframes based on path
             if (channel.target_path == "translation") {
                 for (size_t i = 0; i < time_accessor.count; ++i) {
+                    const float time = read_accessor_vec4(gltf_model, time_accessor, i).x;
+                    const glm::vec3 translation =
+                        glm::vec3(read_accessor_vec4(gltf_model, output_accessor, i));
+
                     PositionKeyframe key;
-                    key.time = times[i];
-                    key.position = glm::vec3(outputs[i * 3 + 0], outputs[i * 3 + 1], outputs[i * 3 + 2]);
+                    key.time = time;
+                    key.position = translation;
                     bone_anim->position_keys.push_back(key);
                     max_time = std::max(max_time, key.time);
                 }
             }
             else if (channel.target_path == "rotation") {
                 for (size_t i = 0; i < time_accessor.count; ++i) {
+                    const float time = read_accessor_vec4(gltf_model, time_accessor, i).x;
+                    const glm::vec4 rotation =
+                        read_accessor_vec4(gltf_model, output_accessor, i, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
                     RotationKeyframe key;
-                    key.time = times[i];
-                    key.rotation = glm::quat(outputs[i * 4 + 3], outputs[i * 4 + 0],
-                        outputs[i * 4 + 1], outputs[i * 4 + 2]);
+                    key.time = time;
+                    key.rotation = glm::quat(rotation.w, rotation.x, rotation.y, rotation.z);
                     bone_anim->rotation_keys.push_back(key);
                     max_time = std::max(max_time, key.time);
                 }
             }
             else if (channel.target_path == "scale") {
                 for (size_t i = 0; i < time_accessor.count; ++i) {
+                    const float time = read_accessor_vec4(gltf_model, time_accessor, i).x;
+                    const glm::vec3 scale =
+                        glm::vec3(read_accessor_vec4(gltf_model, output_accessor, i, glm::vec4(1.0f)));
+
                     ScaleKeyframe key;
-                    key.time = times[i];
-                    key.scale = glm::vec3(outputs[i * 3 + 0], outputs[i * 3 + 1], outputs[i * 3 + 2]);
+                    key.time = time;
+                    key.scale = scale;
                     bone_anim->scale_keys.push_back(key);
                     max_time = std::max(max_time, key.time);
                 }

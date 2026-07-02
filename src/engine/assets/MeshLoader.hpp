@@ -1,6 +1,6 @@
 #pragma once
 #include "../gl/Mesh.hpp"
-#include "../ecs/AnimationComponent.hpp"
+#include "ModelData.hpp"
 #include <string>
 #include <unordered_map>
 #include <memory>
@@ -9,15 +9,11 @@
 class MeshLoader
 {
 private:
-    static std::unordered_map<std::string, Mesh*> mesh_cache;     // Cache loaded meshes to avoid reloading
+    static std::unordered_map<std::string, std::shared_ptr<Mesh>> mesh_cache;
 
 public:
-    // Core loading interface
-    static Mesh* load(const char* path);
-
-
-    // static Mesh* load_obj(const char* path);
-    static ModelData* load_gltf(const char* path);
+    static std::shared_ptr<Mesh> readObjMesh(const char* path);
+    static std::shared_ptr<ModelData> readGltfModel(const char* path);
 
 
     // Memory management
@@ -27,5 +23,5 @@ public:
     // Cache management
     static bool is_loaded(const std::string& filepath);
     static size_t get_loaded_count();
-    static Mesh* get_mesh(const std::string& filepath);
+    static std::shared_ptr<Mesh> get_mesh(const std::string& filepath);
 };

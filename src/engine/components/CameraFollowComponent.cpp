@@ -1,61 +1,46 @@
-/* This is only viable when we've migrated to full ECS
-#include "CameraFollowPlayer.hpp"
-#include "../ecs/Entity.hpp"
-#include "/Camera.hpp"
-
-CameraFollowPlayer::CameraFollowPlayer(Entity* owner)
-    : Component(owner) {
-    camera = owner->getComponent<Camera>();
-}
-
-void CameraFollowPlayer::setTarget(Entity* target) {
-    targetEntity = target;
-}
-
-void CameraFollowPlayer::setOffsets(const glm::vec3& pos,
-                                    const glm::vec3& look) {
-    positionOffset = pos;
-    lookOffset = look;
-}
-
-void CameraFollowPlayer::update(float) {
-    if (!camera || !targetEntity) return;
-
-    glm::vec3 targetPos = targetEntity->getWorldPosition();
-    glm::vec3 camPos = targetPos + positionOffset;
-    glm::vec3 lookAt = targetPos + lookOffset;
-
-    camera->position = camPos;
-    camera->direction = glm::normalize(lookAt - camPos);
-    camera->up = {0.0f, 1.0f, 0.0f};
-}
-*/
 #include "CameraFollowComponent.hpp"
-#include "../../engine/ecs/Entity.hpp"
-#include "../../engine/components/Camera.hpp"
 
-CameraFollowPlayer::CameraFollowPlayer(Camera* cam, Entity* target)
-    : camera(cam), targetEntity(target) {
-    // nothing else, offsets keep their defaults
+#include "Camera.hpp"
+#include "../ecs/EcsComponents.hpp"
+#include "../ecs/Registry.hpp"
+
+#include <glm/geometric.hpp>
+
+CameraFollowPlayer::CameraFollowPlayer(
+    Camera* cam,
+    engine::ecs::Registry* targetRegistry,
+    engine::ecs::EntityId target)
+    : camera(cam)
+    , registry(targetRegistry)
+    , targetEntity(target)
+{
 }
 
-void CameraFollowPlayer::setTarget(Entity* target) {
+void CameraFollowPlayer::setTarget(engine::ecs::EntityId target)
+{
     targetEntity = target;
 }
 
-void CameraFollowPlayer::setOffsets(const glm::vec3& pos, const glm::vec3& look) {
+void CameraFollowPlayer::setOffsets(const glm::vec3& pos, const glm::vec3& look)
+{
     positionOffset = pos;
     lookOffset = look;
 }
 
-void CameraFollowPlayer::update(float) {
-    if (!camera || !targetEntity) return;
+void CameraFollowPlayer::update(float)
+{
+    if (!camera || !registry || !registry->isAlive(targetEntity)) {
+        return;
+    }
 
-    // Use the entity's world transform to compute the camera position & direction.
-    glm::mat4 wm = targetEntity->getWorldMatrix();
-    glm::vec3 targetPos = glm::vec3(wm[3]); // translation column
-    glm::vec3 camPos = targetPos + positionOffset;
-    glm::vec3 lookAt = targetPos + lookOffset;
+    const auto* transform = registry->get<engine::ecs::Transform>(targetEntity);
+    if (!transform) {
+        return;
+    }
+
+    const glm::vec3 targetPos = glm::vec3(transform->worldMatrix[3]);
+    const glm::vec3 camPos = targetPos + positionOffset;
+    const glm::vec3 lookAt = targetPos + lookOffset;
 
     camera->position = camPos;
     camera->direction = glm::normalize(lookAt - camPos);

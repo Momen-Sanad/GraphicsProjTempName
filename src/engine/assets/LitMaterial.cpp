@@ -1,13 +1,15 @@
 #include "LitMaterial.hpp"
 #include <glad/glad.h>
 
+#include <utility>
+
 LitMaterial::LitMaterial(
     std::shared_ptr<Shader> shader,
-    Texture* albedo,
-    Texture* specular,
-    Texture* roughness,
-    Texture* emissive,
-    Texture* ambientOcclusion
+    std::shared_ptr<Texture> albedo,
+    std::shared_ptr<Texture> specular,
+    std::shared_ptr<Texture> roughness,
+    std::shared_ptr<Texture> emissive,
+    std::shared_ptr<Texture> ambientOcclusion
 )
     : Material()
 {
@@ -22,11 +24,11 @@ LitMaterial::LitMaterial(
 
 // ---------------- setters ----------------
 
-void LitMaterial::setAlbedoMap(Texture* tex)            { albedoMap = tex; }
-void LitMaterial::setSpecularMap(Texture* tex)          { specularMap = tex; }
-void LitMaterial::setRoughnessMap(Texture* tex)         { roughnessMap = tex; }
-void LitMaterial::setEmissiveMap(Texture* tex)          { emissiveMap = tex; }
-void LitMaterial::setAmbientOcclusionMap(Texture* tex)  { ambientOcclusionMap = tex; }
+void LitMaterial::setAlbedoMap(std::shared_ptr<Texture> tex)            { albedoMap = std::move(tex); }
+void LitMaterial::setSpecularMap(std::shared_ptr<Texture> tex)          { specularMap = std::move(tex); }
+void LitMaterial::setRoughnessMap(std::shared_ptr<Texture> tex)         { roughnessMap = std::move(tex); }
+void LitMaterial::setEmissiveMap(std::shared_ptr<Texture> tex)          { emissiveMap = std::move(tex); }
+void LitMaterial::setAmbientOcclusionMap(std::shared_ptr<Texture> tex)  { ambientOcclusionMap = std::move(tex); }
 
 // ---------------- setup ----------------
 

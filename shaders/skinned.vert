@@ -1,9 +1,9 @@
 #version 330 core
 
 layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec4 aColor;
+layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
-layout (location = 3) in vec3 aNormal;
+layout (location = 3) in vec4 aColor;
 layout (location = 4) in vec4 aBoneWeights;
 layout (location = 5) in ivec4 aBoneIds;
 
@@ -15,6 +15,8 @@ uniform bool uIsAnimated;
 out vec4 vColor;
 out vec2 vTexCoord;
 out vec3 vNormal;
+out vec3 vWorldPos;
+out vec4 vBoneWeights;
 
 void main() {
     vec4 skinnedPosition;
@@ -38,7 +40,9 @@ void main() {
     }
     
     gl_Position = MVP * skinnedPosition;
+    vWorldPos = (model * skinnedPosition).xyz;
     vColor = aColor;
     vTexCoord = aTexCoord;
     vNormal = normalize(mat3(model) * skinnedNormal);
+    vBoneWeights = aBoneWeights;
 }

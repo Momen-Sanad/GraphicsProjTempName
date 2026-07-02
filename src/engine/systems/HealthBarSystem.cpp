@@ -3,12 +3,12 @@
 #include "imgui.h"
 #include "../components/HealthComponent.hpp"
 #include "../components/HurtboxComponent.hpp"
-#include "../ecs/Entity.hpp"
+#include "../ecs/EcsComponents.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
 void HealthBarSystem::draw_over_entity(const HealthComponent& health,
                                        const HurtboxComponent& hurtbox,
-                                       const Entity& entity,
+                                       const engine::ecs::Transform& transform,
                                        const glm::mat4& viewProj,
                                        int viewportWidth,
                                        int viewportHeight) {
@@ -17,7 +17,7 @@ void HealthBarSystem::draw_over_entity(const HealthComponent& health,
     }
 
     float barHeightOffset = hurtbox.localOffset.y + hurtbox.halfExtents.y + 0.2f;
-    glm::vec3 entityPos = glm::vec3(entity.getWorldMatrix()[3]);
+    glm::vec3 entityPos = glm::vec3(transform.worldMatrix[3]);
     glm::vec3 barWorldPos = entityPos + glm::vec3(0.0f, barHeightOffset, 0.0f);
 
     glm::vec4 clipPos = viewProj * glm::vec4(barWorldPos, 1.0f);

@@ -19,8 +19,14 @@ public:
     Texture();
     ~Texture();
 
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+    Texture(Texture&& other) noexcept;
+    Texture& operator=(Texture&& other) noexcept;
+
     // Create texture from image data
-    void create(int width, int height, const unsigned char* data, GLenum format = GL_RGBA);
+    void create(int textureWidth, int textureHeight, const unsigned char* data, GLenum textureFormat = GL_RGBA);
+    void destroy();
 
     // Set filtering options
     void set_filters(GLenum min_filter, GLenum mag_filter);

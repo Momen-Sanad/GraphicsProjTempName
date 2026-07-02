@@ -31,10 +31,10 @@ Damage flow example
 
 2. It emits CollisionEvent{hitEntity=H_owner, hurtEntity=T_owner, penetration}.
 
-3. CombatSystem listens, checks if hit should apply (owner not same team, invuln, blocking), computes damage, and emits DamageEvent.
+3. Combat logic checks team, invulnerability, and blocking state, then applies damage.
 
 4. HealthSystem subtracts HP, starts invulnerability (invulnTimer = invulnDuration), and signals DeathEvent if HP<=0.
 
-5. SpawnSystem handles respawn or ragdoll/death animation if present.
+5. Game or engine systems handle respawn, cleanup, or death animation if present.
 
 */

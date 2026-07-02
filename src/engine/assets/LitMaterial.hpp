@@ -9,26 +9,26 @@
 class LitMaterial : public Material
 {
 private:
-    Texture* albedoMap           = nullptr;
-    Texture* specularMap         = nullptr;
-    Texture* roughnessMap        = nullptr;
-    Texture* emissiveMap         = nullptr;
-    Texture* ambientOcclusionMap = nullptr;
+    std::shared_ptr<Texture> albedoMap;
+    std::shared_ptr<Texture> specularMap;
+    std::shared_ptr<Texture> roughnessMap;
+    std::shared_ptr<Texture> emissiveMap;
+    std::shared_ptr<Texture> ambientOcclusionMap;
 
 public:
     LitMaterial(std::shared_ptr<Shader> shader,
-                Texture* albedo           = nullptr,
-                Texture* specular         = nullptr,
-                Texture* roughness        = nullptr,
-                Texture* emissive         = nullptr,
-                Texture* ambientOcclusion = nullptr);
+                std::shared_ptr<Texture> albedo           = nullptr,
+                std::shared_ptr<Texture> specular         = nullptr,
+                std::shared_ptr<Texture> roughness        = nullptr,
+                std::shared_ptr<Texture> emissive         = nullptr,
+                std::shared_ptr<Texture> ambientOcclusion = nullptr);
 
     // Map setters
-    void setAlbedoMap(Texture* tex);
-    void setSpecularMap(Texture* tex);
-    void setRoughnessMap(Texture* tex);
-    void setEmissiveMap(Texture* tex);
-    void setAmbientOcclusionMap(Texture* tex);
+    void setAlbedoMap(std::shared_ptr<Texture> tex);
+    void setSpecularMap(std::shared_ptr<Texture> tex);
+    void setRoughnessMap(std::shared_ptr<Texture> tex);
+    void setEmissiveMap(std::shared_ptr<Texture> tex);
+    void setAmbientOcclusionMap(std::shared_ptr<Texture> tex);
 
     // Upload textures & material state
     void setup() override;

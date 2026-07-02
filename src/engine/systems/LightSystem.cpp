@@ -39,8 +39,10 @@ void LightSystem::initUBO() {
 
 void LightSystem::updateUBO() {
     if (ubo == 0) {
-        std::cerr << "LightSystem::updateUBO called before initUBO(); call initUBO() after GL context creation.\n";
-        return;
+        initUBO();
+        if (ubo == 0) {
+            return;
+        }
     }
 
     const int count = (int)std::min((size_t)MAX_LIGHTS, lights.size());
@@ -97,13 +99,26 @@ void LightSystem::updateUBO() {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+void LightSystem::bindToShader(std::shared_ptr<Shader> shader) {
+    if (!shader || ubo == 0 || !glad_glGetUniformBlockIndex || !glad_glUniformBlockBinding) {
+        return;
+    }
+
+    GLuint block_index = glGetUniformBlockIndex(shader->getProgram(), "LightBlock");
+    if (block_index != GL_INVALID_INDEX) {
+        glUniformBlockBinding(shader->getProgram(), block_index, bindingPoint);
+    }
+}
+
 void LightSystem::setupLightsInShader(std::shared_ptr<Shader> shader) {
     // Legacy path: keep previous behaviour (expensive) - set individual uniforms if needed.
     // We'll try to populate the same names as before: lights[i].type, lights[i].color, etc and light_count.
 
     if (!shader) return;
     shader->use();
+    bindToShader(shader);
     shader->setUniform("light_count", static_cast<int>(lights.size()));
+    shader->setUniform("u_lightCount", static_cast<int>(lights.size()));
     for (size_t i = 0; i < lights.size() && i < (size_t)MAX_LIGHTS; ++i) {
         const Light &L = lights[i];
         std::string idx = std::to_string(i);
@@ -112,9 +127,19 @@ void LightSystem::setupLightsInShader(std::shared_ptr<Shader> shader) {
         shader->setUniform("lights[" + idx + "].position", L.position);
         shader->setUniform("lights[" + idx + "].direction", L.direction);
         shader->setUniform("lights[" + idx + "].intensity", L.intensity);
+        shader->setUniform("lights[" + idx + "].range", 25.0f);
+
+        shader->setUniform("u_lights[" + idx + "].type", static_cast<int>(L.type));
+        shader->setUniform("u_lights[" + idx + "].color", L.color);
+        shader->setUniform("u_lights[" + idx + "].position", L.position);
+        shader->setUniform("u_lights[" + idx + "].direction", L.direction);
+        shader->setUniform("u_lights[" + idx + "].intensity", L.intensity);
+        shader->setUniform("u_lights[" + idx + "].range", 25.0f);
         if (L.type == LightType::SPOT) {
             shader->setUniform("lights[" + idx + "].cos_inner_angle", glm::cos(L.innerAngle));
             shader->setUniform("lights[" + idx + "].cos_outer_angle", glm::cos(L.outerAngle));
+            shader->setUniform("u_lights[" + idx + "].innerCone", glm::cos(L.innerAngle));
+            shader->setUniform("u_lights[" + idx + "].outerCone", glm::cos(L.outerAngle));
         }
     }
 }

@@ -51,22 +51,22 @@ void SkinnedMeshRenderer::upload(const SkinnedMesh& mesh)
         mesh.get_vertex_data(),
         GL_STATIC_DRAW);
 
-    size_t stride = mesh.get_vertex_stride();
+    GLsizei stride = static_cast<GLsizei>(mesh.get_vertex_stride());
 
     // Attribute 0: Position (vec3)
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride,
         (void*)offsetof(Vertex, position));
 
-    // Attribute 1: Color (4 unsigned bytes)
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride,
-        (void*)offsetof(Vertex, color));
-
     // Attribute 2: Texture Coordinates (vec2)
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride,
         (void*)offsetof(Vertex, tex_coord));
+
+    // Attribute 3: Color (4 unsigned bytes)
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride,
+        (void*)offsetof(Vertex, color));
 
     // ========================================
     // VBO for skeleton data (normals, bone weights, bone IDs)
@@ -79,11 +79,11 @@ void SkinnedMeshRenderer::upload(const SkinnedMesh& mesh)
             mesh.get_skeleton_data(),
             GL_STATIC_DRAW);
 
-        size_t skel_stride = mesh.get_skeleton_stride();
+        GLsizei skel_stride = static_cast<GLsizei>(mesh.get_skeleton_stride());
 
-        // Attribute 3: Normal (vec3)
-        glEnableVertexAttribArray(3);
-        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, skel_stride,
+        // Attribute 1: Normal (vec3)
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, skel_stride,
             (void*)offsetof(SkeletonVertex, normal));
 
         // Attribute 4: Bone Weights (vec4)
@@ -95,6 +95,13 @@ void SkinnedMeshRenderer::upload(const SkinnedMesh& mesh)
         glEnableVertexAttribArray(5);
         glVertexAttribIPointer(5, 4, GL_INT, skel_stride,
             (void*)offsetof(SkeletonVertex, bone_ids));
+    } else {
+        glDisableVertexAttribArray(1);
+        glVertexAttrib3f(1, 0.0f, 1.0f, 0.0f);
+        glDisableVertexAttribArray(4);
+        glVertexAttrib4f(4, 0.0f, 0.0f, 0.0f, 0.0f);
+        glDisableVertexAttribArray(5);
+        glVertexAttribI4i(5, -1, -1, -1, -1);
     }
 
     // ========================================
@@ -103,7 +110,7 @@ void SkinnedMeshRenderer::upload(const SkinnedMesh& mesh)
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-        mesh.get_index_count() * sizeof(uint16_t),
+        mesh.get_index_count() * sizeof(MeshIndex),
         mesh.get_indices().data(),
         GL_STATIC_DRAW);
 

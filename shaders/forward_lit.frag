@@ -13,6 +13,8 @@ struct Light {
 #define MAX_LIGHTS 16
 uniform int u_lightCount;
 uniform Light u_lights[MAX_LIGHTS];
+uniform vec3 u_cameraPos;
+uniform int u_debugMode;
 
 // material
 struct Material {
@@ -67,7 +69,7 @@ vec3 applyLight(Light light, vec3 N, vec3 V, vec3 albedo, float metallic, float 
 
 void main() {
     vec3 N = normalize(v_normal);
-    vec3 V = normalize(-v_worldPos); // assume camera at origin in viewspace; better pass camera pos
+    vec3 V = normalize(u_cameraPos - v_worldPos);
     // Fetch material maps (fall back to factors)
     vec3 albedo = (texture(u_material.albedoMap, v_uv).rgb) * u_material.albedoFactor;
     float metallic = texture(u_material.metallicMap, v_uv).r * u_material.metallicFactor;
@@ -75,11 +77,28 @@ void main() {
     float ao = texture(u_material.aoMap, v_uv).r * u_material.aoFactor;
     vec3 emission = texture(u_material.emissionMap, v_uv).rgb * u_material.emissionFactor;
 
+    if (u_debugMode == 1) {
+        fragColor = vec4(albedo, 1.0);
+        return;
+    }
+    if (u_debugMode == 2) {
+        fragColor = vec4(N * 0.5 + 0.5, 1.0);
+        return;
+    }
+    if (u_debugMode == 5) {
+        fragColor = vec4(roughness, ao, metallic, 1.0);
+        return;
+    }
+
     vec3 accum = vec3(0.0);
     for (int i = 0; i < u_lightCount; ++i) {
         accum += applyLight(u_lights[i], N, V, albedo, metallic, roughness);
     }
 
     accum = accum * ao + emission;
+    if (u_debugMode == 3) {
+        fragColor = vec4(accum, 1.0);
+        return;
+    }
     fragColor = vec4(accum, 1.0);
 }

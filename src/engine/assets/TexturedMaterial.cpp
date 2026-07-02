@@ -12,7 +12,7 @@ TexturedMaterial::TexturedMaterial()
 // ------------------------------------------------------
 // Constructor with Shader and Texture
 // ------------------------------------------------------
-TexturedMaterial::TexturedMaterial(std::shared_ptr<Shader> shader, Texture* tex)
+TexturedMaterial::TexturedMaterial(std::shared_ptr<Shader> shader, std::shared_ptr<Texture> tex)
     : Material(), maxTextures(8)  // Initialize base class and set maximum texture layers to 8
 {
     setShader(std::move(shader));  // Set shader for the material
@@ -25,15 +25,20 @@ TexturedMaterial::TexturedMaterial(std::shared_ptr<Shader> shader, Texture* tex)
 // ------------------------------------------------------
 
 // Set a single texture and clear any existing texture layers
-void TexturedMaterial::setTexture(Texture* tex)
+void TexturedMaterial::setTexture(std::shared_ptr<Texture> tex)
 {
     clearTextureLayers();  // Clear previous texture layers
     if (tex)
-        addTextureLayer(tex, 1.0f);  // Add the provided texture with full blend weight
+        addTextureLayer(tex, BlendMode::Lerp, 1.0f);  // Add the provided texture with full blend weight
 }
 
 // Get the first texture in the texture layers (if available)
 Texture* TexturedMaterial::getTexture() const
+{
+    return textureLayers.empty() ? nullptr : textureLayers[0].texture.get();
+}
+
+std::shared_ptr<Texture> TexturedMaterial::getTextureHandle() const
 {
     return textureLayers.empty() ? nullptr : textureLayers[0].texture;
 }
@@ -56,7 +61,7 @@ int TexturedMaterial::getTextureUnit() const
 // ------------------------------------------------------
 
 // Add a texture layer with specified blend mode and weight
-void TexturedMaterial::addTextureLayer(Texture* tex, BlendMode blmod, float blendWeight)
+void TexturedMaterial::addTextureLayer(std::shared_ptr<Texture> tex, BlendMode blmod, float blendWeight)
 {
     // If the maximum number of texture layers is reached, do not add another one
     if (textureLayers.size() >= maxTextures)
@@ -67,7 +72,7 @@ void TexturedMaterial::addTextureLayer(Texture* tex, BlendMode blmod, float blen
 }
 
 // Add a texture layer with a specified texture unit, blend mode, and weight
-void TexturedMaterial::addTextureLayer(Texture* tex, int unit, BlendMode blmod, float blendWeight)
+void TexturedMaterial::addTextureLayer(std::shared_ptr<Texture> tex, int unit, BlendMode blmod, float blendWeight)
 {
     // If the maximum number of texture layers is reached, do not add another one
     if (textureLayers.size() >= maxTextures)
@@ -77,7 +82,7 @@ void TexturedMaterial::addTextureLayer(Texture* tex, int unit, BlendMode blmod, 
 }
 
 // Set a texture layer at a specific index with new texture, blend mode, and weight
-void TexturedMaterial::setTextureLayer(int index, Texture* tex, BlendMode blmod, float blendWeight)
+void TexturedMaterial::setTextureLayer(int index, std::shared_ptr<Texture> tex, BlendMode blmod, float blendWeight)
 {
     if (index >= 0 && index < textureLayers.size())
     {
@@ -143,7 +148,7 @@ void TexturedMaterial::setup()
 
     shader->use();  // Use the shader for this material
 
-    int count = textureLayers.size();  // Get the number of texture layers
+    int count = static_cast<int>(textureLayers.size());  // Get the number of texture layers
     if (count == 0)
         return;  // If no textures are added, do nothing
 
@@ -195,22 +200,22 @@ void TexturedMaterial::setup()
         glUniform1i(countLoc, count);  // Upload the texture count
 }
 
-void TexturedMaterial::setAlbedoTexture(Texture* tex) {
+void TexturedMaterial::setAlbedoTexture(std::shared_ptr<Texture> tex) {
     setTexture(tex);
 }
 
-void TexturedMaterial::setSpecularTexture(Texture* tex) {
+void TexturedMaterial::setSpecularTexture(std::shared_ptr<Texture> tex) {
     addTextureLayer(tex, 1);
 }
 
-void TexturedMaterial::setRoughnessTexture(Texture* tex) {
+void TexturedMaterial::setRoughnessTexture(std::shared_ptr<Texture> tex) {
     addTextureLayer(tex, 2);
 }
 
-void TexturedMaterial::setEmissiveTexture(Texture* tex) {
+void TexturedMaterial::setEmissiveTexture(std::shared_ptr<Texture> tex) {
     addTextureLayer(tex, 3);
 }
 
-void TexturedMaterial::setAmbientOcclusionTexture(Texture* tex) {
+void TexturedMaterial::setAmbientOcclusionTexture(std::shared_ptr<Texture> tex) {
     addTextureLayer(tex, 4);
 }
