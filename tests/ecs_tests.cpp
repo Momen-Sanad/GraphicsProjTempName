@@ -223,6 +223,29 @@ void test_collision_correction_respects_parent_space()
     assert_close(transform->worldMatrix[3].x, 9.25f, "Parented mover world matrix should refresh after correction");
 }
 
+void test_sequential_collision_resolution_uses_fresh_transforms()
+{
+    World world;
+    engine::ecs::EntityId mover = world.createEntity("mover", glm::vec3(0.0f));
+    engine::ecs::EntityId obstacleX = world.createEntity("obstacle-x", glm::vec3(0.75f, 0.0f, 0.0f));
+    engine::ecs::EntityId obstacleZ = world.createEntity("obstacle-z", glm::vec3(-0.25f, 0.0f, 0.75f));
+    add_collider(world, mover, glm::vec3(0.5f));
+    add_collider(world, obstacleX, glm::vec3(0.5f));
+    add_collider(world, obstacleZ, glm::vec3(0.5f));
+
+    assert_true(
+        PhysicsCollisionSystem::resolveStaticCollision(world.registry(), mover, obstacleX),
+        "First overlap should resolve");
+    assert_true(
+        PhysicsCollisionSystem::resolveStaticCollision(world.registry(), mover, obstacleZ),
+        "Second overlap should resolve using refreshed world transform");
+
+    const auto* transform = world.registry().get<engine::ecs::Transform>(mover);
+    assert_close(transform->position.x, -0.25f, "First correction should remain applied");
+    assert_close(transform->position.z, -0.25f, "Second correction should use updated mover position");
+    assert_close(transform->worldMatrix[3].z, -0.25f, "World matrix should refresh after sequential corrections");
+}
+
 class CountingSystem final : public engine::ecs::System {
 public:
     void update(engine::ecs::Registry&, float deltaTime) override
@@ -260,6 +283,7 @@ int main()
     run_test("world_recursive_destroy", test_world_recursive_destroy);
     run_test("collision_refreshes_world_transform", test_collision_refreshes_world_transform);
     run_test("collision_correction_respects_parent_space", test_collision_correction_respects_parent_space);
+    run_test("sequential_collision_resolution_uses_fresh_transforms", test_sequential_collision_resolution_uses_fresh_transforms);
     run_test("system_manager_updates", test_system_manager_updates);
 
     std::cout << "Tests passed: " << tests_passed << std::endl;

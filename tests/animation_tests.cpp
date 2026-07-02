@@ -95,6 +95,37 @@ void test_animation_system_updates_skinned_material()
     assert_true(material->get_active_bone_count() == 1, "AnimationSystem should upload one active bone matrix");
 }
 
+void test_animation_system_uses_renderable_model_and_respects_non_loop_stop()
+{
+    World world;
+    auto model = make_test_model();
+    auto material = std::make_shared<SkinnedMaterial>();
+
+    engine::ecs::EntityId entity = world.createEntity("animated");
+    world.registry().emplace<engine::ecs::SkinnedRenderable>(
+        entity,
+        engine::ecs::SkinnedRenderable{{}, material, model, 0});
+    auto& animation = world.registry().emplace<engine::ecs::AnimatorData>(entity);
+    animation.currentAnimation = 0;
+    animation.playing = true;
+    animation.loop = false;
+
+    AnimationSystem system;
+    system.update(world.registry(), 2.0f);
+
+    auto* updated = world.registry().get<engine::ecs::AnimatorData>(entity);
+    assert_true(updated != nullptr, "AnimatorData should remain attached");
+    assert_true(updated->model == model, "AnimationSystem should resolve model from SkinnedRenderable");
+    assert_true(!updated->playing, "Non-looping animation should stop at the end");
+    const float stoppedTime = updated->animator.get_current_time();
+
+    system.update(world.registry(), 0.25f);
+    assert_true(!updated->playing, "Stopped non-looping animation should not restart automatically");
+    assert_true(
+        updated->animator.get_current_time() == stoppedTime,
+        "Stopped non-looping animation time should not advance after completion");
+}
+
 void test_animation_system_play_helper()
 {
     World world;
@@ -115,6 +146,7 @@ int main()
 {
     run_test("animator_updates_time_and_bones", test_animator_updates_time_and_bones);
     run_test("animation_system_updates_skinned_material", test_animation_system_updates_skinned_material);
+    run_test("animation_system_uses_renderable_model_and_respects_non_loop_stop", test_animation_system_uses_renderable_model_and_respects_non_loop_stop);
     run_test("animation_system_play_helper", test_animation_system_play_helper);
 
     std::cout << "Tests passed: " << tests_passed << std::endl;

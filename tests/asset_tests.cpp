@@ -1,6 +1,7 @@
 #include "engine/assets/AssetManager.hpp"
 #include "engine/gl/Mesh.hpp"
 
+#include <cmath>
 #include <cstdint>
 #include <filesystem>
 #include <fstream>
@@ -16,6 +17,13 @@ int tests_failed = 0;
 void assert_true(bool condition, const char* message)
 {
     if (!condition) {
+        throw std::runtime_error(message);
+    }
+}
+
+void assert_close(float actual, float expected, const char* message)
+{
+    if (std::abs(actual - expected) > 0.0001f) {
         throw std::runtime_error(message);
     }
 }
@@ -110,6 +118,24 @@ void write_binary_gltf_payload(const std::filesystem::path& path)
     file.write(reinterpret_cast<const char*>(indices), sizeof(indices));
 }
 
+void write_multi_primitive_payload(const std::filesystem::path& path)
+{
+    std::ofstream file(path, std::ios::binary);
+    if (!file) {
+        throw std::runtime_error("Failed to write " + path.string());
+    }
+
+    const float vertices[] = {
+        -0.5f, 0.0f, 0.0f,
+         0.5f, 0.0f, 0.0f,
+         0.0f, 1.0f, 0.0f,
+        -0.5f, 0.0f, 1.0f,
+         0.5f, 0.0f, 1.0f,
+         0.0f, 1.0f, 1.0f,
+    };
+    file.write(reinterpret_cast<const char*>(vertices), sizeof(vertices));
+}
+
 void test_gltf_strided_uint32_indices()
 {
     const std::filesystem::path dir = test_output_dir();
@@ -150,6 +176,55 @@ void test_gltf_strided_uint32_indices()
     assert_true(model->bounds.valid, "AssetManager should expose imported bounds");
 }
 
+void test_gltf_nodes_multiple_primitives_and_materials()
+{
+    const std::filesystem::path dir = test_output_dir();
+    const std::filesystem::path bin_path = dir / "multi_primitive.bin";
+    const std::filesystem::path gltf_path = dir / "multi_primitive.gltf";
+
+    write_multi_primitive_payload(bin_path);
+    write_text(
+        gltf_path,
+        "{\n"
+        "  \"asset\": { \"version\": \"2.0\" },\n"
+        "  \"scene\": 0,\n"
+        "  \"scenes\": [{ \"name\": \"Scene\", \"nodes\": [0] }],\n"
+        "  \"nodes\": [\n"
+        "    { \"name\": \"Root\", \"translation\": [1, 2, 3], \"children\": [1] },\n"
+        "    { \"name\": \"MeshNode\", \"mesh\": 0, \"scale\": [2, 2, 2] }\n"
+        "  ],\n"
+        "  \"materials\": [{ \"name\": \"Red\" }, { \"name\": \"Blue\" }],\n"
+        "  \"meshes\": [{ \"primitives\": [\n"
+        "    { \"attributes\": { \"POSITION\": 0 }, \"material\": 0 },\n"
+        "    { \"attributes\": { \"POSITION\": 1 }, \"material\": 1 }\n"
+        "  ] }],\n"
+        "  \"buffers\": [{ \"uri\": \"multi_primitive.bin\", \"byteLength\": 72 }],\n"
+        "  \"bufferViews\": [{ \"buffer\": 0, \"byteOffset\": 0, \"byteLength\": 72 }],\n"
+        "  \"accessors\": [\n"
+        "    { \"bufferView\": 0, \"byteOffset\": 0, \"componentType\": 5126, \"count\": 3, \"type\": \"VEC3\" },\n"
+        "    { \"bufferView\": 0, \"byteOffset\": 36, \"componentType\": 5126, \"count\": 3, \"type\": \"VEC3\" }\n"
+        "  ]\n"
+        "}\n");
+
+    AssetManager assets;
+    auto model = assets.loadModel(gltf_path.string());
+    assert_true(model != nullptr, "Multi-primitive glTF should load");
+    assert_true(model->primitives.size() == 2, "glTF mesh should expose both primitives");
+    assert_true(model->materials.size() == 2, "glTF material slots should be preserved");
+    assert_true(model->materials[0].name == "Red", "First material name should be preserved");
+    assert_true(model->primitives[0].materialIndex == 0, "First primitive should keep material index");
+    assert_true(model->primitives[1].materialIndex == 1, "Second primitive should keep material index");
+    assert_true(model->nodes.size() == 2, "glTF nodes should be preserved");
+    assert_true(model->nodes[0].children.size() == 1 && model->nodes[0].children[0] == 1, "Node hierarchy should be preserved");
+    assert_true(model->nodes[1].parentIndex == 0, "Child node should record parent index");
+    assert_true(model->nodes[1].primitiveIndices.size() == 2, "Mesh node should reference flattened primitives");
+    assert_close(model->nodes[0].localTransform[3].x, 1.0f, "Node translation X should be imported");
+    assert_close(model->nodes[0].localTransform[3].y, 2.0f, "Node translation Y should be imported");
+    assert_close(model->nodes[1].localTransform[0].x, 2.0f, "Node scale should be imported");
+    assert_true(model->defaultScene == 0, "Default scene should be preserved");
+    assert_true(model->scenes.size() == 1 && model->scenes[0].rootNodes[0] == 0, "Scene roots should be preserved");
+}
+
 void test_gltf_required_extension_rejected()
 {
     const std::filesystem::path gltf_path = test_output_dir() / "required_extension.gltf";
@@ -173,6 +248,7 @@ int main()
     run_test("obj_without_colors_or_uvs", test_obj_without_colors_or_uvs);
     run_test("mesh_keeps_32_bit_indices", test_mesh_keeps_32_bit_indices);
     run_test("gltf_strided_uint32_indices", test_gltf_strided_uint32_indices);
+    run_test("gltf_nodes_multiple_primitives_and_materials", test_gltf_nodes_multiple_primitives_and_materials);
     run_test("gltf_required_extension_rejected", test_gltf_required_extension_rejected);
 
     std::cout << "Tests passed: " << tests_passed << std::endl;
