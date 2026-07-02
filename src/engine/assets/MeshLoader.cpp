@@ -9,7 +9,9 @@
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "tinygltf/tiny_gltf.h"
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <algorithm>
 #include <cstring>
 
@@ -258,6 +260,46 @@ namespace {
         return matrix;
     }
 
+    glm::mat4 read_node_transform(const tinygltf::Node& node) {
+        if (node.matrix.size() == 16) {
+            glm::mat4 matrix(1.0f);
+            for (size_t component = 0; component < 16; ++component) {
+                matrix[static_cast<int>(component / 4)][static_cast<int>(component % 4)] =
+                    static_cast<float>(node.matrix[component]);
+            }
+            return matrix;
+        }
+
+        glm::vec3 translation(0.0f);
+        if (node.translation.size() == 3) {
+            translation = glm::vec3(
+                static_cast<float>(node.translation[0]),
+                static_cast<float>(node.translation[1]),
+                static_cast<float>(node.translation[2]));
+        }
+
+        glm::quat rotation(1.0f, 0.0f, 0.0f, 0.0f);
+        if (node.rotation.size() == 4) {
+            rotation = glm::quat(
+                static_cast<float>(node.rotation[3]),
+                static_cast<float>(node.rotation[0]),
+                static_cast<float>(node.rotation[1]),
+                static_cast<float>(node.rotation[2]));
+        }
+
+        glm::vec3 scale(1.0f);
+        if (node.scale.size() == 3) {
+            scale = glm::vec3(
+                static_cast<float>(node.scale[0]),
+                static_cast<float>(node.scale[1]),
+                static_cast<float>(node.scale[2]));
+        }
+
+        return glm::translate(glm::mat4(1.0f), translation) *
+               glm::toMat4(rotation) *
+               glm::scale(glm::mat4(1.0f), scale);
+    }
+
     bool has_required_unsupported_extensions(const tinygltf::Model& model) {
         if (!model.extensionsRequired.empty()) {
             std::cerr << "Unsupported required glTF extension: "
@@ -435,6 +477,42 @@ std::shared_ptr<ModelData> MeshLoader::readGltfModel(const char* path)
     }
 
     auto model_data = std::make_shared<ModelData>();
+    model_data->defaultScene = gltf_model.defaultScene;
+
+    model_data->materialNames.reserve(gltf_model.materials.size());
+    for (size_t materialIndex = 0; materialIndex < gltf_model.materials.size(); ++materialIndex) {
+        const std::string& name = gltf_model.materials[materialIndex].name;
+        model_data->materialNames.push_back(
+            name.empty() ? "material_" + std::to_string(materialIndex) : name);
+    }
+
+    model_data->nodes.reserve(gltf_model.nodes.size());
+    for (const tinygltf::Node& gltf_node : gltf_model.nodes) {
+        ImportedModelNode node;
+        node.name = gltf_node.name;
+        node.localTransform = read_node_transform(gltf_node);
+        node.meshIndex = gltf_node.mesh;
+        node.skinIndex = gltf_node.skin;
+        node.children = gltf_node.children;
+        model_data->nodes.push_back(std::move(node));
+    }
+
+    for (size_t parentIndex = 0; parentIndex < gltf_model.nodes.size(); ++parentIndex) {
+        for (int childIndex : gltf_model.nodes[parentIndex].children) {
+            if (childIndex >= 0 && static_cast<size_t>(childIndex) < model_data->nodes.size()) {
+                model_data->nodes[static_cast<size_t>(childIndex)].parentIndex =
+                    static_cast<int>(parentIndex);
+            }
+        }
+    }
+
+    model_data->scenes.reserve(gltf_model.scenes.size());
+    for (const tinygltf::Scene& gltf_scene : gltf_model.scenes) {
+        ImportedModelScene scene;
+        scene.name = gltf_scene.name;
+        scene.rootNodes = gltf_scene.nodes;
+        model_data->scenes.push_back(std::move(scene));
+    }
 
     // Load skeleton if present
     if (!gltf_model.skins.empty()) {
@@ -488,7 +566,9 @@ std::shared_ptr<ModelData> MeshLoader::readGltfModel(const char* path)
     }
 
     // Load meshes
-    for (const auto& gltf_mesh : gltf_model.meshes) {
+    model_data->meshPrimitiveIndices.resize(gltf_model.meshes.size());
+    for (size_t gltfMeshIndex = 0; gltfMeshIndex < gltf_model.meshes.size(); ++gltfMeshIndex) {
+        const auto& gltf_mesh = gltf_model.meshes[gltfMeshIndex];
         for (const auto& primitive : gltf_mesh.primitives) {
             std::vector<Vertex> vertices;
             std::vector<SkeletonVertex> skel_vertices;
@@ -608,7 +688,10 @@ std::shared_ptr<ModelData> MeshLoader::readGltfModel(const char* path)
 
             // Create mesh using the Mesh constructor
             SkinnedMesh mesh(vertices, indices, skel_vertices);
+            const int primitiveIndex = static_cast<int>(model_data->meshes.size());
             model_data->meshes.push_back(std::move(mesh));
+            model_data->meshMaterialIndices.push_back(primitive.material);
+            model_data->meshPrimitiveIndices[gltfMeshIndex].push_back(primitiveIndex);
         }
     }
 

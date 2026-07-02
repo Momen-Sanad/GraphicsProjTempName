@@ -83,32 +83,61 @@ AssetHandle<ModelAsset> AssetManager::loadModel(const std::string& path)
         model->textures.push_back({ {}, texture });
     }
 
+    for (const std::string& materialName : modelData->materialNames) {
+        model->materials.push_back({ materialName, nullptr });
+    }
+
     const int defaultSkinIndex = model->skins.empty() ? -1 : 0;
-    for (const SkinnedMesh& source_mesh : modelData->meshes) {
+    for (size_t meshIndex = 0; meshIndex < modelData->meshes.size(); ++meshIndex) {
+        const SkinnedMesh& source_mesh = modelData->meshes[meshIndex];
         MeshPrimitive primitive;
         primitive.mesh = std::make_shared<SkinnedMesh>(source_mesh);
         primitive.skinIndex = defaultSkinIndex;
+        if (meshIndex < modelData->meshMaterialIndices.size()) {
+            primitive.materialIndex = modelData->meshMaterialIndices[meshIndex];
+        }
         for (const Vertex& vertex : primitive.mesh->get_vertices()) {
             primitive.bounds.include(vertex.position);
             model->bounds.include(vertex.position);
         }
 
-        const int primitiveIndex = static_cast<int>(model->primitives.size());
-        ModelNode node;
-        node.name = "primitive_" + std::to_string(primitiveIndex);
-        node.primitiveIndex = primitiveIndex;
-        node.skinIndex = primitive.skinIndex;
-
         model->primitives.push_back(std::move(primitive));
-        model->nodes.push_back(std::move(node));
     }
 
-    if (!model->nodes.empty()) {
+    if (!modelData->nodes.empty()) {
+        model->nodes.reserve(modelData->nodes.size());
+        for (const ImportedModelNode& importedNode : modelData->nodes) {
+            ModelNode node;
+            node.name = importedNode.name;
+            node.localTransform = importedNode.localTransform;
+            node.skinIndex = importedNode.skinIndex >= 0 ? importedNode.skinIndex : defaultSkinIndex;
+            node.parentIndex = importedNode.parentIndex;
+            node.children = importedNode.children;
+            if (importedNode.meshIndex >= 0 &&
+                static_cast<size_t>(importedNode.meshIndex) < modelData->meshPrimitiveIndices.size()) {
+                node.primitiveIndices = modelData->meshPrimitiveIndices[static_cast<size_t>(importedNode.meshIndex)];
+            }
+            model->nodes.push_back(std::move(node));
+        }
+
+        model->scenes.reserve(modelData->scenes.size());
+        for (const ImportedModelScene& importedScene : modelData->scenes) {
+            model->scenes.push_back({ importedScene.name, importedScene.rootNodes });
+        }
+        model->defaultScene = modelData->defaultScene;
+    }
+
+    if (model->nodes.empty() && !model->primitives.empty()) {
         ModelScene scene;
         scene.name = "default";
-        scene.rootNodes.reserve(model->nodes.size());
-        for (size_t nodeIndex = 0; nodeIndex < model->nodes.size(); ++nodeIndex) {
-            scene.rootNodes.push_back(static_cast<int>(nodeIndex));
+        scene.rootNodes.reserve(model->primitives.size());
+        for (size_t primitiveIndex = 0; primitiveIndex < model->primitives.size(); ++primitiveIndex) {
+            ModelNode node;
+            node.name = "primitive_" + std::to_string(primitiveIndex);
+            node.primitiveIndices.push_back(static_cast<int>(primitiveIndex));
+            node.skinIndex = model->primitives[primitiveIndex].skinIndex;
+            scene.rootNodes.push_back(static_cast<int>(model->nodes.size()));
+            model->nodes.push_back(std::move(node));
         }
         model->scenes.push_back(std::move(scene));
         model->defaultScene = 0;

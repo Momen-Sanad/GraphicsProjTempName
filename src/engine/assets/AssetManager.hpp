@@ -53,7 +53,7 @@ struct SkinAsset {
 struct ModelNode {
     std::string name;
     glm::mat4 localTransform = glm::mat4(1.0f);
-    int primitiveIndex = -1;
+    std::vector<int> primitiveIndices;
     int skinIndex = -1;
     int parentIndex = -1;
     std::vector<int> children;
