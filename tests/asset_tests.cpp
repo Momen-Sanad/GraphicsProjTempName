@@ -139,13 +139,15 @@ void test_gltf_strided_uint32_indices()
     AssetManager assets;
     auto model = assets.loadModel(gltf_path.string());
     assert_true(model != nullptr, "Strided glTF should load");
-    assert_true(model->legacyModel != nullptr, "AssetManager should expose imported model data");
-    assert_true(model->legacyModel->meshes.size() == 1, "glTF should contain one mesh primitive");
-    assert_true(model->legacyModel->meshes[0].get_vertex_count() == 3, "glTF should contain 3 vertices");
-    assert_true(model->legacyModel->meshes[0].get_indices()[2] == 2, "glTF uint32 indices should load correctly");
+    assert_true(model->primitives.size() == 1, "glTF should contain one mesh primitive");
+    assert_true(model->primitives[0].mesh != nullptr, "glTF primitive should expose mesh data");
+    assert_true(model->primitives[0].mesh->get_vertex_count() == 3, "glTF should contain 3 vertices");
+    assert_true(model->primitives[0].mesh->get_indices()[2] == 2, "glTF uint32 indices should load correctly");
     assert_true(
-        model->legacyModel->meshes[0].get_vertices()[1].position.x == 1.0f,
+        model->primitives[0].mesh->get_vertices()[1].position.x == 1.0f,
         "glTF byteStride should skip interleaved padding");
+    assert_true(model->defaultScene == 0, "AssetManager should expose a default scene");
+    assert_true(model->bounds.valid, "AssetManager should expose imported bounds");
 }
 
 void test_gltf_required_extension_rejected()

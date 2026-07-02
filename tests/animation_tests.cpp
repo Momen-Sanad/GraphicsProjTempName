@@ -1,4 +1,4 @@
-#include "engine/assets/ModelData.hpp"
+#include "engine/assets/AssetManager.hpp"
 #include "engine/assets/SkinnedMaterial.hpp"
 #include "engine/ecs/EcsComponents.hpp"
 #include "engine/ecs/Registry.hpp"
@@ -34,11 +34,11 @@ void run_test(const char* name, void (*test)())
     }
 }
 
-std::shared_ptr<ModelData> make_test_model()
+std::shared_ptr<ModelAsset> make_test_model()
 {
-    auto model = std::make_shared<ModelData>();
-    model->skeleton = std::make_shared<Skeleton>();
-    model->skeleton->add_bone("root", -1, glm::mat4(1.0f));
+    auto model = std::make_shared<ModelAsset>();
+    auto skeleton = std::make_shared<Skeleton>();
+    skeleton->add_bone("root", -1, glm::mat4(1.0f));
 
     auto clip = std::make_shared<AnimationClip>("translate", 1.0f, 1.0f);
     BoneAnimation root;
@@ -50,6 +50,7 @@ std::shared_ptr<ModelData> make_test_model()
     root.scale_keys.push_back({0.0f, glm::vec3(1.0f)});
     root.scale_keys.push_back({1.0f, glm::vec3(1.0f)});
     clip->add_bone_animation(root);
+    model->skins.push_back(SkinAsset{"test", skeleton, {0}});
     model->animations.push_back(clip);
 
     return model;
@@ -58,7 +59,7 @@ std::shared_ptr<ModelData> make_test_model()
 void test_animator_updates_time_and_bones()
 {
     auto model = make_test_model();
-    Animator animator(model->skeleton.get());
+    Animator animator(model->skins.front().skeleton.get());
     animator.play(model->animations.front().get(), true);
     animator.update(0.25f);
 
@@ -76,9 +77,10 @@ void test_animation_system_updates_skinned_material()
     engine::ecs::EntityId entity = world.createEntity("animated");
     world.registry().emplace<engine::ecs::SkinnedRenderable>(
         entity,
-        engine::ecs::SkinnedRenderable{{}, material, nullptr, model});
+        engine::ecs::SkinnedRenderable{{}, material, model, 0});
     auto& animation = world.registry().emplace<engine::ecs::AnimatorData>(entity);
-    animation.modelData = model;
+    animation.model = model;
+    animation.skinIndex = 0;
     animation.currentAnimation = 0;
     animation.playing = true;
     animation.loop = true;

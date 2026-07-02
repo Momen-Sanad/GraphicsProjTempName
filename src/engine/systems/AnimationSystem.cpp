@@ -1,9 +1,32 @@
 #include "AnimationSystem.hpp"
 
-#include "../assets/ModelData.hpp"
+#include "../assets/AssetManager.hpp"
 #include "../assets/SkinnedMaterial.hpp"
 #include "../ecs/EcsComponents.hpp"
 #include "../ecs/Registry.hpp"
+
+namespace {
+const SkinAsset* resolveSkin(engine::ecs::AnimatorData& animation, engine::ecs::SkinnedRenderable& skinned)
+{
+    if (!animation.model) {
+        animation.model = skinned.model;
+    }
+    if (animation.skinIndex < 0) {
+        animation.skinIndex = skinned.skinIndex;
+    }
+
+    if (!animation.model) {
+        return nullptr;
+    }
+
+    const int skinIndex = animation.skinIndex >= 0 ? animation.skinIndex : 0;
+    if (skinIndex < 0 || static_cast<size_t>(skinIndex) >= animation.model->skins.size()) {
+        return nullptr;
+    }
+
+    return &animation.model->skins[static_cast<size_t>(skinIndex)];
+}
+}
 
 void AnimationSystem::update(engine::ecs::Registry& registry, float deltaTime)
 {
@@ -12,38 +35,43 @@ void AnimationSystem::update(engine::ecs::Registry& registry, float deltaTime)
             engine::ecs::EntityId,
             engine::ecs::AnimatorData& animation,
             engine::ecs::SkinnedRenderable& skinned) {
-            if (!animation.modelData) {
-                animation.modelData = skinned.modelData;
-            }
-            if (!animation.modelData || !animation.modelData->skeleton) {
+            const SkinAsset* skin = resolveSkin(animation, skinned);
+            if (!skin || !skin->skeleton) {
                 return;
             }
 
             if (!animation.initialized) {
-                animation.animator.set_skeleton(animation.modelData->skeleton.get());
+                animation.animator.set_skeleton(skin->skeleton.get());
                 animation.initialized = true;
             }
 
             const bool hasClip =
                 animation.currentAnimation >= 0 &&
-                static_cast<size_t>(animation.currentAnimation) < animation.modelData->animations.size() &&
-                animation.modelData->animations[static_cast<size_t>(animation.currentAnimation)];
+                static_cast<size_t>(animation.currentAnimation) < animation.model->animations.size() &&
+                animation.model->animations[static_cast<size_t>(animation.currentAnimation)];
 
-            if (hasClip) {
-                const AnimationClip* clip = animation.modelData->animations[static_cast<size_t>(animation.currentAnimation)].get();
-                if (animation.animator.get_current_clip() != clip || !animation.animator.is_animation_playing()) {
-                    animation.animator.play(clip, animation.loop);
-                }
-                animation.animator.set_looping(animation.loop);
-                animation.animator.set_playback_speed(animation.speed);
-                animation.playing = true;
-            }
-
-            if (!animation.playing) {
+            if (!hasClip || !animation.playing) {
                 return;
             }
 
+            const AnimationClip* clip = animation.model->animations[static_cast<size_t>(animation.currentAnimation)].get();
+            animation.animator.set_looping(animation.loop);
+            animation.animator.set_playback_speed(animation.speed);
+
+            if (animation.animator.get_current_clip() != clip) {
+                animation.animator.play(clip, animation.loop);
+            } else if (!animation.animator.is_animation_playing()) {
+                if (!animation.loop && animation.animator.get_current_time() >= clip->get_duration()) {
+                    animation.playing = false;
+                    return;
+                }
+                animation.animator.resume();
+            }
+
             animation.animator.update(deltaTime);
+            if (!animation.loop && !animation.animator.is_animation_playing()) {
+                animation.playing = false;
+            }
 
             if (skinned.material) {
                 skinned.material->set_bone_matrices(animation.animator.get_bone_matrices());

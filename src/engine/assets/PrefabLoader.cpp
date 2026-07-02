@@ -82,7 +82,7 @@ engine::ecs::EntityId PrefabLoader::instantiate(
         if (modelIt != cachedModels.end() && modelIt->second) {
             auto& skinned = world->registry().ensure<engine::ecs::SkinnedRenderable>(entity);
             skinned.model = modelIt->second;
-            skinned.modelData = modelIt->second->legacyModel;
+            skinned.skinIndex = skinned.model && !skinned.model->skins.empty() ? 0 : -1;
         }
     }
 

@@ -3,7 +3,6 @@
 #include "Game/GameEntityFactory.hpp"
 #include "Game/GameSystems.hpp"
 
-#include "engine/assets/ModelData.hpp"
 #include "engine/assets/SkinnedMaterial.hpp"
 #include "engine/assets/TintedMaterial.hpp"
 #include "engine/components/Camera.hpp"
@@ -68,7 +67,7 @@ void test_game_entity_factory_components()
         "Static entity should be parented to root");
 
     auto model = std::make_shared<ModelAsset>();
-    model->legacyModel = std::make_shared<ModelData>();
+    model->skins.push_back(SkinAsset{"test", std::make_shared<Skeleton>(), {}});
     auto skinnedMaterial = std::make_shared<SkinnedMaterial>();
     auto skinned = factory.createSkinnedRenderable("skinned", {}, skinnedMaterial, model, root);
     auto* renderable = world.registry().get<engine::ecs::SkinnedRenderable>(skinned);

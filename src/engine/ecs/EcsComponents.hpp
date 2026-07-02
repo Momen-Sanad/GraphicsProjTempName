@@ -19,7 +19,6 @@ struct ModelAsset;
 class Shader;
 class SkinnedMaterial;
 class SkinnedMeshRenderer;
-struct ModelData;
 
 namespace engine::ecs {
 
@@ -56,7 +55,7 @@ struct SkinnedRenderable {
     std::vector<std::shared_ptr<SkinnedMeshRenderer>> renderers;
     std::shared_ptr<SkinnedMaterial> material;
     std::shared_ptr<ModelAsset> model;
-    std::shared_ptr<ModelData> modelData;
+    int skinIndex = -1;
 };
 
 struct CameraData {
@@ -79,7 +78,8 @@ struct LightData {
 };
 
 struct AnimatorData {
-    std::shared_ptr<ModelData> modelData;
+    std::shared_ptr<ModelAsset> model;
+    int skinIndex = -1;
     Animator animator;
     int currentAnimation = -1;
     float speed = 1.0f;

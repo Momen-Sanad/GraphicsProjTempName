@@ -65,24 +65,53 @@ AssetHandle<ModelAsset> AssetManager::loadModel(const std::string& path)
 
     auto model = std::make_shared<ModelAsset>();
     model->path = path;
-    model->legacyModel = std::move(modelData);
-    model->animations = model->legacyModel->animations;
+    model->animations = modelData->animations;
 
-    if (model->legacyModel->skeleton) {
-        model->skins.push_back({ model->legacyModel->skeleton });
+    if (modelData->skeleton) {
+        SkinAsset skin;
+        skin.name = "default";
+        skin.skeleton = modelData->skeleton;
+        const int boneCount = modelData->skeleton->get_bone_count();
+        skin.joints.reserve(static_cast<size_t>(boneCount));
+        for (int boneIndex = 0; boneIndex < boneCount; ++boneIndex) {
+            skin.joints.push_back(boneIndex);
+        }
+        model->skins.push_back(std::move(skin));
     }
 
-    for (auto& texture : model->legacyModel->textures) {
+    for (auto& texture : modelData->textures) {
         model->textures.push_back({ {}, texture });
     }
 
-    for (const SkinnedMesh& source_mesh : model->legacyModel->meshes) {
+    const int defaultSkinIndex = model->skins.empty() ? -1 : 0;
+    for (const SkinnedMesh& source_mesh : modelData->meshes) {
         MeshPrimitive primitive;
         primitive.mesh = std::make_shared<SkinnedMesh>(source_mesh);
+        primitive.skinIndex = defaultSkinIndex;
         for (const Vertex& vertex : primitive.mesh->get_vertices()) {
             primitive.bounds.include(vertex.position);
+            model->bounds.include(vertex.position);
         }
+
+        const int primitiveIndex = static_cast<int>(model->primitives.size());
+        ModelNode node;
+        node.name = "primitive_" + std::to_string(primitiveIndex);
+        node.primitiveIndex = primitiveIndex;
+        node.skinIndex = primitive.skinIndex;
+
         model->primitives.push_back(std::move(primitive));
+        model->nodes.push_back(std::move(node));
+    }
+
+    if (!model->nodes.empty()) {
+        ModelScene scene;
+        scene.name = "default";
+        scene.rootNodes.reserve(model->nodes.size());
+        for (size_t nodeIndex = 0; nodeIndex < model->nodes.size(); ++nodeIndex) {
+            scene.rootNodes.push_back(static_cast<int>(nodeIndex));
+        }
+        model->scenes.push_back(std::move(scene));
+        model->defaultScene = 0;
     }
 
     if (model->primitives.empty()) {
@@ -171,10 +200,10 @@ std::vector<AssetHandle<SkinnedMeshRenderer>> AssetManager::createSkinnedMeshRen
     }
 
     std::vector<AssetHandle<SkinnedMeshRenderer>> renderers;
-    if (model.legacyModel) {
-        for (const SkinnedMesh& mesh : model.legacyModel->meshes) {
+    for (const MeshPrimitive& primitive : model.primitives) {
+        if (primitive.mesh) {
             auto renderer = std::make_shared<SkinnedMeshRenderer>();
-            renderer->upload(mesh);
+            renderer->upload(*primitive.mesh);
             renderers.push_back(renderer);
         }
     }

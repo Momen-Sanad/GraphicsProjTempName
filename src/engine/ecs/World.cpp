@@ -58,14 +58,14 @@ engine::ecs::EntityId World::createSkinnedRenderable(
     const glm::vec3& scale)
 {
     engine::ecs::EntityId entity = createEntity(name, position, rotation, scale);
-    auto modelData = model ? model->legacyModel : nullptr;
+    const int skinIndex = model && !model->skins.empty() ? 0 : -1;
     registry_.emplace<engine::ecs::SkinnedRenderable>(
         entity,
         engine::ecs::SkinnedRenderable{
             std::move(renderers),
             std::move(material),
             std::move(model),
-            std::move(modelData)});
+            skinIndex});
     setParent(entity, parent);
     return entity;
 }

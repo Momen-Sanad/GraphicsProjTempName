@@ -81,7 +81,7 @@ int main()
 
     if (std::filesystem::exists(SWORDMAN_GLTF_PATH)) {
         auto model = world.assets().loadModel(SWORDMAN_GLTF_PATH);
-        if (model && model->legacyModel && !model->legacyModel->meshes.empty()) {
+        if (model && !model->primitives.empty()) {
             auto renderers = world.assets().createSkinnedMeshRenderers("demo-swordman", *model);
             std::shared_ptr<Texture> texture;
             if (!model->textures.empty()) {
@@ -100,7 +100,8 @@ int main()
                 glm::vec3(0.01f));
 
             auto& animation = world.registry().emplace<engine::ecs::AnimatorData>(character);
-            animation.modelData = model->legacyModel;
+            animation.model = model;
+            animation.skinIndex = 0;
             animation.currentAnimation = 0;
             animation.playing = true;
             animation.loop = true;

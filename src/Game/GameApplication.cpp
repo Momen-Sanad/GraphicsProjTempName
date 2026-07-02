@@ -5,7 +5,6 @@
 #include "Entities/Crusader.hpp"
 #include "Entities/Enemy.hpp"
 
-#include "../engine/assets/ModelData.hpp"
 #include "../engine/components/CombatComponent.hpp"
 #include "../engine/components/HealthComponent.hpp"
 #include "../engine/components/HurtboxComponent.hpp"
@@ -350,7 +349,8 @@ void GameApplication::setupWorld()
             glm::vec3(swordmanScale));
 
         auto& animation = world_.registry().emplace<engine::ecs::AnimatorData>(state_.playerVisual);
-        animation.modelData = assets_.swordmanModel->legacyModel;
+        animation.model = assets_.swordmanModel;
+        animation.skinIndex = 0;
         animation.currentAnimation = 0;
         animation.playing = true;
         animation.loop = true;
@@ -436,7 +436,8 @@ engine::ecs::EntityId GameApplication::spawnEnemy(const glm::vec3& position)
             glm::vec3(skeletonScale));
 
         auto& animation = world_.registry().emplace<engine::ecs::AnimatorData>(visual);
-        animation.modelData = assets_.skeletonModel->legacyModel;
+        animation.model = assets_.skeletonModel;
+        animation.skinIndex = 0;
         animation.currentAnimation = 0;
         animation.playing = true;
         animation.loop = true;
