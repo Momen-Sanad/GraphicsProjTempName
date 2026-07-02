@@ -4,6 +4,7 @@
 #include "engine/ecs/Registry.hpp"
 #include "engine/ecs/SystemManager.hpp"
 #include "engine/ecs/World.hpp"
+#include "engine/systems/PhysicsCollisionSystem.hpp"
 #include "engine/systems/TransformSystem.hpp"
 
 #include <glm/gtc/epsilon.hpp>
@@ -178,6 +179,50 @@ void test_world_recursive_destroy()
     assert_true(reused.generation != root.generation, "Reused slot should invalidate old handle generation");
 }
 
+void add_collider(World& world, engine::ecs::EntityId entity, const glm::vec3& halfExtents)
+{
+    auto& collider = world.registry().emplace<engine::ecs::ColliderData>(entity);
+    collider.halfExtents = halfExtents;
+}
+
+void test_collision_refreshes_world_transform()
+{
+    World world;
+    engine::ecs::EntityId mover = world.createEntity("mover", glm::vec3(0.0f));
+    engine::ecs::EntityId obstacle = world.createEntity("obstacle", glm::vec3(0.75f, 0.0f, 0.0f));
+    add_collider(world, mover, glm::vec3(0.5f));
+    add_collider(world, obstacle, glm::vec3(0.5f));
+
+    const bool resolved = PhysicsCollisionSystem::resolveStaticCollision(world.registry(), mover, obstacle);
+    const auto* transform = world.registry().get<engine::ecs::Transform>(mover);
+
+    assert_true(resolved, "Overlapping colliders should resolve");
+    assert_close(transform->position.x, -0.25f, "Mover local position should be corrected");
+    assert_close(transform->worldMatrix[3].x, -0.25f, "World matrix should refresh after collision correction");
+}
+
+void test_collision_correction_respects_parent_space()
+{
+    World world;
+    engine::ecs::EntityId parent = world.createEntity(
+        "parent",
+        glm::vec3(10.0f, 0.0f, 0.0f),
+        glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
+        glm::vec3(2.0f, 1.0f, 1.0f));
+    engine::ecs::EntityId mover = world.createEntity("mover", glm::vec3(0.0f));
+    engine::ecs::EntityId obstacle = world.createEntity("obstacle", glm::vec3(10.75f, 0.0f, 0.0f));
+    assert_true(world.setParent(mover, parent), "Mover should be parented for local-space collision test");
+    add_collider(world, mover, glm::vec3(0.5f));
+    add_collider(world, obstacle, glm::vec3(0.5f));
+
+    const bool resolved = PhysicsCollisionSystem::resolveStaticCollision(world.registry(), mover, obstacle);
+    const auto* transform = world.registry().get<engine::ecs::Transform>(mover);
+
+    assert_true(resolved, "Parented overlapping colliders should resolve");
+    assert_close(transform->position.x, -0.375f, "World correction should be converted into parent local space");
+    assert_close(transform->worldMatrix[3].x, 9.25f, "Parented mover world matrix should refresh after correction");
+}
+
 class CountingSystem final : public engine::ecs::System {
 public:
     void update(engine::ecs::Registry&, float deltaTime) override
@@ -213,6 +258,8 @@ int main()
     run_test("hierarchy_rejects_cycles", test_hierarchy_rejects_cycles);
     run_test("world_factory_renderable_handles", test_world_factory_renderable_handles);
     run_test("world_recursive_destroy", test_world_recursive_destroy);
+    run_test("collision_refreshes_world_transform", test_collision_refreshes_world_transform);
+    run_test("collision_correction_respects_parent_space", test_collision_correction_respects_parent_space);
     run_test("system_manager_updates", test_system_manager_updates);
 
     std::cout << "Tests passed: " << tests_passed << std::endl;

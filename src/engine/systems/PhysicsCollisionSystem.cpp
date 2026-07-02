@@ -1,8 +1,34 @@
 #include "PhysicsCollisionSystem.hpp"
 
 #include "../ecs/Registry.hpp"
+#include "TransformSystem.hpp"
 
 #include <limits>
+
+namespace {
+glm::vec3 world_correction_to_local(
+    engine::ecs::Registry& registry,
+    engine::ecs::EntityId mover,
+    const glm::vec3& correction)
+{
+    const auto* hierarchy = registry.get<engine::ecs::Hierarchy>(mover);
+    if (!hierarchy || !registry.isAlive(hierarchy->parent)) {
+        return correction;
+    }
+
+    const auto* parentTransform = registry.get<engine::ecs::Transform>(hierarchy->parent);
+    if (!parentTransform) {
+        return correction;
+    }
+
+    const glm::mat3 parentBasis(parentTransform->worldMatrix);
+    if (glm::abs(glm::determinant(parentBasis)) <= 1e-6f) {
+        return correction;
+    }
+
+    return glm::inverse(parentBasis) * correction;
+}
+} // namespace
 
 bool PhysicsCollisionSystem::computeMeshBounds(const Mesh& mesh, MeshBounds& outBounds) {
     const auto positions = mesh.get_positions();
@@ -70,6 +96,8 @@ bool PhysicsCollisionSystem::resolveStaticCollision(
     engine::ecs::EntityId mover,
     engine::ecs::EntityId obstacle)
 {
+    TransformSystem::updateWorldTransforms(registry);
+
     auto* moverTransform = registry.get<engine::ecs::Transform>(mover);
     auto* moverCollider = registry.get<engine::ecs::ColliderData>(mover);
     auto* obstacleTransform = registry.get<engine::ecs::Transform>(obstacle);
@@ -107,7 +135,8 @@ bool PhysicsCollisionSystem::resolveStaticCollision(
         correction.z = (delta.z < 0.0f) ? -overlap.z : overlap.z;
     }
 
-    moverTransform->position += correction;
+    moverTransform->position += world_correction_to_local(registry, mover, correction);
     moverTransform->dirty = true;
+    TransformSystem::updateWorldTransforms(registry);
     return true;
 }
