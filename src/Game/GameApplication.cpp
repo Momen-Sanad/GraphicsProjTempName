@@ -84,7 +84,12 @@ bool isDeadOrMissing(World& world, engine::ecs::EntityId entity)
 
 namespace game {
 
-GameApplication::~GameApplication() = default;
+GameApplication::~GameApplication()
+{
+    player_.reset();
+    assets_ = GameAssets{};
+    world_.shutdownGpuResources();
+}
 
 int GameApplication::run()
 {
@@ -107,6 +112,9 @@ int GameApplication::run()
     ImGui_ImplOpenGL3_Init("#version 330");
 
     if (!loadAssets()) {
+        player_.reset();
+        assets_ = GameAssets{};
+        world_.shutdownGpuResources();
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
@@ -130,8 +138,8 @@ int GameApplication::run()
     }
 
     player_.reset();
-    world_.clear();
-    world_.assets().clear();
+    assets_ = GameAssets{};
+    world_.shutdownGpuResources();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <cstdint>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -26,6 +27,7 @@ public:
 
     // Create texture from image data
     void create(int textureWidth, int textureHeight, const unsigned char* data, GLenum textureFormat = GL_RGBA);
+    static Texture createSolid(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
     void destroy();
 
     // Set filtering options

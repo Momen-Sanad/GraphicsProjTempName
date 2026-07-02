@@ -49,6 +49,7 @@ public:
     void setParent(engine::ecs::EntityId child, engine::ecs::EntityId parent);
     void destroyEntity(engine::ecs::EntityId entity, DestroyMode mode = DestroyMode::Recursive);
     void clear();
+    void shutdownGpuResources();
 
     engine::ecs::Transform* transform(engine::ecs::EntityId entity);
     const engine::ecs::Transform* transform(engine::ecs::EntityId entity) const;

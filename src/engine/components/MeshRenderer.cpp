@@ -1,5 +1,7 @@
 #include "MeshRenderer.hpp"
 
+#include <GLFW/glfw3.h>
+
 // ------------------------------------------------------------
 // Constructor / Destructor
 // ------------------------------------------------------------
@@ -132,10 +134,11 @@ void MeshRenderer::draw() const {
 // Destroy OpenGL GPU Objects
 // ------------------------------------------------------------
 void MeshRenderer::destroy() {
+    const bool hasContext = glfwGetCurrentContext() != nullptr;
     // Delete the OpenGL resources if they exist
-    if (vao) glDeleteVertexArrays(1, &vao);
-    if (vbo) glDeleteBuffers(1, &vbo);
-    if (ebo) glDeleteBuffers(1, &ebo);
+    if (hasContext && vao) glDeleteVertexArrays(1, &vao);
+    if (hasContext && vbo) glDeleteBuffers(1, &vbo);
+    if (hasContext && ebo) glDeleteBuffers(1, &ebo);
 
     vao   = 0;
     vbo   = 0;

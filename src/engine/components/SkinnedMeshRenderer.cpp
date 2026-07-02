@@ -1,5 +1,6 @@
 #include "SkinnedMeshRenderer.hpp"
 
+#include <GLFW/glfw3.h>
 
 SkinnedMeshRenderer::SkinnedMeshRenderer() : MeshRenderer() {}
 
@@ -129,8 +130,8 @@ void SkinnedMeshRenderer::destroy() {
     MeshRenderer::destroy();
 
     // Destroy skeleton VBO
-    if (skeleton_vbo) {
+    if (glfwGetCurrentContext() != nullptr && skeleton_vbo) {
         glDeleteBuffers(1, &skeleton_vbo);
-        skeleton_vbo = 0;
     }
+    skeleton_vbo = 0;
 }

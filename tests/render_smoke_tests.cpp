@@ -93,8 +93,7 @@ int main()
         glFinish();
 
         GLenum err = glGetError();
-        world.clear();
-        world.assets().clear();
+        world.shutdownGpuResources();
         glfwDestroyWindow(window);
         glfwTerminate();
 

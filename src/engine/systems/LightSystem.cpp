@@ -2,14 +2,20 @@
 #include <cstring> // memcpy
 #include "../gl/Shader.hpp"
 #include <iostream>
+#include <GLFW/glfw3.h>
 
 // Helper: round up to 16-bytes if we need manual padding (we use vec4 arrays, so fine)
 LightSystem::LightSystem() = default;
 
 LightSystem::~LightSystem() {
-    if (ubo != 0) {
+    shutdownGpuResources();
+}
+
+void LightSystem::shutdownGpuResources() {
+    if (ubo != 0 && glfwGetCurrentContext() != nullptr) {
         glDeleteBuffers(1, &ubo);
     }
+    ubo = 0;
 }
 
 void LightSystem::addLight(const Light& light) {

@@ -11,6 +11,7 @@ public:
     static constexpr int MAX_LIGHTS = 8;
     LightSystem();
     ~LightSystem();
+    void shutdownGpuResources();
 
     // Add a light
     void addLight(const Light& light);

@@ -67,8 +67,7 @@ int main()
 
     if (!tintShader || !skinnedShader) {
         std::cerr << "Failed to load demo shaders.\n";
-        world.clear();
-        world.assets().clear();
+        world.shutdownGpuResources();
         return 1;
     }
 
@@ -142,7 +141,6 @@ int main()
         window.swap_buffers();
     }
 
-    world.clear();
-    world.assets().clear();
+    world.shutdownGpuResources();
     return 0;
 }

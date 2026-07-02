@@ -15,7 +15,9 @@ Texture::~Texture()
     destroy();
 }
 
-Texture::Texture(Texture&& other) noexcept {
+Texture::Texture(Texture&& other) noexcept
+    : id(0), sampler(0), width(0), height(0), format(GL_RGBA)
+{
     *this = std::move(other);
 }
 
@@ -40,8 +42,9 @@ Texture& Texture::operator=(Texture&& other) noexcept {
 
 void Texture::destroy()
 {
-    if (id != 0 && glad_glDeleteTextures) glDeleteTextures(1, &id);
-    if (sampler != 0 && glad_glDeleteSamplers) glDeleteSamplers(1, &sampler);
+    const bool hasContext = glfwGetCurrentContext() != nullptr;
+    if (hasContext && id != 0 && glad_glDeleteTextures) glDeleteTextures(1, &id);
+    if (hasContext && sampler != 0 && glad_glDeleteSamplers) glDeleteSamplers(1, &sampler);
 
     id = 0;
     sampler = 0;
@@ -101,6 +104,14 @@ void Texture::create(int textureWidth, int textureHeight, const unsigned char* d
         glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &max_aniso);  // Get the maximum anisotropy value supported by the hardware
         glSamplerParameterf(sampler, GL_TEXTURE_MAX_ANISOTROPY, max_aniso);  // Set the anisotropic filtering level
     }
+}
+
+Texture Texture::createSolid(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+{
+    Texture texture;
+    const unsigned char pixel[4] = {r, g, b, a};
+    texture.create(1, 1, pixel, GL_RGBA);
+    return texture;
 }
 
 // ----------------------------------------------------

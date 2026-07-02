@@ -1,4 +1,5 @@
 #include "Shader.hpp"
+#include <GLFW/glfw3.h>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -127,7 +128,9 @@ bool Shader::createFromFiles(const std::string& vsPath,
 // ----------------------------------------------------
 void Shader::destroy() {
     if (program) {
-        glDeleteProgram(program);  // Deletes the shader program from OpenGL
+        if (glfwGetCurrentContext() != nullptr) {
+            glDeleteProgram(program);  // Deletes the shader program from OpenGL
+        }
         program = 0;  // Set program ID to 0 to indicate it's been deleted
     }
     uniformCache.clear();  // Clear the cached uniform locations

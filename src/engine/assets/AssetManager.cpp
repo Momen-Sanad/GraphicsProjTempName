@@ -192,4 +192,5 @@ void AssetManager::clear()
     models_.clear();
     meshes_.clear();
     textures_.clear();
+    TextureLoader::clear_cache();
 }

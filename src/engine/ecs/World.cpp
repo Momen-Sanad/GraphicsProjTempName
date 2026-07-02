@@ -118,6 +118,13 @@ void World::clear() {
     registry_.clear();
 }
 
+void World::shutdownGpuResources() {
+    registry_.clear();
+    systemManager_.clear();
+    assetManager_.clear();
+    lightSystem_.shutdownGpuResources();
+}
+
 engine::ecs::Transform* World::transform(engine::ecs::EntityId entity) {
     return registry_.get<engine::ecs::Transform>(entity);
 }
