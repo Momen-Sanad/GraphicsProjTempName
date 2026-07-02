@@ -4,6 +4,8 @@
 #include "../gl/Texture.hpp"
 #include "../gl/Shader.hpp"
 
+#include <glm/glm.hpp>
+
 #include <memory>
 
 class LitMaterial : public Material
@@ -14,6 +16,11 @@ private:
     std::shared_ptr<Texture> roughnessMap;
     std::shared_ptr<Texture> emissiveMap;
     std::shared_ptr<Texture> ambientOcclusionMap;
+    glm::vec3 albedoFactor = glm::vec3(1.0f);
+    glm::vec3 specularFactor = glm::vec3(0.04f);
+    glm::vec3 emissiveFactor = glm::vec3(0.0f);
+    float roughnessFactor = 0.5f;
+    float ambientOcclusionFactor = 1.0f;
 
 public:
     LitMaterial(std::shared_ptr<Shader> shader,

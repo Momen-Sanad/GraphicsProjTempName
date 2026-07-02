@@ -29,19 +29,40 @@ struct TexturedMaterial {
     sampler2D ambient_occlusion_map;
     sampler2D roughness_map;
     sampler2D emissive_map;
+    bool has_albedo_map;
+    bool has_specular_map;
+    bool has_ambient_occlusion_map;
+    bool has_roughness_map;
+    bool has_emissive_map;
+    vec3 albedo_factor;
+    vec3 specular_factor;
+    vec3 emissive_factor;
+    float roughness_factor;
+    float ambient_occlusion_factor;
 };
 
 // This function samples the texture maps from the textured material and calculates the equivalent material at the given texture coordinates.
 Material sample_material(TexturedMaterial tex_mat, vec2 tex_coord){
     Material mat;
-    vec4 albedo = texture(tex_mat.albedo_map, tex_coord);
+    vec4 albedo = tex_mat.has_albedo_map
+        ? texture(tex_mat.albedo_map, tex_coord)
+        : vec4(tex_mat.albedo_factor, 1.0);
     mat.diffuse = albedo.rgb;
     mat.alpha = albedo.a;
-    mat.specular = texture(tex_mat.specular_map, tex_coord).rgb;
-    mat.emissive = texture(tex_mat.emissive_map, tex_coord).rgb;
-    mat.ambient = mat.diffuse * texture(tex_mat.ambient_occlusion_map, tex_coord).r;
+    mat.specular = tex_mat.has_specular_map
+        ? texture(tex_mat.specular_map, tex_coord).rgb
+        : tex_mat.specular_factor;
+    mat.emissive = tex_mat.has_emissive_map
+        ? texture(tex_mat.emissive_map, tex_coord).rgb
+        : tex_mat.emissive_factor;
+    float ao = tex_mat.has_ambient_occlusion_map
+        ? texture(tex_mat.ambient_occlusion_map, tex_coord).r
+        : tex_mat.ambient_occlusion_factor;
+    mat.ambient = mat.diffuse * ao;
 
-    float roughness = texture(tex_mat.roughness_map, tex_coord).r;
+    float roughness = tex_mat.has_roughness_map
+        ? texture(tex_mat.roughness_map, tex_coord).r
+        : tex_mat.roughness_factor;
     // We are using a formula designed the Blinn-Phong model which is a popular approximation of the Phong model.
     // The source of the formula is http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
     // It is noteworthy that we clamp the roughness to prevent its value from ever becoming 0 or 1 to prevent lighting artifacts.

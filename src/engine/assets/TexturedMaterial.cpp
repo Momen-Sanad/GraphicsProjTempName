@@ -1,5 +1,6 @@
 #include "TexturedMaterial.hpp"
 #include <algorithm>
+#include <string>
 
 // ------------------------------------------------------
 // Default Constructor
@@ -63,22 +64,28 @@ int TexturedMaterial::getTextureUnit() const
 // Add a texture layer with specified blend mode and weight
 void TexturedMaterial::addTextureLayer(std::shared_ptr<Texture> tex, BlendMode blmod, float blendWeight)
 {
+    if (!tex)
+        return;
+
     // If the maximum number of texture layers is reached, do not add another one
     if (textureLayers.size() >= maxTextures)
         return;
 
     int unit = static_cast<int>(textureLayers.size());  // Use the current size of texture layers as the texture unit
-    textureLayers.emplace_back(tex, unit, blmod, blendWeight);  // Add a new texture layer
+    textureLayers.emplace_back(std::move(tex), unit, blmod, std::clamp(blendWeight, 0.0f, 1.0f));  // Add a new texture layer
 }
 
 // Add a texture layer with a specified texture unit, blend mode, and weight
 void TexturedMaterial::addTextureLayer(std::shared_ptr<Texture> tex, int unit, BlendMode blmod, float blendWeight)
 {
+    if (!tex)
+        return;
+
     // If the maximum number of texture layers is reached, do not add another one
     if (textureLayers.size() >= maxTextures)
         return;
 
-    textureLayers.emplace_back(tex, unit, blmod, blendWeight);  // Add a new texture layer with specified parameters
+    textureLayers.emplace_back(std::move(tex), unit, blmod, std::clamp(blendWeight, 0.0f, 1.0f));  // Add a new texture layer with specified parameters
 }
 
 // Set a texture layer at a specific index with new texture, blend mode, and weight
@@ -86,8 +93,13 @@ void TexturedMaterial::setTextureLayer(int index, std::shared_ptr<Texture> tex, 
 {
     if (index >= 0 && index < textureLayers.size())
     {
-        textureLayers[index].texture = tex;
-        textureLayers[index].blendWeight = blendWeight;
+        if (!tex) {
+            removeTextureLayer(index);
+            return;
+        }
+
+        textureLayers[index].texture = std::move(tex);
+        textureLayers[index].blendWeight = std::clamp(blendWeight, 0.0f, 1.0f);
         textureLayers[index].blendMode = blmod;
     }
 }
@@ -148,18 +160,24 @@ void TexturedMaterial::setup()
 
     shader->use();  // Use the shader for this material
 
-    int count = static_cast<int>(textureLayers.size());  // Get the number of texture layers
+    std::vector<const TextureLayer*> activeLayers;
+    activeLayers.reserve(textureLayers.size());
+    for (const TextureLayer& layer : textureLayers) {
+        if (layer.texture) {
+            activeLayers.push_back(&layer);
+        }
+    }
+
+    int count = static_cast<int>(activeLayers.size());  // Get the number of usable texture layers
+    shader->setUniform("u_hasTexture", count > 0);
+    shader->setUniform("u_textureCount", count);
     if (count == 0)
         return;  // If no textures are added, do nothing
 
     // Bind all textures to fixed texture units (0, 1, ..., n)
     for (int i = 0; i < count; i++)
     {
-        if (textureLayers[i].texture)
-        {
-            glActiveTexture(GL_TEXTURE0 + i);  // Activate the corresponding texture unit
-            glBindTexture(GL_TEXTURE_2D, textureLayers[i].texture->get_id());  // Bind the texture
-        }
+        activeLayers[i]->texture->bind(i);
     }
 
     // Set fixed sampler uniform names: u_tex0, u_tex1, ..., u_tex7
@@ -171,15 +189,14 @@ void TexturedMaterial::setup()
     // Assign each texture unit to its respective sampler uniform in the shader
     for (int i = 0; i < count; i++)
     {
-        GLint loc = getUniformLocation(samplerNames[i]);  // Get the location of the uniform
-        if (loc != -1)
-            glUniform1i(loc, i);  // Set the texture unit for the sampler
+        shader->setUniform(samplerNames[i], i);
     }
+    shader->setUniform("u_texture", 0);
 
     // Upload blend weights to the shader
     std::vector<float> weights(count);
     for (int i = 0; i < count; i++)
-        weights[i] = textureLayers[i].blendWeight;  // Store the blend weights
+        weights[i] = activeLayers[i]->blendWeight;  // Store the blend weights
 
     GLint weightsLoc = getUniformLocation("u_blendWeights");
     if (weightsLoc != -1)
@@ -188,16 +205,12 @@ void TexturedMaterial::setup()
     // Upload blend modes to the shader
     std::vector<GLint> modes(count);
     for (int i = 0; i < count; i++)
-        modes[i] = static_cast<GLint>(textureLayers[i].blendMode);  // Store the blend modes
+        modes[i] = static_cast<GLint>(activeLayers[i]->blendMode);  // Store the blend modes
 
     GLint modesLoc = getUniformLocation("u_blendModes");
     if (modesLoc != -1)
         glUniform1iv(modesLoc, count, modes.data());  // Upload blend modes to the shader
 
-    // Upload the number of textures to the shader
-    GLint countLoc = getUniformLocation("u_textureCount");
-    if (countLoc != -1)
-        glUniform1i(countLoc, count);  // Upload the texture count
 }
 
 void TexturedMaterial::setAlbedoTexture(std::shared_ptr<Texture> tex) {

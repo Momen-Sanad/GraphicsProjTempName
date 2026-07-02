@@ -3,6 +3,33 @@
 
 #include <utility>
 
+namespace {
+void bind_map(
+    const std::shared_ptr<Shader>& shader,
+    const char* legacyName,
+    const char* modernName,
+    const char* legacyHasName,
+    const char* modernHasName,
+    const std::shared_ptr<Texture>& texture,
+    int unit)
+{
+    if (texture) {
+        texture->bind(unit);
+    } else {
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        if (glad_glBindSampler) {
+            glBindSampler(unit, 0);
+        }
+    }
+
+    shader->setUniform(legacyName, unit);
+    shader->setUniform(modernName, unit);
+    shader->setUniform(legacyHasName, texture != nullptr);
+    shader->setUniform(modernHasName, texture != nullptr);
+}
+} // namespace
+
 LitMaterial::LitMaterial(
     std::shared_ptr<Shader> shader,
     std::shared_ptr<Texture> albedo,
@@ -39,27 +66,31 @@ void LitMaterial::setup()
     shader->use();
 
     // Albedo
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, albedoMap ? albedoMap->get_id() : 0);
-    shader->setUniform("material.albedo_map", 0);
+    bind_map(shader, "material.albedo_map", "u_material.albedoMap", "material.has_albedo_map", "u_material.hasAlbedoMap", albedoMap, 0);
 
     // Specular
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, specularMap ? specularMap->get_id() : 0);
-    shader->setUniform("material.specular_map", 1);
+    bind_map(shader, "material.specular_map", "u_material.specularMap", "material.has_specular_map", "u_material.hasSpecularMap", specularMap, 1);
 
     // Ambient Occlusion
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, ambientOcclusionMap ? ambientOcclusionMap->get_id() : 0);
-    shader->setUniform("material.ambient_occlusion_map", 2);
+    bind_map(shader, "material.ambient_occlusion_map", "u_material.aoMap", "material.has_ambient_occlusion_map", "u_material.hasAoMap", ambientOcclusionMap, 2);
 
     // Roughness
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, roughnessMap ? roughnessMap->get_id() : 0);
-    shader->setUniform("material.roughness_map", 3);
+    bind_map(shader, "material.roughness_map", "u_material.roughnessMap", "material.has_roughness_map", "u_material.hasRoughnessMap", roughnessMap, 3);
 
     // Emissive
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, emissiveMap ? emissiveMap->get_id() : 0);
-    shader->setUniform("material.emissive_map", 4);
+    bind_map(shader, "material.emissive_map", "u_material.emissionMap", "material.has_emissive_map", "u_material.hasEmissionMap", emissiveMap, 4);
+
+    shader->setUniform("material.albedo_factor", albedoFactor);
+    shader->setUniform("material.specular_factor", specularFactor);
+    shader->setUniform("material.emissive_factor", emissiveFactor);
+    shader->setUniform("material.roughness_factor", roughnessFactor);
+    shader->setUniform("material.ambient_occlusion_factor", ambientOcclusionFactor);
+
+    shader->setUniform("u_material.albedoFactor", albedoFactor);
+    shader->setUniform("u_material.metallicMap", 1);
+    shader->setUniform("u_material.hasMetallicMap", false);
+    shader->setUniform("u_material.metallicFactor", 0.0f);
+    shader->setUniform("u_material.roughnessFactor", roughnessFactor);
+    shader->setUniform("u_material.aoFactor", ambientOcclusionFactor);
+    shader->setUniform("u_material.emissionFactor", emissiveFactor);
 }

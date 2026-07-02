@@ -23,6 +23,11 @@ struct Material {
     sampler2D roughnessMap;
     sampler2D aoMap;
     sampler2D emissionMap;
+    bool hasAlbedoMap;
+    bool hasMetallicMap;
+    bool hasRoughnessMap;
+    bool hasAoMap;
+    bool hasEmissionMap;
     vec3 albedoFactor;
     float metallicFactor;
     float roughnessFactor;
@@ -71,11 +76,17 @@ void main() {
     vec3 N = normalize(v_normal);
     vec3 V = normalize(u_cameraPos - v_worldPos);
     // Fetch material maps (fall back to factors)
-    vec3 albedo = (texture(u_material.albedoMap, v_uv).rgb) * u_material.albedoFactor;
-    float metallic = texture(u_material.metallicMap, v_uv).r * u_material.metallicFactor;
-    float roughness = texture(u_material.roughnessMap, v_uv).r * u_material.roughnessFactor;
-    float ao = texture(u_material.aoMap, v_uv).r * u_material.aoFactor;
-    vec3 emission = texture(u_material.emissionMap, v_uv).rgb * u_material.emissionFactor;
+    vec3 albedoSample = u_material.hasAlbedoMap ? texture(u_material.albedoMap, v_uv).rgb : vec3(1.0);
+    float metallicSample = u_material.hasMetallicMap ? texture(u_material.metallicMap, v_uv).r : 1.0;
+    float roughnessSample = u_material.hasRoughnessMap ? texture(u_material.roughnessMap, v_uv).r : 1.0;
+    float aoSample = u_material.hasAoMap ? texture(u_material.aoMap, v_uv).r : 1.0;
+    vec3 emissionSample = u_material.hasEmissionMap ? texture(u_material.emissionMap, v_uv).rgb : vec3(1.0);
+
+    vec3 albedo = albedoSample * u_material.albedoFactor;
+    float metallic = metallicSample * u_material.metallicFactor;
+    float roughness = roughnessSample * u_material.roughnessFactor;
+    float ao = aoSample * u_material.aoFactor;
+    vec3 emission = emissionSample * u_material.emissionFactor;
 
     if (u_debugMode == 1) {
         fragColor = vec4(albedo, 1.0);
