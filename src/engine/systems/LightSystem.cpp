@@ -105,15 +105,17 @@ void LightSystem::updateUBO() {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void LightSystem::bindToShader(std::shared_ptr<Shader> shader) {
+bool LightSystem::bindToShader(std::shared_ptr<Shader> shader) {
     if (!shader || ubo == 0 || !glad_glGetUniformBlockIndex || !glad_glUniformBlockBinding) {
-        return;
+        return false;
     }
 
     GLuint block_index = glGetUniformBlockIndex(shader->getProgram(), "LightBlock");
     if (block_index != GL_INVALID_INDEX) {
         glUniformBlockBinding(shader->getProgram(), block_index, bindingPoint);
+        return true;
     }
+    return false;
 }
 
 void LightSystem::setupLightsInShader(std::shared_ptr<Shader> shader) {
@@ -122,7 +124,8 @@ void LightSystem::setupLightsInShader(std::shared_ptr<Shader> shader) {
 
     if (!shader) return;
     shader->use();
-    bindToShader(shader);
+    const bool usingLightBlock = bindToShader(shader);
+    shader->setUniform("u_useLightBlock", usingLightBlock);
     shader->setUniform("light_count", static_cast<int>(lights.size()));
     shader->setUniform("u_lightCount", static_cast<int>(lights.size()));
     for (size_t i = 0; i < lights.size() && i < (size_t)MAX_LIGHTS; ++i) {

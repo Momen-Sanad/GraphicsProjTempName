@@ -110,6 +110,30 @@ uniform int u_debugMode;
 uniform TexturedMaterial material;
 uniform Light lights[MAX_LIGHT_COUNT];
 uniform int light_count;
+uniform bool u_useLightBlock;
+
+layout(std140) uniform LightBlock {
+    vec4 lb_header;
+    vec4 lb_data[MAX_LIGHT_COUNT * 4];
+};
+
+Light light_from_block(int index) {
+    int base = index * 4;
+    vec4 color = lb_data[base + 0];
+    vec4 posType = lb_data[base + 1];
+    vec4 dir = lb_data[base + 2];
+    vec4 angles = lb_data[base + 3];
+
+    Light light;
+    light.type = int(posType.w + 0.5);
+    light.color = color.rgb;
+    light.position = posType.xyz;
+    light.direction = dir.xyz;
+    light.cos_inner_angle = angles.x;
+    light.cos_outer_angle = angles.y;
+    light.intensity = color.w;
+    return light;
+}
 
 void main() {
     // First, we sample the material color from the material textures.
@@ -136,10 +160,12 @@ void main() {
     vec3 accumulated_light = sampled.emissive + sampled.ambient * ambient;
 
     // Make sure that the actual light count never exceeds the maximum light count.
-    int count = min(light_count, MAX_LIGHT_COUNT);
+    int count = u_useLightBlock
+        ? min(int(lb_header.x + 0.5), MAX_LIGHT_COUNT)
+        : min(light_count, MAX_LIGHT_COUNT);
     // Now we will loop over all the lights.
     for(int index = 0; index < count; index++){
-        Light light = lights[index];
+        Light light = u_useLightBlock ? light_from_block(index) : lights[index];
         vec3 Ldir;
         float attenuation = 1.0;
         float intensity = light.intensity;

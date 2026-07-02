@@ -31,6 +31,30 @@ struct Light {
 
 uniform Light lights[MAX_LIGHT_COUNT];
 uniform int light_count;
+uniform bool u_useLightBlock;
+
+layout(std140) uniform LightBlock {
+    vec4 lb_header;
+    vec4 lb_data[MAX_LIGHT_COUNT * 4];
+};
+
+Light light_from_block(int index) {
+    int base = index * 4;
+    vec4 color = lb_data[base + 0];
+    vec4 posType = lb_data[base + 1];
+    vec4 dir = lb_data[base + 2];
+    vec4 angles = lb_data[base + 3];
+
+    Light light;
+    light.type = int(posType.w + 0.5);
+    light.color = color.rgb;
+    light.position = posType.xyz;
+    light.direction = dir.xyz;
+    light.cos_inner_angle = angles.x;
+    light.cos_outer_angle = angles.y;
+    light.intensity = color.w;
+    return light;
+}
 
 vec3 apply_light(Light light, vec3 normal, vec3 view, vec3 baseColor) {
     vec3 Ldir;
@@ -82,9 +106,12 @@ void main() {
 
     vec3 view = normalize(camera_pos - vWorldPos);
     vec3 lit = baseColor.rgb * ambient;
-    int count = min(light_count, MAX_LIGHT_COUNT);
+    int count = u_useLightBlock
+        ? min(int(lb_header.x + 0.5), MAX_LIGHT_COUNT)
+        : min(light_count, MAX_LIGHT_COUNT);
     for (int i = 0; i < count; i++) {
-        lit += apply_light(lights[i], normal, view, baseColor.rgb);
+        Light light = u_useLightBlock ? light_from_block(i) : lights[i];
+        lit += apply_light(light, normal, view, baseColor.rgb);
     }
 
     vec3 color = lit;

@@ -10,11 +10,36 @@ struct Light {
     float outerCone; // cos
 };
 
-#define MAX_LIGHTS 16
+#define MAX_LIGHTS 8
 uniform int u_lightCount;
 uniform Light u_lights[MAX_LIGHTS];
 uniform vec3 u_cameraPos;
 uniform int u_debugMode;
+uniform bool u_useLightBlock;
+
+layout(std140) uniform LightBlock {
+    vec4 lb_header;
+    vec4 lb_data[MAX_LIGHTS * 4];
+};
+
+Light lightFromBlock(int index) {
+    int base = index * 4;
+    vec4 color = lb_data[base + 0];
+    vec4 posType = lb_data[base + 1];
+    vec4 dir = lb_data[base + 2];
+    vec4 angles = lb_data[base + 3];
+
+    Light light;
+    light.type = int(posType.w + 0.5);
+    light.position = posType.xyz;
+    light.direction = dir.xyz;
+    light.color = color.rgb;
+    light.intensity = color.w;
+    light.range = 25.0;
+    light.innerCone = angles.x;
+    light.outerCone = angles.y;
+    return light;
+}
 
 // material
 struct Material {
@@ -102,8 +127,10 @@ void main() {
     }
 
     vec3 accum = vec3(0.0);
-    for (int i = 0; i < u_lightCount; ++i) {
-        accum += applyLight(u_lights[i], N, V, albedo, metallic, roughness);
+    int lightCount = u_useLightBlock ? min(int(lb_header.x + 0.5), MAX_LIGHTS) : min(u_lightCount, MAX_LIGHTS);
+    for (int i = 0; i < lightCount; ++i) {
+        Light light = u_useLightBlock ? lightFromBlock(i) : u_lights[i];
+        accum += applyLight(light, N, V, albedo, metallic, roughness);
     }
 
     accum = accum * ao + emission;
