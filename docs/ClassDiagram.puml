@@ -38,25 +38,24 @@ package "Platform" as Platform {
 
 package "ECS" as ECS {
   class World {
-    +addEntity()
-    +removeEntity()
-  }
-  class Entity {
-    +name
-    +transform
-    +parent
-  }
-  abstract class Component {
-    +deserialize()
-  }
-  class EntityManager {
     +createEntity()
     +destroyEntity()
+    +registry()
+    +assets()
+    +renderer()
   }
-  class ComponentManager {
-    +addComponent()
-    +removeComponent()
+  class EntityId {
+    +index
+    +generation
   }
+  class Registry {
+    +createEntity()
+    +destroyEntity()
+    +emplace()
+    +get()
+    +each()
+  }
+  class ComponentSignature
   abstract class System {
     +update()
   }
@@ -65,8 +64,8 @@ package "ECS" as ECS {
     +updateSystems()
   }
   class Coordinator {
-    +getEntityManager()
-    +getComponentManager()
+    +registry()
+    +systems()
   }
 }
 
@@ -212,18 +211,13 @@ Application --> Engine : controls
 Input --> CameraControlSystem : feeds
 Input --> ScriptSystem : feeds
 
-World o-- EntityManager
-World o-- ComponentManager
+World o-- Registry
 World o-- SystemManager
 
-Entity *-- Transform : has
-Entity *-- Component : has
-
-EntityManager --> Entity : "creates / manages"
-ComponentManager --> Component : stores
+Registry --> EntityId : "creates / validates"
+Registry --> ComponentSignature : tracks
 SystemManager --> System : "stores / updates"
-Coordinator --> EntityManager
-Coordinator --> ComponentManager
+Coordinator --> Registry
 Coordinator --> SystemManager
 
 MeshRenderer --> Mesh : renders
@@ -249,13 +243,13 @@ RenderSystem --> Camera : uses
 RenderSystem --> MeshRenderer : draws
 RenderSystem --> PostProcessingPass : applies
 
-Scene --> Entity : describes
+Scene --> EntityId : describes
 SceneDeserializer --> AssetManager : "loads assets"
-SceneDeserializer --> EntityManager : "creates entities"
+SceneDeserializer --> World : "creates entities"
 SceneDeserializer --> Scene : populates
 SceneDeserializer --> Transform : "sets transforms"
 
-PhysicsSystem --> EntityManager : queries
+PhysicsSystem --> Registry : queries
 PhysicsSystem --> Transform : updates
 
 CameraControlSystem --> Input

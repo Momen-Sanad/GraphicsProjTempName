@@ -209,8 +209,8 @@ Populate and cleanly implement the following in
 
 
 
-- Composition (fastest): Player wraps an Entity* (use the existing stub in Player.hpp).
-- Implement Player core state + API: move, block, attack, dodge flags/timers; update moves the root entity’s transform or velocity.
+- Composition: Player/game wrappers store `EntityId` handles and keep movement/combat state in ECS data components.
+- Implement Player core state + API: move, block, attack, dodge flags/timers; systems update the root entity's `Transform` or physics velocity.
 - Camera follow: in Player::update, update world.get_camera() relative to player; disable or bypass CameraController in main.cpp.
 - Add Crusader as a prefab function (or derived class) that sets stats/meshes/materials after CreatePlayer.
-- Implement CreatePlayer(World&) -> std::unique_ptr<Player> that builds the hierarchy: root entity (parent), child body mesh, child weapon mesh.
+- Implement player creation through `World`/game factories that build an `EntityId` hierarchy: root entity, child body mesh, child weapon mesh.

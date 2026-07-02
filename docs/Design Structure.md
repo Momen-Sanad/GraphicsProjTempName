@@ -19,21 +19,21 @@ Class List:
 
 ### `src/engine/ecs/`
 
-- **World**: high-level container holding all entities and global state.
+- **World**: high-level container holding the registry, assets, render/lights, systems, scheduling, and global state.
     
-- **Entity**: represents a scene object (name, transform, parent pointer).
+- **EntityId**: generation-safe handle used to reference an entity.
     
-- **Component (abstract)**: base class for all components; supports deserialization hook.
+- **ECS components**: plain data structs such as `Transform`, `Hierarchy`, `Renderable`, `AnimatorData`, and `ColliderData`.
     
-- **EntityManager**: creates/destroys entities and manages entity IDs.
+- **Registry**: creates/destroys entities, stores typed component pools, validates generations, and runs queries.
     
-- **ComponentManager**: stores and provides components per-entity.
+- **ComponentSignature**: tracks which component types an entity owns for query matching.
     
 - **System (abstract)**: base class for systems that operate on entities/components.
     
 - **SystemManager**: registers and updates systems and their execution order.
     
-- **Coordinator**: (optional facade) ties EntityManager, ComponentManager and SystemManager together (you already have Coordinator.hpp).
+- **Coordinator**: optional facade over `Registry` and `SystemManager`.
     
 
 ### `src/engine/components/`
@@ -46,7 +46,7 @@ Class List:
     
 - **Light**: stores light type (directional/point/spot) and light parameters (color, range, cone angles).
     
-- **ScriptingComponent**: attaches scripts/behaviours to an entity (bridges to scripting system).
+- **Scripting data**: attaches scripts/behaviours to an entity handle (bridges to scripting system).
     
 
 ### `src/engine/assets/`

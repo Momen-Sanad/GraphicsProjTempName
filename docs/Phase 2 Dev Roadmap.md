@@ -30,13 +30,11 @@ Goal: Entities, components, and systems fully functional.
 
 ### Files
 
-- Entity.hpp
+- EntityId.hpp
     
-- EntityManager.hpp /.cpp
+- Registry.hpp /.cpp
     
-- Component.hpp
-    
-- ComponentManager.hpp /.cpp
+- EcsComponents.hpp
     
 - System.hpp
     

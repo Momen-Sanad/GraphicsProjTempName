@@ -159,34 +159,34 @@
 
 ---
 
-## TRACK 3 - ECS & Scene (World, Entity, Component, SceneDeserializer)
+## TRACK 3 - ECS & Scene (World, Registry, Components, SceneDeserializer)
 
 **Owner:** --
 
 > This track enables other tracks to plug in assets/systems via interfaces. Make managers return simple objects so render/physics can proceed.
 
-### T3.1 - Basic ECS skeleton (Entity, World, Managers)
+### T3.1 - Basic ECS skeleton (EntityId, World, Registry)
 
-- **Goal:** `Entity`, `EntityManager`, `ComponentManager`, `World` minimal implementations supporting create/destroy and assign IDs.
+- **Goal:** `EntityId`, generation-safe `Registry`, and `World` implementations supporting create/destroy and component storage.
     
-- **Deliverables:** `Entity.hpp/cpp`, `EntityManager.hpp/cpp`, `ComponentManager.hpp/cpp`, `World.hpp/cpp`.
+- **Deliverables:** `EntityId.hpp`, `Registry.hpp/cpp`, `EcsComponents.hpp`, `World.hpp/cpp`.
     
-- **Acceptance:**  create entities, add/remove components (use `Component` stubs), and validate counts.
+- **Acceptance:** create entities, add/remove typed component data, validate generations, and run component queries.
     
-- **Related classes / seq:** `World`, `Entity`, `EntityManager`, `ComponentManager`. (scene loading, physics)
+- **Related classes / seq:** `World`, `EntityId`, `Registry`, `ComponentSignature`. (scene loading, physics)
     
 
-### T3.2 - Abstract Component & core components (Transform, MeshRenderer, Camera, Light)
+### T3.2 - ECS data components (Transform, Renderable, Camera, Light)
 
-- **Goal:** `Component` base class and implementations for `Transform`, `MeshRenderer`, `Camera`, `Light` with simple data containers and serialization hooks.
+- **Goal:** plain ECS data structs for `Transform`, `Renderable`, `Camera`, `Light`, and related runtime data.
     
 - **Deliverables:** header/cpp for each component test for serialization/deserialization from JSON.
     
-- **Acceptance:** Components can be attached to an `Entity` and serialized/deserialized to/from JSON snippets.
+- **Acceptance:** Components can be attached to an `EntityId` through `Registry` and serialized/deserialized to/from JSON snippets.
     
 - **Deps / stubs:** none (uses JSON lib).
     
-- **Related classes / seq:** `Component`, `Transform`, `MeshRenderer`, `Camera`, `Light`. (scene loading & render)
+- **Related classes / seq:** `Registry`, `Transform`, `Renderable`, `Camera`, `Light`. (scene loading & render)
     
 
 ### T3.3 - SceneDeserializer + scene format spec
@@ -197,18 +197,18 @@
     
 - **Acceptance:** Given sample JSON, `SceneDeserializer` creates entities in `World` and attaches components. parsing materials (including pipeline state: culling, depth test, blending, color/depth masks), linking materials to entities, and ensuring `MaterialManager` creates Material objects accordingly.`AssetManager` (singleton) exists, shares assets (same mesh/texture pointer) across entities.
     
-- **Related classes / seq:** `SceneDeserializer`, `ComponentManager`, `AssetManager`. (scene loading)
+- **Related classes / seq:** `SceneDeserializer`, `Registry`, `AssetManager`. (scene loading)
     
 
-### T3.4 - Coordinator / SystemManager integration stub
+### T3.4 - Registry / SystemManager integration
 
-- **Goal:** `Coordinator` facade that exposes `getEntityManager()`/`getComponentManager()` and a `SystemManager`.
+- **Goal:** generation-safe `Registry` plus `SystemManager` services exposed through `World`.
     
-- **Deliverables:** `Coordinator.hpp/cpp`, `SystemManager` minimal implementation.
+- **Deliverables:** `Registry.hpp/cpp`, `World.hpp/cpp`, `SystemManager` implementation.
     
-- **Acceptance:** system calls `updateSystems()` calls system `update().
+- **Acceptance:** `World::systems().updateAll(world.registry(), dt)` updates registered systems.
     
-- **Related classes / seq:** `Coordinator`, `SystemManager`. (startup & loop)
+- **Related classes / seq:** `World`, `Registry`, `SystemManager`. (startup & loop)
     
 
 ---
@@ -240,7 +240,7 @@
     
 - **Deps / stubs:** reactphysics3d.
     
-- **Related classes / seq:** `PhysicsSystem`, `Transform`, `EntityManager`. (game loop / physics)
+- **Related classes / seq:** `PhysicsSystem`, `Transform`, `Registry`. (game loop / physics)
     
 
 ### T4.3 - ScriptSystem + ScriptHost
@@ -273,7 +273,7 @@
 
 - **Startup & bootstrap**: Track1 (Application, Window, GLContext, FrameScheduler, Engine init)
     
-- **Scene Loading**: Track3 (SceneDeserializer, EntityManager, ComponentManager) + Track2 (AssetManager / MeshLoader)
+- **Scene Loading**: Track3 (SceneDeserializer, Registry) + Track2 (AssetManager / MeshLoader)
     
 - **Rendering**: Track2 (RenderSystem, Shader, Mesh, Material, Framebuffer)
     

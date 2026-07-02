@@ -26,11 +26,9 @@ participant GLContext as GL
 participant FrameScheduler as FS
 participant AssetManager as AM
 participant World as W
+participant Registry as Reg
 participant SystemManager as SM
 participant SceneDeserializer as SD
-participant AssetManager as AM
-participant EntityManager as EM
-participant ComponentManager as CM
 participant Scene as Sc
 participant RenderSystem as RS
 participant PhysicsSystem as PS
@@ -75,14 +73,14 @@ group **Scene Loading**
     AM -> MeshLoader : loadMesh()
     MeshLoader -> Mesh : create()
 
-    SD -> EM : createEntity()
-    EM -> Entity : instantiate()
-    EM -> Entity : return entity
+    SD -> W : createEntity()
+    W -> Reg : createEntity()
+    Reg -> W : return EntityId
 
-    SD -> CM : addComponent(Transform)
-    CM -> Tr : create()
+    SD -> Reg : emplace(Transform)
+    Reg -> Tr : create()
 
-    SD -> CM : addComponent(MeshRenderer / Camera / Light / Script)
+    SD -> Reg : emplace(Renderable / Camera / Light)
 
     SD -> Sc : populate()
     SD -> Tr : setTransform()
@@ -108,7 +106,7 @@ loop **Main Game Loop**
 
     ' ---------- Physics ----------
     SM -> PS : update()
-    PS -> EM : fetchEntities()
+    PS -> Reg : query components()
     PS -> Tr : integratePhysics()
 
     ' ---------- Scripting ----------

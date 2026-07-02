@@ -82,10 +82,10 @@ The project is structured as a learning-focused engine that can be used as the b
 
 ### Entity-Component-System (ECS)
 
-- **World**: container for entities (a linear list or other container)
-- **Entity**: lightweight ID + name, parent pointer, local transform; holds a list of components
-- **Component**: abstract base class with virtual methods (e.g., `deserialize()`, `update()`)
-- **Systems**: process entities that have required components (e.g., `ForwardRenderer` looks for `Camera` and `MeshRenderer`)
+- **World**: owns the ECS registry plus engine services such as assets, render, lights, systems, and scheduling
+- **EntityId**: generation-safe handle used to reference registry data
+- **Components**: plain data structs stored in typed registry pools
+- **Systems**: process entities that have required components (for example, `RenderSystem` looks for `Transform` plus `Renderable`)
 
 Common components:
 - `Transform` — local transform and parent-child relationship
@@ -288,7 +288,7 @@ Make sure asset keys in the scene file match loader keys.
 
 ## Extending the Engine
 
-- **New Component**: derive from `Component`, implement `deserialize()` and relevant update hooks; register so the deserializer can instantiate by type name.
+- **New ECS data type**: add a plain data struct and register/load it through the registry or scene importer; behavior belongs in systems.
 - **New System**: add a system class that queries the world for component sets and performs updates. Register it in the application initialization.
 - **New Material/Shader**: create a shader, add a material subclass if needed, and add an entry in the scene `assets.materials` section.
 - **Renderer**: implement additional render passes (deferred, shadow maps, etc.) but ensure the scene format or a config option can enable them.
