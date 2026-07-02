@@ -11,6 +11,8 @@
 #include "../systems/LightSystem.hpp"
 #include "../systems/RenderSystem.hpp"
 
+#include <unordered_set>
+
 enum class DestroyMode {
     Single,
     Recursive
@@ -46,7 +48,7 @@ public:
         const glm::quat& rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
         const glm::vec3& scale = glm::vec3(1.0f));
 
-    void setParent(engine::ecs::EntityId child, engine::ecs::EntityId parent);
+    bool setParent(engine::ecs::EntityId child, engine::ecs::EntityId parent);
     void destroyEntity(engine::ecs::EntityId entity, DestroyMode mode = DestroyMode::Recursive);
     void clear();
     void shutdownGpuResources();
@@ -76,6 +78,10 @@ public:
     const engine::ecs::SystemManager& systems() const { return systemManager_; }
     
 private:
+    bool wouldCreateHierarchyCycle(engine::ecs::EntityId child, engine::ecs::EntityId parent) const;
+    void destroyEntityRecursive(
+        engine::ecs::EntityId entity,
+        std::unordered_set<engine::ecs::EntityId, engine::ecs::EntityIdHash>& visited);
     void detachFromParent(engine::ecs::EntityId entity);
     void destroyEntitySingle(engine::ecs::EntityId entity);
 

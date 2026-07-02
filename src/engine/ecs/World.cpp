@@ -1,6 +1,7 @@
 #include "World.hpp"
 
 #include <algorithm>
+#include <unordered_set>
 
 // ------------------------------------------------------------
 // Constructor for World class (default constructor)
@@ -69,17 +70,22 @@ engine::ecs::EntityId World::createSkinnedRenderable(
     return entity;
 }
 
-void World::setParent(engine::ecs::EntityId child, engine::ecs::EntityId parent) {
+bool World::setParent(engine::ecs::EntityId child, engine::ecs::EntityId parent) {
     if (!registry_.isAlive(child)) {
-        return;
+        return false;
+    }
+
+    if (parent.valid()) {
+        if (!registry_.isAlive(parent) || parent == child || wouldCreateHierarchyCycle(child, parent)) {
+            return false;
+        }
     }
 
     detachFromParent(child);
-
     auto& hierarchy = registry_.ensure<engine::ecs::Hierarchy>(child);
     hierarchy.parent = engine::ecs::InvalidEntity;
 
-    if (registry_.isAlive(parent) && parent != child) {
+    if (parent.valid()) {
         hierarchy.parent = parent;
         auto& parentHierarchy = registry_.ensure<engine::ecs::Hierarchy>(parent);
         if (std::find(parentHierarchy.children.begin(), parentHierarchy.children.end(), child) ==
@@ -87,6 +93,8 @@ void World::setParent(engine::ecs::EntityId child, engine::ecs::EntityId parent)
             parentHierarchy.children.push_back(child);
         }
     }
+
+    return true;
 }
 
 void World::destroyEntity(engine::ecs::EntityId entity, DestroyMode mode) {
@@ -95,13 +103,9 @@ void World::destroyEntity(engine::ecs::EntityId entity, DestroyMode mode) {
     }
 
     if (mode == DestroyMode::Recursive) {
-        std::vector<engine::ecs::EntityId> children;
-        if (const auto* hierarchy = registry_.get<engine::ecs::Hierarchy>(entity)) {
-            children = hierarchy->children;
-        }
-        for (engine::ecs::EntityId child : children) {
-            destroyEntity(child, DestroyMode::Recursive);
-        }
+        std::unordered_set<engine::ecs::EntityId, engine::ecs::EntityIdHash> visited;
+        destroyEntityRecursive(entity, visited);
+        return;
     } else if (auto* hierarchy = registry_.get<engine::ecs::Hierarchy>(entity)) {
         for (engine::ecs::EntityId child : hierarchy->children) {
             if (auto* childHierarchy = registry_.get<engine::ecs::Hierarchy>(child)) {
@@ -131,6 +135,45 @@ engine::ecs::Transform* World::transform(engine::ecs::EntityId entity) {
 
 const engine::ecs::Transform* World::transform(engine::ecs::EntityId entity) const {
     return registry_.get<engine::ecs::Transform>(entity);
+}
+
+bool World::wouldCreateHierarchyCycle(engine::ecs::EntityId child, engine::ecs::EntityId parent) const {
+    engine::ecs::EntityId current = parent;
+    while (registry_.isAlive(current)) {
+        if (current == child) {
+            return true;
+        }
+
+        const auto* hierarchy = registry_.get<engine::ecs::Hierarchy>(current);
+        if (!hierarchy || !hierarchy->parent.valid()) {
+            return false;
+        }
+        current = hierarchy->parent;
+    }
+    return false;
+}
+
+void World::destroyEntityRecursive(
+    engine::ecs::EntityId entity,
+    std::unordered_set<engine::ecs::EntityId, engine::ecs::EntityIdHash>& visited)
+{
+    if (!registry_.isAlive(entity) || !visited.insert(entity).second) {
+        return;
+    }
+
+    std::vector<engine::ecs::EntityId> children;
+    if (const auto* hierarchy = registry_.get<engine::ecs::Hierarchy>(entity)) {
+        children = hierarchy->children;
+    }
+
+    for (engine::ecs::EntityId child : children) {
+        destroyEntityRecursive(child, visited);
+    }
+
+    if (auto* hierarchy = registry_.get<engine::ecs::Hierarchy>(entity)) {
+        hierarchy->children.clear();
+    }
+    destroyEntitySingle(entity);
 }
 
 void World::detachFromParent(engine::ecs::EntityId entity) {

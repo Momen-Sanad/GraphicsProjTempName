@@ -107,7 +107,7 @@ void test_transform_hierarchy()
     World world;
     engine::ecs::EntityId parent = world.createEntity("parent", glm::vec3(10.0f, 0.0f, 0.0f));
     engine::ecs::EntityId child = world.createEntity("child", glm::vec3(5.0f, 0.0f, 0.0f));
-    world.setParent(child, parent);
+    assert_true(world.setParent(child, parent), "Valid parent relationship should succeed");
 
     TransformSystem::updateWorldTransforms(world.registry());
 
@@ -119,6 +119,29 @@ void test_transform_hierarchy()
         world.registry().get<engine::ecs::Transform>(child)->worldMatrix[3].x,
         15.0f,
         "Child world transform should include parent and local translation");
+}
+
+void test_hierarchy_rejects_cycles()
+{
+    World world;
+    engine::ecs::EntityId root = world.createEntity("root");
+    engine::ecs::EntityId child = world.createEntity("child");
+    engine::ecs::EntityId grandchild = world.createEntity("grandchild");
+
+    assert_true(world.setParent(child, root), "Root should accept child");
+    assert_true(world.setParent(grandchild, child), "Child should accept grandchild");
+    assert_true(!world.setParent(root, grandchild), "Parenting an ancestor under a descendant should fail");
+    assert_true(!world.setParent(root, root), "Self-parenting should fail");
+
+    const auto* rootHierarchy = world.registry().get<engine::ecs::Hierarchy>(root);
+    const auto* childHierarchy = world.registry().get<engine::ecs::Hierarchy>(child);
+    assert_true(rootHierarchy && !rootHierarchy->parent.valid(), "Failed parent operation should not mutate root parent");
+    assert_true(childHierarchy && childHierarchy->parent == root, "Existing child parent should remain intact");
+
+    world.destroyEntity(root, DestroyMode::Recursive);
+    assert_true(!world.registry().isAlive(root), "Recursive destroy should remove root after rejected cycle");
+    assert_true(!world.registry().isAlive(child), "Recursive destroy should remove child after rejected cycle");
+    assert_true(!world.registry().isAlive(grandchild), "Recursive destroy should remove grandchild after rejected cycle");
 }
 
 void test_world_factory_renderable_handles()
@@ -142,8 +165,8 @@ void test_world_recursive_destroy()
     engine::ecs::EntityId child = world.createEntity("child");
     engine::ecs::EntityId grandchild = world.createEntity("grandchild");
 
-    world.setParent(child, root);
-    world.setParent(grandchild, child);
+    assert_true(world.setParent(child, root), "Child parent should be assigned");
+    assert_true(world.setParent(grandchild, child), "Grandchild parent should be assigned");
     world.destroyEntity(root, DestroyMode::Recursive);
 
     assert_true(!world.registry().isAlive(root), "Root should be destroyed");
@@ -187,6 +210,7 @@ int main()
     run_test("component_add_get_remove", test_component_add_get_remove);
     run_test("query_matching", test_query_matching);
     run_test("transform_hierarchy", test_transform_hierarchy);
+    run_test("hierarchy_rejects_cycles", test_hierarchy_rejects_cycles);
     run_test("world_factory_renderable_handles", test_world_factory_renderable_handles);
     run_test("world_recursive_destroy", test_world_recursive_destroy);
     run_test("system_manager_updates", test_system_manager_updates);
