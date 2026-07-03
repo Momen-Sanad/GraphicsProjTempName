@@ -73,6 +73,7 @@ private:
     void updateWaves();
     void updateXpOrbs(float deltaTime);
     void updateCollisions();
+    void updateCharacterLights();
 
     void render(Window& window, float deltaTime, uint64_t frameIndex);
     void renderUi(const glm::mat4& viewProjection, int width, int height);

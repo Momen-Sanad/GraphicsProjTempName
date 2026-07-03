@@ -26,6 +26,10 @@ void LightSystem::addLight(const Light& light) {
     lights.push_back(light);
 }
 
+void LightSystem::clearLights() {
+    lights.clear();
+}
+
 void LightSystem::initUBO() {
     if (ubo != 0) return; // already created
 

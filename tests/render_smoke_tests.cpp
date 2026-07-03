@@ -238,6 +238,47 @@ void testLightBlockIntensityChangesPixels()
         "Increasing directional light intensity should visibly brighten the lit draw");
 }
 
+std::array<unsigned char, 4> drawPointLit(const glm::vec3& color)
+{
+    World world;
+    const std::string shaderDir = SHADER_DIR;
+    auto shader = world.assets().loadShader(
+        "smoke-point-lit-" + std::to_string(static_cast<int>(color.r * 10.0f)) + "-" +
+            std::to_string(static_cast<int>(color.b * 10.0f)),
+        shaderDir + "/light.vert",
+        shaderDir + "/light.frag");
+    require(shader != nullptr, "Failed to load point-lit shader");
+
+    world.lights().initUBO();
+    require(world.lights().bindToShader(shader), "Point-lit shader should expose LightBlock");
+    world.lights().addLight(Light(
+        LightType::POINT,
+        color,
+        glm::vec3(0.0f, 0.0f, 1.0f),
+        glm::vec3(0.0f),
+        glm::radians(15.0f),
+        glm::radians(30.0f),
+        3.0f));
+
+    Mesh mesh = makeTriangleMesh();
+    auto renderer = world.assets().createMeshRenderer("smoke-point-lit", mesh);
+    auto material = std::make_shared<LitMaterial>(shader);
+    world.createRenderable("point-lit", renderer, material);
+
+    auto pixel = drawAndReadCenter(world);
+    world.shutdownGpuResources();
+    return pixel;
+}
+
+void testPointLightColorAffectsPixels()
+{
+    const auto redPixel = drawPointLit(glm::vec3(1.0f, 0.05f, 0.04f));
+    const auto bluePixel = drawPointLit(glm::vec3(0.08f, 0.25f, 1.0f));
+
+    require(redPixel[0] > redPixel[2] + 40, "Red point light should tint the lit pixel red");
+    require(bluePixel[2] > bluePixel[0] + 40, "Blue point light should tint the lit pixel blue");
+}
+
 void testSkinnedDraw()
 {
     World world;
@@ -319,6 +360,7 @@ int main()
         run("static_tinted_draw", testStaticTintedDraw);
         run("textured_draw", testTexturedDraw);
         run("light_block_intensity_changes_pixels", testLightBlockIntensityChangesPixels);
+        run("point_light_color_affects_pixels", testPointLightColorAffectsPixels);
         run("skinned_draw", testSkinnedDraw);
 
         if (window) {

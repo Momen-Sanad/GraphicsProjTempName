@@ -15,6 +15,7 @@ public:
 
     // Add a light
     void addLight(const Light& light);
+    void clearLights();
 
     // Initialize the GPU UBO (call once after GL context creation)
     void initUBO();

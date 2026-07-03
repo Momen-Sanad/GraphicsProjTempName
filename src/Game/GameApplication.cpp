@@ -37,6 +37,9 @@
 namespace {
 constexpr int WINDOW_W = 1280;
 constexpr int WINDOW_H = 720;
+constexpr float CHARACTER_LIGHT_HEIGHT = 0.35f;
+constexpr float PLAYER_UNDER_LIGHT_INTENSITY = 3.2f;
+constexpr float ENEMY_UNDER_LIGHT_INTENSITY = 2.6f;
 
 #ifdef ASSET_DIR
 constexpr const char* MODELS_DIR = ASSET_DIR "/models";
@@ -78,6 +81,13 @@ bool isDeadOrMissing(World& world, engine::ecs::EntityId entity)
     }
     const auto* health = world.registry().get<HealthComponent>(entity);
     return health && health->dead;
+}
+
+glm::vec3 underLightPosition(World& world, engine::ecs::EntityId entity)
+{
+    glm::vec3 position = game::worldPosition(world, entity);
+    position.y = CHARACTER_LIGHT_HEIGHT;
+    return position;
 }
 } // namespace
 
@@ -257,32 +267,7 @@ bool GameApplication::loadAssets()
 
 void GameApplication::setupLights()
 {
-    LightSystem& lights = world_.lights();
-    lights.initUBO();
-    lights.addLight(Light(
-        LightType::DIRECTIONAL,
-        glm::vec3(1.0f),
-        glm::vec3(0.0f, 10.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f),
-        glm::radians(15.0f),
-        glm::radians(30.0f),
-        1.0f));
-    lights.addLight(Light(
-        LightType::POINT,
-        glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 5.0f, 0.0f),
-        glm::vec3(0.0f),
-        glm::radians(15.0f),
-        glm::radians(30.0f),
-        1.0f));
-    lights.addLight(Light(
-        LightType::SPOT,
-        glm::vec3(0.0f, 0.0f, 1.0f),
-        glm::vec3(2.0f, 4.0f, 0.0f),
-        glm::vec3(-1.0f, -1.0f, 0.0f),
-        glm::radians(30.0f),
-        glm::radians(60.0f),
-        1.0f));
+    world_.lights().initUBO();
 }
 
 void GameApplication::setupWorld()
@@ -399,6 +384,8 @@ void GameApplication::setupWorld()
     sphereCollider.halfExtents = glm::vec3(1.0f);
 
     spawnInitialWave();
+    TransformSystem::updateWorldTransforms(world_.registry());
+    updateCharacterLights();
 }
 
 void GameApplication::spawnInitialWave()
@@ -535,6 +522,57 @@ void GameApplication::update(Window& window, float deltaTime)
     animationSystem_.update(world_.registry(), deltaTime);
     world_.systems().updateAll(world_.registry(), deltaTime);
     TransformSystem::updateWorldTransforms(world_.registry());
+    updateCharacterLights();
+}
+
+void GameApplication::updateCharacterLights()
+{
+    LightSystem& lights = world_.lights();
+    lights.clearLights();
+
+    int remainingLights = LightSystem::MAX_LIGHTS;
+    auto addLight = [&lights, &remainingLights](const Light& light) {
+        if (remainingLights <= 0) {
+            return;
+        }
+        lights.addLight(light);
+        --remainingLights;
+    };
+
+    addLight(Light(
+        LightType::DIRECTIONAL,
+        glm::vec3(1.0f),
+        glm::vec3(0.0f, 10.0f, 0.0f),
+        glm::normalize(glm::vec3(0.2f, -1.0f, 0.15f)),
+        glm::radians(15.0f),
+        glm::radians(30.0f),
+        0.45f));
+
+    if (!isDeadOrMissing(world_, state_.player)) {
+        addLight(Light(
+            LightType::POINT,
+            glm::vec3(0.12f, 0.45f, 1.0f),
+            underLightPosition(world_, state_.player),
+            glm::vec3(0.0f),
+            glm::radians(15.0f),
+            glm::radians(30.0f),
+            PLAYER_UNDER_LIGHT_INTENSITY));
+    }
+
+    for (engine::ecs::EntityId enemy : state_.enemies) {
+        if (isDeadOrMissing(world_, enemy)) {
+            continue;
+        }
+
+        addLight(Light(
+            LightType::POINT,
+            glm::vec3(1.0f, 0.08f, 0.05f),
+            underLightPosition(world_, enemy),
+            glm::vec3(0.0f),
+            glm::radians(15.0f),
+            glm::radians(30.0f),
+            ENEMY_UNDER_LIGHT_INTENSITY));
+    }
 }
 
 void GameApplication::updateCombat(float)
