@@ -1,5 +1,6 @@
 #include "GameApplication.hpp"
 
+#include "GameAnimationFactory.hpp"
 #include "GameEntityFactory.hpp"
 #include "GameSystems.hpp"
 #include "Entities/Crusader.hpp"
@@ -251,6 +252,8 @@ bool GameApplication::loadAssets()
     if (assets_.skinnedShader && std::filesystem::exists(SWORDMAN_GLTF_PATH)) {
         assets_.swordmanModel = assets.loadModel(SWORDMAN_GLTF_PATH);
         if (assets_.swordmanModel) {
+            assets_.swordmanBaseAnimation = assets_.swordmanModel->animations.empty() ? -1 : 0;
+            assets_.swordmanAttackAnimation = ensurePlayerAttackAnimation(*assets_.swordmanModel);
             assets_.swordmanRenderers = assets.createSkinnedMeshRenderers("game-swordman", *assets_.swordmanModel);
         }
     }
@@ -336,9 +339,11 @@ void GameApplication::setupWorld()
         auto& animation = world_.registry().emplace<engine::ecs::AnimatorData>(state_.playerVisual);
         animation.model = assets_.swordmanModel;
         animation.skinIndex = 0;
-        animation.currentAnimation = 0;
-        animation.playing = true;
-        animation.loop = true;
+        animation.currentAnimation = assets_.swordmanBaseAnimation >= 0
+            ? assets_.swordmanBaseAnimation
+            : assets_.swordmanAttackAnimation;
+        animation.playing = animation.currentAnimation >= 0;
+        animation.loop = assets_.swordmanBaseAnimation >= 0;
 
         world_.registry().remove<engine::ecs::Renderable>(player_->getBody());
         world_.registry().remove<engine::ecs::Renderable>(player_->getWeapon());
@@ -519,6 +524,7 @@ void GameApplication::update(Window& window, float deltaTime)
     updateXpOrbs(deltaTime);
     updateWaves();
     updateCollisions();
+    updatePlayerAnimationState();
     animationSystem_.update(world_.registry(), deltaTime);
     world_.systems().updateAll(world_.registry(), deltaTime);
     TransformSystem::updateWorldTransforms(world_.registry());
@@ -572,6 +578,41 @@ void GameApplication::updateCharacterLights()
             glm::radians(15.0f),
             glm::radians(30.0f),
             ENEMY_UNDER_LIGHT_INTENSITY));
+    }
+}
+
+void GameApplication::updatePlayerAnimationState()
+{
+    if (assets_.swordmanAttackAnimation < 0 || !world_.registry().isAlive(state_.playerVisual)) {
+        return;
+    }
+
+    auto* animation = world_.registry().get<engine::ecs::AnimatorData>(state_.playerVisual);
+    if (!animation) {
+        return;
+    }
+
+    const bool attacking = player_ && player_->isAttacking();
+    if (attacking && !playerAttackAnimationActive_) {
+        animation->currentAnimation = assets_.swordmanAttackAnimation;
+        animation->loop = false;
+        animation->speed = 1.0f;
+        animation->playing = true;
+        animation->animator.stop();
+        playerAttackAnimationActive_ = true;
+        return;
+    }
+
+    if (!attacking && playerAttackAnimationActive_) {
+        const int fallbackAnimation = assets_.swordmanBaseAnimation >= 0
+            ? assets_.swordmanBaseAnimation
+            : assets_.swordmanAttackAnimation;
+        animation->currentAnimation = fallbackAnimation;
+        animation->loop = assets_.swordmanBaseAnimation >= 0;
+        animation->speed = 1.0f;
+        animation->playing = fallbackAnimation >= 0;
+        animation->animator.stop();
+        playerAttackAnimationActive_ = false;
     }
 }
 

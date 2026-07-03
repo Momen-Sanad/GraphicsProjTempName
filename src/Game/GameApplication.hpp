@@ -52,6 +52,8 @@ struct GameAssets {
     std::shared_ptr<ModelAsset> skeletonModel;
     std::vector<std::shared_ptr<SkinnedMeshRenderer>> swordmanRenderers;
     std::vector<std::shared_ptr<SkinnedMeshRenderer>> skeletonRenderers;
+    int swordmanBaseAnimation = -1;
+    int swordmanAttackAnimation = -1;
 };
 
 class GameApplication {
@@ -74,6 +76,7 @@ private:
     void updateXpOrbs(float deltaTime);
     void updateCollisions();
     void updateCharacterLights();
+    void updatePlayerAnimationState();
 
     void render(Window& window, float deltaTime, uint64_t frameIndex);
     void renderUi(const glm::mat4& viewProjection, int width, int height);
@@ -88,6 +91,7 @@ private:
     GameplayState state_;
     std::unique_ptr<Player> player_;
     RenderDebugMode renderDebugMode_ = RenderDebugMode::Final;
+    bool playerAttackAnimationActive_ = false;
 };
 
 } // namespace game

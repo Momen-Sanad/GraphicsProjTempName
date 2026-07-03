@@ -1,5 +1,6 @@
 #include "Game/Entities/Crusader.hpp"
 #include "Game/Entities/Enemy.hpp"
+#include "Game/GameAnimationFactory.hpp"
 #include "Game/GameEntityFactory.hpp"
 #include "Game/GameSystems.hpp"
 
@@ -50,6 +51,38 @@ std::shared_ptr<Material> inert_material()
     return std::make_shared<TintedMaterial>();
 }
 
+std::shared_ptr<ModelAsset> make_swordman_like_model()
+{
+    auto model = std::make_shared<ModelAsset>();
+    auto skeleton = std::make_shared<Skeleton>();
+    skeleton->add_bone("_rootJoint", -1, glm::mat4(1.0f));
+    skeleton->add_bone("UnknownSoldier_Spine1_03", 0, glm::mat4(1.0f));
+    skeleton->add_bone("UnknownSoldier_Spine2_04", 1, glm::mat4(1.0f));
+    skeleton->add_bone("UnknownSoldier_RightShoulder_031", 2, glm::mat4(1.0f));
+    skeleton->add_bone("UnknownSoldier_RightArm_032", 3, glm::mat4(1.0f));
+    skeleton->add_bone("UnknownSoldier_RightForeArm_033", 4, glm::mat4(1.0f));
+    skeleton->add_bone("UnknownSoldier_RightHand_034", 5, glm::mat4(1.0f));
+    skeleton->add_bone("UnknownSoldier_LeftShoulder_08", 2, glm::mat4(1.0f));
+    skeleton->add_bone("UnknownSoldier_LeftArm_09", 7, glm::mat4(1.0f));
+    skeleton->add_bone("UnknownSoldier_LeftForeArm_010", 8, glm::mat4(1.0f));
+    model->skins.push_back(SkinAsset{"swordman", skeleton, {}});
+
+    auto base = std::make_shared<AnimationClip>("base", 1.0f, 1.0f);
+    for (int boneId = 0; boneId < skeleton->get_bone_count(); ++boneId) {
+        BoneAnimation bone;
+        bone.bone_id = boneId;
+        bone.position_keys.push_back({0.0f, glm::vec3(0.0f)});
+        bone.position_keys.push_back({1.0f, glm::vec3(0.0f)});
+        bone.rotation_keys.push_back({0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f)});
+        bone.rotation_keys.push_back({1.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f)});
+        bone.scale_keys.push_back({0.0f, glm::vec3(1.0f)});
+        bone.scale_keys.push_back({1.0f, glm::vec3(1.0f)});
+        base->add_bone_animation(bone);
+    }
+    model->animations.push_back(base);
+    return model;
+}
+
 void test_game_entity_factory_components()
 {
     World world;
@@ -75,6 +108,38 @@ void test_game_entity_factory_components()
     assert_true(renderable != nullptr, "Skinned factory should add SkinnedRenderable");
     assert_true(renderable->model == model, "Skinned factory should keep model handle");
     assert_true(renderable->material == skinnedMaterial, "Skinned factory should keep material handle");
+}
+
+void test_player_attack_animation_factory()
+{
+    auto model = make_swordman_like_model();
+    const int index = game::ensurePlayerAttackAnimation(*model);
+    const int reused = game::ensurePlayerAttackAnimation(*model);
+
+    assert_true(index == 1, "Attack animation should be appended after the base clip");
+    assert_true(reused == index, "Attack animation factory should not duplicate clips");
+    assert_true(model->animations.size() == 2, "Model should contain base and attack clips");
+
+    const auto& clip = model->animations[static_cast<size_t>(index)];
+    assert_true(clip->get_name() == "player_sword_attack", "Attack clip should be named");
+    assert_true(clip->get_duration() == 0.25f, "Attack clip duration should match attack timer");
+    assert_true(
+        clip->get_bone_animations().size() == static_cast<size_t>(model->skins.front().skeleton->get_bone_count()),
+        "Attack clip should contain a channel for every bone");
+
+    const int rightArm = model->skins.front().skeleton->get_bone_id("UnknownSoldier_RightArm_032");
+    const BoneAnimation* rightArmAnimation = clip->get_bone_animation(rightArm);
+    assert_true(rightArmAnimation != nullptr, "Attack clip should animate the right arm");
+    assert_true(rightArmAnimation->rotation_keys.size() == 4, "Attack right arm should have four keyframes");
+
+    const glm::quat& rest = rightArmAnimation->rotation_keys.front().rotation;
+    const glm::quat& strike = rightArmAnimation->rotation_keys[2].rotation;
+    const float rotationDelta =
+        glm::abs(rest.x - strike.x) +
+        glm::abs(rest.y - strike.y) +
+        glm::abs(rest.z - strike.z) +
+        glm::abs(rest.w - strike.w);
+    assert_true(rotationDelta > 0.1f, "Attack clip should visibly rotate the sword arm");
 }
 
 void test_player_movement_attack_and_camera()
@@ -155,6 +220,7 @@ void test_recursive_destroy_invalidates_children()
 int main()
 {
     run_test("game_entity_factory_components", test_game_entity_factory_components);
+    run_test("player_attack_animation_factory", test_player_attack_animation_factory);
     run_test("player_movement_attack_and_camera", test_player_movement_attack_and_camera);
     run_test("enemy_ai_moves_and_attacks", test_enemy_ai_moves_and_attacks);
     run_test("xp_level_up", test_xp_level_up);
