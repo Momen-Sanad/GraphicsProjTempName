@@ -76,6 +76,23 @@ std::shared_ptr<TintedMaterial> makeTintedMaterial(
     return material;
 }
 
+std::shared_ptr<LitMaterial> makeLitFactorMaterial(
+    AssetManager& assets,
+    const std::string& name,
+    std::shared_ptr<Shader> shader,
+    const glm::vec3& albedo,
+    const glm::vec3& specular,
+    float roughness)
+{
+    auto material = std::make_shared<LitMaterial>(std::move(shader));
+    material->setAlbedoFactor(albedo);
+    material->setSpecularFactor(specular);
+    material->setRoughnessFactor(roughness);
+    material->setAmbientOcclusionFactor(1.0f);
+    assets.registerMaterial(name, material);
+    return material;
+}
+
 bool isDeadOrMissing(World& world, engine::ecs::EntityId entity)
 {
     if (!world.registry().isAlive(entity)) {
@@ -201,8 +218,6 @@ bool GameApplication::loadAssets()
     assets_.green = makeTintedMaterial(assets, "game-green", assets_.mainShader, {0.4f, 1.0f, 0.2f, 1.0f});
     assets_.red = makeTintedMaterial(assets, "game-red", assets_.mainShader, {1.0f, 0.2f, 0.2f, 1.0f});
     assets_.xpGold = makeTintedMaterial(assets, "game-xp-gold", assets_.mainShader, {1.0f, 0.85f, 0.0f, 1.0f});
-    assets_.steel = makeTintedMaterial(assets, "game-steel", assets_.mainShader, {0.78f, 0.82f, 0.88f, 1.0f});
-    assets_.darkLeather = makeTintedMaterial(assets, "game-dark-leather", assets_.mainShader, {0.12f, 0.07f, 0.04f, 1.0f});
 
     auto moon = assets.loadTexture(textureDir + "/moon.jpg");
     auto houseTexture = assets.loadTexture(textureDir + "/house/house.jpeg");
@@ -232,15 +247,37 @@ bool GameApplication::loadAssets()
         suzanneAO);
     assets.registerMaterial("game-asphalt", assets_.asphalt);
 
+    assets_.steel = makeLitFactorMaterial(
+        assets,
+        "game-lit-steel",
+        assets_.lightShader,
+        glm::vec3(0.72f, 0.76f, 0.82f),
+        glm::vec3(0.85f),
+        0.22f);
+    assets_.brass = makeLitFactorMaterial(
+        assets,
+        "game-lit-brass",
+        assets_.lightShader,
+        glm::vec3(0.95f, 0.68f, 0.22f),
+        glm::vec3(0.65f, 0.48f, 0.2f),
+        0.32f);
+    assets_.darkLeather = makeLitFactorMaterial(
+        assets,
+        "game-lit-dark-leather",
+        assets_.lightShader,
+        glm::vec3(0.16f, 0.075f, 0.035f),
+        glm::vec3(0.08f),
+        0.72f);
+
     Mesh cubeMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(1.0f));
     Mesh glassMesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec2(1.0f));
     Mesh sphereMesh = Mesh::create_sphere();
     Mesh planeMesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec2(1.0f));
     Mesh xpOrbMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(0.3f));
-    Mesh swordBladeMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, 0.62f), glm::vec3(0.08f, 0.035f, 1.16f));
-    Mesh swordGuardMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, 0.05f), glm::vec3(0.46f, 0.08f, 0.08f));
-    Mesh swordGripMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, -0.17f), glm::vec3(0.09f, 0.09f, 0.34f));
-    Mesh swordPommelMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, -0.38f), glm::vec3(0.16f, 0.14f, 0.12f));
+    Mesh swordBladeMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, 1.14f), glm::vec3(0.055f, 0.028f, 1.65f));
+    Mesh swordGuardMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, 0.28f), glm::vec3(0.5f, 0.07f, 0.08f));
+    Mesh swordGripMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.07f, 0.07f, 0.44f));
+    Mesh swordPommelMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, -0.29f), glm::vec3(0.13f, 0.13f, 0.1f));
 
     assets_.cubeRenderer = assets.createMeshRenderer("game-cube", cubeMesh);
     assets_.glassRenderer = assets.createMeshRenderer("game-glass-plane", glassMesh);
@@ -343,7 +380,7 @@ void GameApplication::setupWorld()
             material,
             assets_.swordmanModel,
             state_.player,
-            glm::vec3(0.0f, 0.9f, 0.0f),
+            glm::vec3(0.0f),
             glm::quat(1.0f, 0.0f, 0.0f, 0.0f),
             glm::vec3(swordmanScale));
 
@@ -434,7 +471,7 @@ void GameApplication::attachSwordToPlayerHand()
     swordAssets.gripRenderer = assets_.swordGripRenderer;
     swordAssets.pommelRenderer = assets_.swordPommelRenderer;
     swordAssets.bladeMaterial = assets_.steel;
-    swordAssets.guardMaterial = assets_.steel;
+    swordAssets.guardMaterial = assets_.brass;
     swordAssets.gripMaterial = assets_.darkLeather;
 
     state_.playerSword = createPlayerSword(world_, state_.player, swordAssets);

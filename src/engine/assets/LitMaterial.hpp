@@ -37,6 +37,12 @@ public:
     void setEmissiveMap(std::shared_ptr<Texture> tex);
     void setAmbientOcclusionMap(std::shared_ptr<Texture> tex);
 
+    void setAlbedoFactor(const glm::vec3& factor);
+    void setSpecularFactor(const glm::vec3& factor);
+    void setEmissiveFactor(const glm::vec3& factor);
+    void setRoughnessFactor(float factor);
+    void setAmbientOcclusionFactor(float factor);
+
     // Upload textures & material state
     void setup() override;
 };

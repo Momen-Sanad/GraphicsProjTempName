@@ -36,8 +36,9 @@ struct GameAssets {
     std::shared_ptr<TintedMaterial> yellow;
     std::shared_ptr<TintedMaterial> red;
     std::shared_ptr<TintedMaterial> xpGold;
-    std::shared_ptr<TintedMaterial> steel;
-    std::shared_ptr<TintedMaterial> darkLeather;
+    std::shared_ptr<LitMaterial> steel;
+    std::shared_ptr<LitMaterial> brass;
+    std::shared_ptr<LitMaterial> darkLeather;
     std::shared_ptr<TexturedMaterial> house;
     std::shared_ptr<TexturedMaterial> houseMixed;
     std::shared_ptr<TexturedMaterial> glass;

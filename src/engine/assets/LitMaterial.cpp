@@ -57,6 +57,12 @@ void LitMaterial::setRoughnessMap(std::shared_ptr<Texture> tex)         { roughn
 void LitMaterial::setEmissiveMap(std::shared_ptr<Texture> tex)          { emissiveMap = std::move(tex); }
 void LitMaterial::setAmbientOcclusionMap(std::shared_ptr<Texture> tex)  { ambientOcclusionMap = std::move(tex); }
 
+void LitMaterial::setAlbedoFactor(const glm::vec3& factor)              { albedoFactor = factor; }
+void LitMaterial::setSpecularFactor(const glm::vec3& factor)            { specularFactor = factor; }
+void LitMaterial::setEmissiveFactor(const glm::vec3& factor)            { emissiveFactor = factor; }
+void LitMaterial::setRoughnessFactor(float factor)                      { roughnessFactor = factor; }
+void LitMaterial::setAmbientOcclusionFactor(float factor)               { ambientOcclusionFactor = factor; }
+
 // ---------------- setup ----------------
 
 void LitMaterial::setup()
