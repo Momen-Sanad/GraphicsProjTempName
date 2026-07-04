@@ -68,6 +68,37 @@ void test_animator_updates_time_and_bones()
     assert_true(animator.get_bone_matrices().size() == 1, "Animator should produce one bone matrix");
 }
 
+void test_animator_exposes_model_space_bone_matrices()
+{
+    auto skeleton = std::make_shared<Skeleton>();
+    skeleton->add_bone("root", -1, glm::mat4(1.0f));
+    skeleton->add_bone("child", 0, glm::mat4(1.0f));
+
+    auto clip = std::make_shared<AnimationClip>("child", 1.0f, 1.0f);
+    BoneAnimation root;
+    root.bone_id = 0;
+    root.position_keys.push_back({0.0f, glm::vec3(1.0f, 0.0f, 0.0f)});
+    root.rotation_keys.push_back({0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f)});
+    root.scale_keys.push_back({0.0f, glm::vec3(1.0f)});
+    clip->add_bone_animation(root);
+
+    BoneAnimation child;
+    child.bone_id = 1;
+    child.position_keys.push_back({0.0f, glm::vec3(0.0f, 2.0f, 0.0f)});
+    child.rotation_keys.push_back({0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f)});
+    child.scale_keys.push_back({0.0f, glm::vec3(1.0f)});
+    clip->add_bone_animation(child);
+
+    Animator animator(skeleton.get());
+    animator.play(clip.get(), true);
+
+    const auto& boneModels = animator.get_bone_model_matrices();
+    assert_true(boneModels.size() == 2, "Animator should expose one model matrix per bone");
+    assert_true(animator.get_local_bone_transforms().size() == 2, "Animator should expose local bone transforms");
+    assert_true(boneModels[1][3].x == 1.0f, "Child model matrix should include parent translation");
+    assert_true(boneModels[1][3].y == 2.0f, "Child model matrix should include child translation");
+}
+
 void test_animation_system_updates_skinned_material()
 {
     World world;
@@ -145,6 +176,7 @@ void test_animation_system_play_helper()
 int main()
 {
     run_test("animator_updates_time_and_bones", test_animator_updates_time_and_bones);
+    run_test("animator_exposes_model_space_bone_matrices", test_animator_exposes_model_space_bone_matrices);
     run_test("animation_system_updates_skinned_material", test_animation_system_updates_skinned_material);
     run_test("animation_system_uses_renderable_model_and_respects_non_loop_stop", test_animation_system_uses_renderable_model_and_respects_non_loop_stop);
     run_test("animation_system_play_helper", test_animation_system_play_helper);

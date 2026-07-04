@@ -1,5 +1,6 @@
 #include "Animator.hpp"
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtx/quaternion.hpp>
 
 Animator::Animator()
@@ -23,6 +24,7 @@ Animator::Animator(const Skeleton* skeleton)
     if (skeleton) {
         local_transforms.resize(skeleton->get_bone_count(), glm::mat4(1.0f));
         bone_matrices.resize(skeleton->get_bone_count(), glm::mat4(1.0f));
+        bone_model_matrices.resize(skeleton->get_bone_count(), glm::mat4(1.0f));
     }
 }
 
@@ -31,6 +33,11 @@ void Animator::set_skeleton(const Skeleton* skeleton) {
     if (skeleton) {
         local_transforms.resize(skeleton->get_bone_count(), glm::mat4(1.0f));
         bone_matrices.resize(skeleton->get_bone_count(), glm::mat4(1.0f));
+        bone_model_matrices.resize(skeleton->get_bone_count(), glm::mat4(1.0f));
+    } else {
+        local_transforms.clear();
+        bone_matrices.clear();
+        bone_model_matrices.clear();
     }
 }
 
@@ -110,11 +117,21 @@ void Animator::calculate_transforms() {
         glm::vec3 position(0.0f);
         glm::quat rotation(1.0f, 0.0f, 0.0f, 0.0f);
         glm::vec3 scale(1.0f);
+        glm::vec3 skew(0.0f);
+        glm::vec4 perspective(0.0f);
+        glm::decompose(bone.local_transform, scale, rotation, position, skew, perspective);
+        rotation = glm::normalize(rotation);
 
         if (bone_anim) {
-            position = bone_anim->get_position(current_time);
-            rotation = bone_anim->get_rotation(current_time);
-            scale = bone_anim->get_scale(current_time);
+            if (!bone_anim->position_keys.empty()) {
+                position = bone_anim->get_position(current_time);
+            }
+            if (!bone_anim->rotation_keys.empty()) {
+                rotation = bone_anim->get_rotation(current_time);
+            }
+            if (!bone_anim->scale_keys.empty()) {
+                scale = bone_anim->get_scale(current_time);
+            }
         }
         else {
             // Use bind pose if no animation data
@@ -130,6 +147,16 @@ void Animator::calculate_transforms() {
         local_transforms[i] = translation * rotation_mat * scale_mat;
     }
 
-    // Calculate final bone matrices
+    bone_model_matrices.resize(skeleton->get_bone_count());
+    for (int i = 0; i < skeleton->get_bone_count(); ++i) {
+        const Bone& bone = skeleton->get_bone(i);
+        if (bone.parent_id < 0) {
+            bone_model_matrices[i] = local_transforms[i];
+        } else {
+            bone_model_matrices[i] = bone_model_matrices[bone.parent_id] * local_transforms[i];
+        }
+    }
+
+    // Calculate final skinning matrices
     skeleton->calculate_bone_matrices(local_transforms, bone_matrices);
 }

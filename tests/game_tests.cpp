@@ -3,6 +3,7 @@
 #include "Game/GameAnimationFactory.hpp"
 #include "Game/GameEntityFactory.hpp"
 #include "Game/GameSystems.hpp"
+#include "Game/GameWeaponFactory.hpp"
 
 #include "engine/assets/SkinnedMaterial.hpp"
 #include "engine/assets/TintedMaterial.hpp"
@@ -10,9 +11,11 @@
 #include "engine/components/HealthComponent.hpp"
 #include "engine/ecs/EcsComponents.hpp"
 #include "engine/ecs/World.hpp"
+#include "engine/systems/BoneAttachmentSystem.hpp"
 #include "engine/systems/TransformSystem.hpp"
 
 #include <glm/geometric.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
 #include <memory>
@@ -142,6 +145,78 @@ void test_player_attack_animation_factory()
     assert_true(rotationDelta > 0.1f, "Attack clip should visibly rotate the sword arm");
 }
 
+void test_player_sword_factory_and_socket_selection()
+{
+    World world;
+    engine::ecs::EntityId root = world.createEntity("root");
+    game::SwordVisualAssets assets;
+    assets.bladeRenderer = inert_renderer();
+    assets.guardRenderer = inert_renderer();
+    assets.gripRenderer = inert_renderer();
+    assets.pommelRenderer = inert_renderer();
+    assets.bladeMaterial = inert_material();
+    assets.guardMaterial = inert_material();
+    assets.gripMaterial = inert_material();
+
+    engine::ecs::EntityId sword = game::createPlayerSword(world, root, assets);
+    const auto* swordHierarchy = world.registry().get<engine::ecs::Hierarchy>(sword);
+
+    assert_true(world.registry().isAlive(sword), "Sword factory should create a root entity");
+    assert_true(swordHierarchy && swordHierarchy->children.size() == 4, "Sword should contain blade, guard, grip, and pommel");
+
+    auto model = make_swordman_like_model();
+    const Skeleton& skeleton = *model->skins.front().skeleton;
+    assert_true(
+        game::resolvePlayerSwordHandBoneName(skeleton) == game::kSwordmanRightHandBone,
+        "Sword socket should fall back to the swordman right hand bone");
+
+    engine::ecs::BoneAttachment attachment = game::makePlayerSwordAttachment(sword, skeleton);
+    assert_true(attachment.boneName == game::kSwordmanRightHandBone, "Sword attachment should cache the resolved hand bone name");
+    assert_true(attachment.boneId == skeleton.get_bone_id(game::kSwordmanRightHandBone), "Sword attachment should cache the hand bone id");
+
+    auto locatorModel = make_swordman_like_model();
+    Skeleton& locatorSkeleton = *locatorModel->skins.front().skeleton;
+    const int handId = locatorSkeleton.get_bone_id(game::kSwordmanRightHandBone);
+    const int locatorId = locatorSkeleton.add_bone(game::kSwordmanHandLocatorBone, handId, glm::mat4(1.0f));
+    locatorSkeleton.get_bone(locatorId).local_transform =
+        glm::scale(glm::mat4(1.0f), glm::vec3(0.05f));
+
+    engine::ecs::BoneAttachment locatorAttachment = game::makePlayerSwordAttachment(sword, locatorSkeleton);
+    assert_true(locatorAttachment.boneName == game::kSwordmanHandLocatorBone, "Sword socket should prefer the hand locator");
+    assert_true(locatorAttachment.localScale.x > 1000.0f, "Locator scale should be compensated so the sword stays visible");
+}
+
+void test_player_attack_points_sword_forward()
+{
+    World world;
+    auto model = make_swordman_like_model();
+    const int attackIndex = game::ensurePlayerAttackAnimation(*model);
+    const Skeleton& skeleton = *model->skins.front().skeleton;
+
+    engine::ecs::EntityId visual = world.createEntity("visual");
+    auto& animation = world.registry().emplace<engine::ecs::AnimatorData>(visual);
+    animation.model = model;
+    animation.skinIndex = 0;
+    animation.animator.set_skeleton(model->skins.front().skeleton.get());
+    animation.animator.play(model->animations[static_cast<size_t>(attackIndex)].get(), false);
+    animation.animator.set_current_time(0.16f);
+
+    engine::ecs::EntityId sword = world.createEntity("sword");
+    auto attachment = game::makePlayerSwordAttachment(visual, skeleton);
+    attachment.localOffset = glm::vec3(0.0f);
+    attachment.localScale = glm::vec3(1.0f);
+    world.registry().emplace<engine::ecs::BoneAttachment>(sword, attachment);
+
+    BoneAttachmentSystem::updateAttachments(world.registry());
+    TransformSystem::updateWorldTransforms(world.registry());
+
+    const auto* transform = world.registry().get<engine::ecs::Transform>(sword);
+    const glm::vec3 swordForward = glm::normalize(glm::mat3(transform->worldMatrix) * glm::vec3(0.0f, 0.0f, 1.0f));
+    assert_true(
+        glm::dot(swordForward, glm::vec3(0.0f, 0.0f, 1.0f)) > 0.25f,
+        "Attack contact frame should keep the sword facing generally forward");
+}
+
 void test_player_movement_attack_and_camera()
 {
     World world;
@@ -221,6 +296,8 @@ int main()
 {
     run_test("game_entity_factory_components", test_game_entity_factory_components);
     run_test("player_attack_animation_factory", test_player_attack_animation_factory);
+    run_test("player_sword_factory_and_socket_selection", test_player_sword_factory_and_socket_selection);
+    run_test("player_attack_points_sword_forward", test_player_attack_points_sword_forward);
     run_test("player_movement_attack_and_camera", test_player_movement_attack_and_camera);
     run_test("enemy_ai_moves_and_attacks", test_enemy_ai_moves_and_attacks);
     run_test("xp_level_up", test_xp_level_up);

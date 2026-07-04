@@ -99,6 +99,10 @@ void updatePlayerController(World& world, engine::ecs::EntityId player, float de
         transform->dirty = true;
     }
 
+    if (world.registry().has<engine::ecs::BoneAttachment>(controller->weapon)) {
+        return;
+    }
+
     if (auto* weapon = world.registry().get<engine::ecs::Transform>(controller->weapon)) {
         if (controller->attackTimer > 0.0f) {
             const float t = 1.0f - (controller->attackTimer / controller->attackDuration);

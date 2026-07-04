@@ -1,9 +1,11 @@
+#include "engine/assets/AssetManager.hpp"
 #include "engine/assets/TintedMaterial.hpp"
 #include "engine/components/MeshRenderer.hpp"
 #include "engine/ecs/EcsComponents.hpp"
 #include "engine/ecs/Registry.hpp"
 #include "engine/ecs/SystemManager.hpp"
 #include "engine/ecs/World.hpp"
+#include "engine/systems/BoneAttachmentSystem.hpp"
 #include "engine/systems/PhysicsCollisionSystem.hpp"
 #include "engine/systems/TransformSystem.hpp"
 
@@ -246,6 +248,82 @@ void test_sequential_collision_resolution_uses_fresh_transforms()
     assert_close(transform->worldMatrix[3].z, -0.25f, "World matrix should refresh after sequential corrections");
 }
 
+std::shared_ptr<ModelAsset> make_attachment_model()
+{
+    auto model = std::make_shared<ModelAsset>();
+    auto skeleton = std::make_shared<Skeleton>();
+    skeleton->add_bone("root", -1, glm::mat4(1.0f));
+    skeleton->add_bone("hand", 0, glm::mat4(1.0f));
+
+    auto clip = std::make_shared<AnimationClip>("pose", 1.0f, 1.0f);
+    BoneAnimation root;
+    root.bone_id = 0;
+    root.position_keys.push_back({0.0f, glm::vec3(0.0f)});
+    root.rotation_keys.push_back({0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f)});
+    root.scale_keys.push_back({0.0f, glm::vec3(1.0f)});
+    clip->add_bone_animation(root);
+
+    BoneAnimation hand;
+    hand.bone_id = 1;
+    hand.position_keys.push_back({0.0f, glm::vec3(0.0f, 2.0f, 0.0f)});
+    hand.rotation_keys.push_back({0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f)});
+    hand.scale_keys.push_back({0.0f, glm::vec3(1.0f)});
+    clip->add_bone_animation(hand);
+
+    model->skins.push_back(SkinAsset{"test", skeleton, {0, 1}});
+    model->animations.push_back(clip);
+    return model;
+}
+
+void test_bone_attachment_follows_parented_source_bone()
+{
+    World world;
+    auto model = make_attachment_model();
+
+    engine::ecs::EntityId source = world.createEntity("source", glm::vec3(5.0f, 0.0f, 0.0f));
+    auto& animation = world.registry().emplace<engine::ecs::AnimatorData>(source);
+    animation.model = model;
+    animation.skinIndex = 0;
+    animation.animator.set_skeleton(model->skins.front().skeleton.get());
+    animation.animator.play(model->animations.front().get(), true);
+
+    engine::ecs::EntityId parent = world.createEntity("parent", glm::vec3(1.0f, 0.0f, 0.0f));
+    engine::ecs::EntityId target = world.createEntity("target");
+    assert_true(world.setParent(target, parent), "Attachment target should be parented");
+
+    auto& attachment = world.registry().emplace<engine::ecs::BoneAttachment>(target);
+    attachment.sourceEntity = source;
+    attachment.boneName = "hand";
+    attachment.localOffset = glm::vec3(0.0f, 0.0f, 3.0f);
+
+    BoneAttachmentSystem::updateAttachments(world.registry());
+    TransformSystem::updateWorldTransforms(world.registry());
+
+    const auto* transform = world.registry().get<engine::ecs::Transform>(target);
+    assert_close(transform->position.x, 4.0f, "Attachment should convert world target into parent local X");
+    assert_close(transform->position.y, 2.0f, "Attachment should convert world target into parent local Y");
+    assert_close(transform->position.z, 3.0f, "Attachment should convert world target into parent local Z");
+    assert_close(transform->worldMatrix[3].x, 5.0f, "Attachment world X should follow source bone");
+    assert_close(transform->worldMatrix[3].y, 2.0f, "Attachment world Y should follow source bone");
+    assert_close(transform->worldMatrix[3].z, 3.0f, "Attachment world Z should include grip offset");
+}
+
+void test_bone_attachment_ignores_missing_source()
+{
+    World world;
+    engine::ecs::EntityId source = world.createEntity("source");
+    engine::ecs::EntityId target = world.createEntity("target", glm::vec3(3.0f, 0.0f, 0.0f));
+    auto& attachment = world.registry().emplace<engine::ecs::BoneAttachment>(target);
+    attachment.sourceEntity = source;
+    attachment.boneName = "hand";
+
+    world.destroyEntity(source);
+    BoneAttachmentSystem::updateAttachments(world.registry());
+
+    const auto* transform = world.registry().get<engine::ecs::Transform>(target);
+    assert_close(transform->position.x, 3.0f, "Missing source should leave attachment target unchanged");
+}
+
 class CountingSystem final : public engine::ecs::System {
 public:
     void update(engine::ecs::Registry&, float deltaTime) override
@@ -284,6 +362,8 @@ int main()
     run_test("collision_refreshes_world_transform", test_collision_refreshes_world_transform);
     run_test("collision_correction_respects_parent_space", test_collision_correction_respects_parent_space);
     run_test("sequential_collision_resolution_uses_fresh_transforms", test_sequential_collision_resolution_uses_fresh_transforms);
+    run_test("bone_attachment_follows_parented_source_bone", test_bone_attachment_follows_parented_source_bone);
+    run_test("bone_attachment_ignores_missing_source", test_bone_attachment_ignores_missing_source);
     run_test("system_manager_updates", test_system_manager_updates);
 
     std::cout << "Tests passed: " << tests_passed << std::endl;

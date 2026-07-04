@@ -3,6 +3,7 @@
 #include "../engine/assets/AssetManager.hpp"
 
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 
 #include <array>
 #include <initializer_list>
@@ -53,9 +54,29 @@ inline int findAnimation(const ModelAsset& model, std::string_view name)
     return -1;
 }
 
-inline BoneSample sampleBase(const AnimationClip* baseClip, int boneId, float time)
+inline BoneSample sampleBindPose(const Skeleton& skeleton, int boneId)
 {
     BoneSample sample;
+    if (boneId < 0 || boneId >= skeleton.get_bone_count()) {
+        return sample;
+    }
+
+    glm::vec3 skew(0.0f);
+    glm::vec4 perspective(0.0f);
+    glm::decompose(
+        skeleton.get_bone(boneId).local_transform,
+        sample.scale,
+        sample.rotation,
+        sample.position,
+        skew,
+        perspective);
+    sample.rotation = glm::normalize(sample.rotation);
+    return sample;
+}
+
+inline BoneSample sampleBase(const Skeleton& skeleton, const AnimationClip* baseClip, int boneId, float time)
+{
+    BoneSample sample = sampleBindPose(skeleton, boneId);
     if (!baseClip) {
         return sample;
     }
@@ -68,9 +89,15 @@ inline BoneSample sampleBase(const AnimationClip* baseClip, int boneId, float ti
     const float baseTime = baseClip->get_duration() > 0.0f
         ? glm::clamp(time, 0.0f, baseClip->get_duration())
         : 0.0f;
-    sample.position = baseBone->get_position(baseTime);
-    sample.rotation = baseBone->get_rotation(baseTime);
-    sample.scale = baseBone->get_scale(baseTime);
+    if (!baseBone->position_keys.empty()) {
+        sample.position = baseBone->get_position(baseTime);
+    }
+    if (!baseBone->rotation_keys.empty()) {
+        sample.rotation = baseBone->get_rotation(baseTime);
+    }
+    if (!baseBone->scale_keys.empty()) {
+        sample.scale = baseBone->get_scale(baseTime);
+    }
     return sample;
 }
 
@@ -164,7 +191,7 @@ inline int ensurePlayerAttackAnimation(ModelAsset& model)
 
         for (size_t phase = 0; phase < keyTimes.size(); ++phase) {
             const float time = keyTimes[phase];
-            const auto sample = animation_factory_detail::sampleBase(baseClip, boneId, time);
+            const auto sample = animation_factory_detail::sampleBase(skeleton, baseClip, boneId, time);
             const glm::quat delta = animation_factory_detail::attackDelta(bones, boneId, phase);
 
             boneAnimation.position_keys.push_back({time, sample.position});

@@ -10,6 +10,7 @@
 #include "../engine/assets/TintedMaterial.hpp"
 #include "../engine/ecs/World.hpp"
 #include "../engine/systems/AnimationSystem.hpp"
+#include "../engine/systems/BoneAttachmentSystem.hpp"
 #include "../engine/systems/RenderSystem.hpp"
 
 #include <glm/glm.hpp>
@@ -35,6 +36,8 @@ struct GameAssets {
     std::shared_ptr<TintedMaterial> yellow;
     std::shared_ptr<TintedMaterial> red;
     std::shared_ptr<TintedMaterial> xpGold;
+    std::shared_ptr<TintedMaterial> steel;
+    std::shared_ptr<TintedMaterial> darkLeather;
     std::shared_ptr<TexturedMaterial> house;
     std::shared_ptr<TexturedMaterial> houseMixed;
     std::shared_ptr<TexturedMaterial> glass;
@@ -47,6 +50,10 @@ struct GameAssets {
     std::shared_ptr<MeshRenderer> sphereRenderer;
     std::shared_ptr<MeshRenderer> planeRenderer;
     std::shared_ptr<MeshRenderer> xpOrbRenderer;
+    std::shared_ptr<MeshRenderer> swordBladeRenderer;
+    std::shared_ptr<MeshRenderer> swordGuardRenderer;
+    std::shared_ptr<MeshRenderer> swordGripRenderer;
+    std::shared_ptr<MeshRenderer> swordPommelRenderer;
 
     std::shared_ptr<ModelAsset> swordmanModel;
     std::shared_ptr<ModelAsset> skeletonModel;
@@ -69,6 +76,7 @@ private:
     void spawnInitialWave();
     engine::ecs::EntityId spawnEnemy(const glm::vec3& position);
     void spawnXpBurst(const glm::vec3& position);
+    void attachSwordToPlayerHand();
 
     void update(Window& window, float deltaTime);
     void updateCombat(float deltaTime);
@@ -87,6 +95,7 @@ private:
 
     World world_;
     AnimationSystem animationSystem_;
+    BoneAttachmentSystem boneAttachmentSystem_;
     GameAssets assets_;
     GameplayState state_;
     std::unique_ptr<Player> player_;

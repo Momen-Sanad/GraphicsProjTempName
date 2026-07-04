@@ -88,6 +88,7 @@ struct GameplayState {
     engine::ecs::EntityId island = engine::ecs::InvalidEntity;
     engine::ecs::EntityId player = engine::ecs::InvalidEntity;
     engine::ecs::EntityId playerVisual = engine::ecs::InvalidEntity;
+    engine::ecs::EntityId playerSword = engine::ecs::InvalidEntity;
     engine::ecs::EntityId testHouse = engine::ecs::InvalidEntity;
     engine::ecs::EntityId collisionSphere = engine::ecs::InvalidEntity;
     std::vector<engine::ecs::EntityId> enemies;

@@ -88,6 +88,15 @@ struct AnimatorData {
     bool initialized = false;
 };
 
+struct BoneAttachment {
+    EntityId sourceEntity = InvalidEntity;
+    std::string boneName;
+    int boneId = -1;
+    glm::vec3 localOffset = glm::vec3(0.0f);
+    glm::quat localRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+    glm::vec3 localScale = glm::vec3(1.0f);
+};
+
 struct PhysicsBodyData {
     uint32_t bodyId = UINT32_MAX;
 };

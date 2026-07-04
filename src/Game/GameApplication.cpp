@@ -3,6 +3,7 @@
 #include "GameAnimationFactory.hpp"
 #include "GameEntityFactory.hpp"
 #include "GameSystems.hpp"
+#include "GameWeaponFactory.hpp"
 #include "Entities/Crusader.hpp"
 #include "Entities/Enemy.hpp"
 
@@ -200,6 +201,8 @@ bool GameApplication::loadAssets()
     assets_.green = makeTintedMaterial(assets, "game-green", assets_.mainShader, {0.4f, 1.0f, 0.2f, 1.0f});
     assets_.red = makeTintedMaterial(assets, "game-red", assets_.mainShader, {1.0f, 0.2f, 0.2f, 1.0f});
     assets_.xpGold = makeTintedMaterial(assets, "game-xp-gold", assets_.mainShader, {1.0f, 0.85f, 0.0f, 1.0f});
+    assets_.steel = makeTintedMaterial(assets, "game-steel", assets_.mainShader, {0.78f, 0.82f, 0.88f, 1.0f});
+    assets_.darkLeather = makeTintedMaterial(assets, "game-dark-leather", assets_.mainShader, {0.12f, 0.07f, 0.04f, 1.0f});
 
     auto moon = assets.loadTexture(textureDir + "/moon.jpg");
     auto houseTexture = assets.loadTexture(textureDir + "/house/house.jpeg");
@@ -234,12 +237,20 @@ bool GameApplication::loadAssets()
     Mesh sphereMesh = Mesh::create_sphere();
     Mesh planeMesh = Mesh::create_plane(glm::vec3(0.0f), glm::vec2(1.0f));
     Mesh xpOrbMesh = Mesh::create_cuboid(glm::vec3(0.0f), glm::vec3(0.3f));
+    Mesh swordBladeMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, 0.62f), glm::vec3(0.08f, 0.035f, 1.16f));
+    Mesh swordGuardMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, 0.05f), glm::vec3(0.46f, 0.08f, 0.08f));
+    Mesh swordGripMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, -0.17f), glm::vec3(0.09f, 0.09f, 0.34f));
+    Mesh swordPommelMesh = Mesh::create_cuboid(glm::vec3(0.0f, 0.0f, -0.38f), glm::vec3(0.16f, 0.14f, 0.12f));
 
     assets_.cubeRenderer = assets.createMeshRenderer("game-cube", cubeMesh);
     assets_.glassRenderer = assets.createMeshRenderer("game-glass-plane", glassMesh);
     assets_.sphereRenderer = assets.createMeshRenderer("game-sphere", sphereMesh);
     assets_.planeRenderer = assets.createMeshRenderer("game-plane", planeMesh);
     assets_.xpOrbRenderer = assets.createMeshRenderer("game-xp-orb", xpOrbMesh);
+    assets_.swordBladeRenderer = assets.createMeshRenderer("game-sword-blade", swordBladeMesh);
+    assets_.swordGuardRenderer = assets.createMeshRenderer("game-sword-guard", swordGuardMesh);
+    assets_.swordGripRenderer = assets.createMeshRenderer("game-sword-grip", swordGripMesh);
+    assets_.swordPommelRenderer = assets.createMeshRenderer("game-sword-pommel", swordPommelMesh);
 
     const std::string houseMeshPath = modelDir + "/house/house.obj";
     assets_.houseMesh = assets.loadMesh(houseMeshPath);
@@ -346,7 +357,7 @@ void GameApplication::setupWorld()
         animation.loop = assets_.swordmanBaseAnimation >= 0;
 
         world_.registry().remove<engine::ecs::Renderable>(player_->getBody());
-        world_.registry().remove<engine::ecs::Renderable>(player_->getWeapon());
+        attachSwordToPlayerHand();
     }
 
     state_.testHouse = factory.createStaticRenderable(
@@ -391,6 +402,50 @@ void GameApplication::setupWorld()
     spawnInitialWave();
     TransformSystem::updateWorldTransforms(world_.registry());
     updateCharacterLights();
+}
+
+void GameApplication::attachSwordToPlayerHand()
+{
+    if (!assets_.swordmanModel ||
+        assets_.swordmanModel->skins.empty() ||
+        !assets_.swordmanModel->skins.front().skeleton ||
+        !world_.registry().isAlive(state_.playerVisual)) {
+        return;
+    }
+
+    const Skeleton& skeleton = *assets_.swordmanModel->skins.front().skeleton;
+    engine::ecs::BoneAttachment attachment = makePlayerSwordAttachment(state_.playerVisual, skeleton);
+    if (attachment.boneName.empty()) {
+        std::cerr << "Warning: swordman right-hand bone was not found; keeping fallback weapon.\n";
+        return;
+    }
+
+    if (state_.playerSword.valid() && world_.registry().isAlive(state_.playerSword)) {
+        world_.destroyEntity(state_.playerSword, DestroyMode::Recursive);
+    }
+
+    if (player_ && world_.registry().isAlive(player_->getWeapon())) {
+        world_.destroyEntity(player_->getWeapon(), DestroyMode::Recursive);
+    }
+
+    SwordVisualAssets swordAssets;
+    swordAssets.bladeRenderer = assets_.swordBladeRenderer;
+    swordAssets.guardRenderer = assets_.swordGuardRenderer;
+    swordAssets.gripRenderer = assets_.swordGripRenderer;
+    swordAssets.pommelRenderer = assets_.swordPommelRenderer;
+    swordAssets.bladeMaterial = assets_.steel;
+    swordAssets.guardMaterial = assets_.steel;
+    swordAssets.gripMaterial = assets_.darkLeather;
+
+    state_.playerSword = createPlayerSword(world_, state_.player, swordAssets);
+    world_.registry().emplace<engine::ecs::BoneAttachment>(state_.playerSword, attachment);
+
+    if (auto* controller = world_.registry().get<PlayerController>(state_.player)) {
+        controller->weapon = state_.playerSword;
+        if (const auto* transform = world_.registry().get<engine::ecs::Transform>(state_.playerSword)) {
+            controller->weaponRestRotation = transform->rotation;
+        }
+    }
 }
 
 void GameApplication::spawnInitialWave()
@@ -526,6 +581,7 @@ void GameApplication::update(Window& window, float deltaTime)
     updateCollisions();
     updatePlayerAnimationState();
     animationSystem_.update(world_.registry(), deltaTime);
+    boneAttachmentSystem_.update(world_.registry(), deltaTime);
     world_.systems().updateAll(world_.registry(), deltaTime);
     TransformSystem::updateWorldTransforms(world_.registry());
     updateCharacterLights();

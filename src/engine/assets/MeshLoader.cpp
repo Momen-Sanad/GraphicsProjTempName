@@ -556,7 +556,8 @@ std::shared_ptr<ModelData> MeshLoader::readGltfModel(const char* path)
                 ? inverse_bind_matrices[i]
                 : glm::mat4(1.0f);
 
-            model_data->skeleton->add_bone(node.name, parent_id, inverse_bind);
+            const int bone_id = model_data->skeleton->add_bone(node.name, parent_id, inverse_bind);
+            model_data->skeleton->get_bone(bone_id).local_transform = read_node_transform(node);
         }
 
         // Set global inverse transform (root node transform)

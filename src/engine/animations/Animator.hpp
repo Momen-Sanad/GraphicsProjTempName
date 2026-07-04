@@ -19,6 +19,7 @@ private:
 
     // Final bone matrices for rendering (bone space -> model space)
     std::vector<glm::mat4> bone_matrices;
+    std::vector<glm::mat4> bone_model_matrices;
 
 public:
     Animator();
@@ -45,6 +46,8 @@ public:
     float get_current_time() const { return current_time; }
     const AnimationClip* get_current_clip() const { return current_clip; }
     const std::vector<glm::mat4>& get_bone_matrices() const { return bone_matrices; }
+    const std::vector<glm::mat4>& get_bone_model_matrices() const { return bone_model_matrices; }
+    const std::vector<glm::mat4>& get_local_bone_transforms() const { return local_transforms; }
 
     // Setters
     void set_playback_speed(float speed) { playback_speed = speed; }
