@@ -16,6 +16,7 @@
 
 #include <glm/geometric.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include <iostream>
 #include <memory>
@@ -186,6 +187,44 @@ void test_player_sword_factory_and_socket_selection()
     assert_true(locatorAttachment.localScale.x > 1000.0f, "Locator scale should be compensated so the sword stays visible");
 }
 
+void test_player_sword_socket_calibration_faces_forward()
+{
+    World world;
+    auto model = make_swordman_like_model();
+    Skeleton& skeleton = *model->skins.front().skeleton;
+    const int handId = skeleton.get_bone_id(game::kSwordmanRightHandBone);
+    const int locatorId = skeleton.add_bone(game::kSwordmanHandLocatorBone, handId, glm::mat4(1.0f));
+    skeleton.get_bone(locatorId).local_transform =
+        glm::translate(glm::mat4(1.0f), glm::vec3(0.2f, 0.0f, 0.0f)) *
+        glm::mat4_cast(glm::angleAxis(glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f))) *
+        glm::scale(glm::mat4(1.0f), glm::vec3(0.05f));
+
+    auto bindPose = std::make_shared<AnimationClip>("bind_pose", 1.0f, 1.0f);
+    model->animations.push_back(bindPose);
+
+    engine::ecs::EntityId visual = world.createEntity("visual");
+    auto& animation = world.registry().emplace<engine::ecs::AnimatorData>(visual);
+    animation.model = model;
+    animation.skinIndex = 0;
+    animation.animator.set_skeleton(model->skins.front().skeleton.get());
+    animation.animator.play(bindPose.get(), true);
+
+    engine::ecs::EntityId sword = world.createEntity("sword");
+    auto attachment = game::makePlayerSwordAttachment(visual, skeleton);
+    attachment.localOffset = glm::vec3(0.0f);
+    attachment.localScale = glm::vec3(1.0f);
+    world.registry().emplace<engine::ecs::BoneAttachment>(sword, attachment);
+
+    BoneAttachmentSystem::updateAttachments(world.registry());
+    TransformSystem::updateWorldTransforms(world.registry());
+
+    const auto* transform = world.registry().get<engine::ecs::Transform>(sword);
+    const glm::vec3 swordForward = glm::normalize(glm::mat3(transform->worldMatrix) * glm::vec3(0.0f, 0.0f, 1.0f));
+    assert_true(
+        glm::dot(swordForward, glm::vec3(0.0f, 0.0f, 1.0f)) > 0.99f,
+        "Socket calibration should make the sword blade face player-forward");
+}
+
 void test_player_attack_points_sword_forward()
 {
     World world;
@@ -297,6 +336,7 @@ int main()
     run_test("game_entity_factory_components", test_game_entity_factory_components);
     run_test("player_attack_animation_factory", test_player_attack_animation_factory);
     run_test("player_sword_factory_and_socket_selection", test_player_sword_factory_and_socket_selection);
+    run_test("player_sword_socket_calibration_faces_forward", test_player_sword_socket_calibration_faces_forward);
     run_test("player_attack_points_sword_forward", test_player_attack_points_sword_forward);
     run_test("player_movement_attack_and_camera", test_player_movement_attack_and_camera);
     run_test("enemy_ai_moves_and_attacks", test_enemy_ai_moves_and_attacks);

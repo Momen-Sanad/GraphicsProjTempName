@@ -106,6 +106,11 @@ inline glm::quat eulerDegrees(float x, float y, float z)
     return glm::quat(glm::radians(glm::vec3(x, y, z)));
 }
 
+inline glm::quat swordForwardAttackTwist(bool windup)
+{
+    return eulerDegrees(0.0f, windup ? 45.0f : 80.0f, 0.0f);
+}
+
 inline glm::quat attackDelta(const AttackBones& bones, int boneId, size_t phase)
 {
     if (phase == 0 || phase == 3) {
@@ -129,7 +134,9 @@ inline glm::quat attackDelta(const AttackBones& bones, int boneId, size_t phase)
         return windup ? eulerDegrees(-36.0f, 5.0f, -12.0f) : eulerDegrees(34.0f, -16.0f, 22.0f);
     }
     if (boneId == bones.rightHand) {
-        return windup ? eulerDegrees(0.0f, -12.0f, -26.0f) : eulerDegrees(0.0f, 26.0f, 58.0f);
+        const glm::quat handPose =
+            windup ? eulerDegrees(0.0f, -12.0f, -26.0f) : eulerDegrees(0.0f, 26.0f, 58.0f);
+        return glm::normalize(handPose * swordForwardAttackTwist(windup));
     }
     if (boneId == bones.leftShoulder) {
         return windup ? eulerDegrees(4.0f, 0.0f, 12.0f) : eulerDegrees(-6.0f, 0.0f, -16.0f);
