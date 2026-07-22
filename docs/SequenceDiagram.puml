@@ -1,0 +1,129 @@
+@startuml
+' ---------- VISUAL STYLE ----------
+skinparam backgroundColor #696969
+skinparam sequence {
+    ArrowColor #9cdcfe
+    LifeLineBorderColor #9cdcfe
+    LifeLineBackgroundColor #2b2b2b
+    ActorBorderColor #ffffff
+    ActorBackgroundColor #696969
+    ParticipantBorderColor #696969
+    ParticipantBackgroundColor #c4c4c4
+    BoxBorderColor #444444
+    BoxBackgroundColor #151515
+    NoteBackgroundColor #2b2b2b
+    NoteBorderColor #666666
+    GroupBorderColor #c4c4c4
+    GroupBackgroundColor #c4c4c4
+}
+
+actor User as U
+
+participant Application as App
+participant Window as Win
+participant Engine as Eng
+participant GLContext as GL
+participant FrameScheduler as FS
+participant AssetManager as AM
+participant World as W
+participant Registry as Reg
+participant SystemManager as SM
+participant SceneDeserializer as SD
+participant Scene as Sc
+participant RenderSystem as RS
+participant PhysicsSystem as PS
+participant CameraControlSystem as CCS
+participant ScriptSystem as SS
+participant Input as In
+participant Transform as Tr
+participant MeshRenderer as MR
+participant Camera as Cam
+participant PostProcessingPass as PPP
+participant MonoBehaviour as MB
+
+' =====================================================
+'                    ENGINE STARTUP
+' =====================================================
+
+group **Engine Startup**
+    U -> App : run()
+    App -> Win : create()
+    App -> Eng : initialize()
+
+    Eng -> GL : initialize()
+    Eng -> FS : initialize()
+    Eng -> AM : initialize()
+    Eng -> W : create()
+
+    Eng -> SM : registerSystems()
+    SM -> RS : register()
+    SM -> PS : register()
+    SM -> CCS : register()
+    SM -> SS : register()
+end group
+
+' =====================================================
+'                  SCENE DESERIALIZATION
+' =====================================================
+
+group **Scene Loading**
+    U -> SD : deserializeScene()
+
+    SD -> AM : loadAsset()
+    AM -> MeshLoader : loadMesh()
+    MeshLoader -> Mesh : create()
+
+    SD -> W : createEntity()
+    W -> Reg : createEntity()
+    Reg -> W : return EntityId
+
+    SD -> Reg : emplace(Transform)
+    Reg -> Tr : create()
+
+    SD -> Reg : emplace(Renderable / Camera / Light)
+
+    SD -> Sc : populate()
+    SD -> Tr : setTransform()
+end group
+
+' =====================================================
+'                      GAME LOOP
+' =====================================================
+
+loop **Main Game Loop**
+    App -> In : poll()
+    In -> CCS : deliverInput()
+
+    FS -> App : deltaTime()
+    App -> Eng : update()
+    Eng -> SM : updateSystems()
+
+    ' ---------- Rendering ----------
+    SM -> RS : update()
+    RS -> Cam : getActiveCamera()
+    RS -> MR : draw()
+    RS -> PPP : apply()
+
+    ' ---------- Physics ----------
+    SM -> PS : update()
+    PS -> Reg : query components()
+    PS -> Tr : integratePhysics()
+
+    ' ---------- Scripting ----------
+    SM -> SS : update()
+    SS -> Components.ScriptingComponent : runScripts()
+    Components.ScriptingComponent -> MB : update()
+end loop
+
+' =====================================================
+'                      SHUTDOWN
+' =====================================================
+
+group **Shutdown**
+    U -> App : shutdown()
+    App -> Eng : shutdown()
+    Eng -> W : destroy()
+    Eng -> AM : cleanup()
+end group
+
+@enduml

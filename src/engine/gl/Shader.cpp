@@ -1,84 +1,236 @@
 #include "Shader.hpp"
+#include <GLFW/glfw3.h>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 
-// Helper function to read a file into a string
-static std::string ReadFile(const std::string& filepath) {
+Shader::~Shader() {
+    destroy();
+}
 
-    std::ifstream file(filepath);
-    if (!file.is_open()) 
-    {
-        std::cerr << "Failed to open shader file: " << filepath << std::endl;
+Shader::Shader(Shader&& other) noexcept {
+    *this = std::move(other);
+}
+
+Shader& Shader::operator=(Shader&& other) noexcept {
+    if (this != &other) {
+        destroy();  // Cleans up any existing resources
+
+        // Transfers the program and uniform cache
+        program = other.program;
+        uniformCache = std::move(other.uniformCache);
+
+        // Nullify the source object to avoid double deletion
+        other.program = 0;
+    }
+    return *this;
+}
+
+std::string Shader::readFile(const std::string& path) {
+    std::ifstream file(path);
+    if (!file) {
+        std::cerr << "Failed to open shader file: " << path << std::endl;
         return "";
     }
-
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    return buffer.str();
+    
+    std::stringstream ss;
+    ss << file.rdbuf();  // Read the entire file content into a stringstream
+    return ss.str();     // Return the file contents as a string
 }
 
-static GLuint CompileShader(GLenum type, const std::string& source, const std::string& name) {
-    
-    GLuint shader = glCreateShader(type);
-    const char* src = source.c_str();
-    glShaderSource(shader, 1, &src, nullptr);
-    glCompileShader(shader);
+// ----------------------------------------------------
+// Shader compiler: Compiles a shader from source code
+// ----------------------------------------------------
+GLuint Shader::compileShader(const std::string& source, GLenum type) {
+    GLuint shader = glCreateShader(type);  // Creates the shader object (either vertex or fragment)
 
+    const char* src = source.c_str();
+    glShaderSource(shader, 1, &src, nullptr);  // Pass the shader source code to OpenGL
+    glCompileShader(shader);  // Compile the shader
+
+    // Check compile status
     GLint success;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+    if (!success) {
+        GLint logLength;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
+        std::string log(logLength, ' ');
+        glGetShaderInfoLog(shader, logLength, nullptr, log.data());  // Retrieve the error log
+        std::cerr << "Shader compilation failed:\n" << log << std::endl;
+        glDeleteShader(shader);  // Clean up the shader if compilation fails
+        return 0;  // Return 0 if compilation failed
+    }
 
-    if (!success) 
-    {
-        char log[512];
-        glGetShaderInfoLog(shader, 512, nullptr, log);
-        std::cerr << "Shader compilation failed (" << name << "):\n" << log << std::endl;
-    } 
-
-    else 
-        std::cout << "Shader compiled: " << name << std::endl;
-    
-
-    return shader;
+    return shader;  // Return the compiled shader ID
 }
 
-GLuint LoadVert(const std::string& filename) 
+// ----------------------------------------------------
+// Create shader from source code: Compiles and links vertex and fragment shaders
+// ----------------------------------------------------
+bool Shader::createFromSources(const std::string& vsSource,
+                               const std::string& fsSource)
 {
-    std::string source = ReadFile(std::string(SHADER_DIR) + "/" + filename);
-    return CompileShader(GL_VERTEX_SHADER, source, filename);
-}
+    destroy();  // Clean up existing resources before creating new ones
 
+    // Compile the vertex and fragment shaders
+    GLuint vs = compileShader(vsSource, GL_VERTEX_SHADER);
+    if (!vs) return false;
 
-GLuint LoadFrag(const std::string& filename) 
-{
-    std::string source = ReadFile(std::string(SHADER_DIR) + "/" + filename);
-    return CompileShader(GL_FRAGMENT_SHADER, source, filename);
-}
+    GLuint fs = compileShader(fsSource, GL_FRAGMENT_SHADER);
+    if (!fs) {
+        glDeleteShader(vs);  // Clean up if fragment shader compilation fails
+        return false;
+    }
 
-GLuint LinkProgram(GLuint vertShader, GLuint fragShader) 
-{
+    // Create the shader program and attach the compiled shaders
+    program = glCreateProgram();
+    glAttachShader(program, vs);
+    glAttachShader(program, fs);
+    glLinkProgram(program);  // Link the shaders into a program
 
-    GLuint program = glCreateProgram();
-    glAttachShader(program, vertShader);
-    glAttachShader(program, fragShader);
-    glLinkProgram(program);
+    glDeleteShader(vs);  // Delete individual shaders after linking
+    glDeleteShader(fs);
 
+    // Check if the program was successfully linked
     GLint success;
     glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if (!success) {
+        GLint logLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+        std::string log(logLength, ' ');
+        glGetProgramInfoLog(program, logLength, nullptr, log.data());  // Retrieve the program link error log
+        std::cerr << "Shader link failed:\n" << log << std::endl;
+        glDeleteProgram(program);  // Clean up if linking failed
+        program = 0;
+        return false;
+    }
 
-    if (!success) 
-    {
-        char log[512];
-        glGetProgramInfoLog(program, 512, nullptr, log);
-        std::cerr << "Shader program link failed:\n" << log << std::endl;
-    } 
-    
-    else 
-        std::cout << "Shader program linked successfully.\n";
-
-
-    glDeleteShader(vertShader);
-    glDeleteShader(fragShader);
-
-    return program;
+    return true;  // Return true if the program was successfully created and linked
 }
+
+// ----------------------------------------------------
+// Create shader from file paths: Reads shader files and creates a program
+// ----------------------------------------------------
+bool Shader::createFromFiles(const std::string& vsPath,
+                             const std::string& fsPath)
+{
+    std::string vs = readFile(vsPath);  // Read the vertex shader source file
+    std::string fs = readFile(fsPath);  // Read the fragment shader source file
+
+    if (vs.empty() || fs.empty())  // Check if reading the files was successful
+        return false;
+
+    return createFromSources(vs, fs);  // Use the source strings to create the shader program
+}
+
+// ----------------------------------------------------
+// Cleanup: Deletes the shader program and clears the uniform cache
+// ----------------------------------------------------
+void Shader::destroy() {
+    if (program) {
+        if (glfwGetCurrentContext() != nullptr) {
+            glDeleteProgram(program);  // Deletes the shader program from OpenGL
+        }
+        program = 0;  // Set program ID to 0 to indicate it's been deleted
+    }
+    uniformCache.clear();  // Clear the cached uniform locations
+}
+
+// ----------------------------------------------------
+// Use program: Activates the shader program for rendering
+// ----------------------------------------------------
+void Shader::use() const {
+    glUseProgram(program);  // Use the program in OpenGL's current rendering context
+}
+
+// ----------------------------------------------------
+// Cached uniform locations: Retrieves or caches the location of a uniform variable
+// ----------------------------------------------------
+GLint Shader::getUniformLocation(const std::string& name) const {
+    // Check if the uniform location is already cached
+    auto it = uniformCache.find(name);
+    if (it != uniformCache.end())
+        return it->second;  // Return the cached location if found
+
+    // Otherwise, retrieve the location from OpenGL
+    GLint loc = glGetUniformLocation(program, name.c_str());
+    uniformCache[name] = loc;  // Cache the uniform location for future use
+    return loc;
+}
+
+bool Shader::hasUniform(const std::string& name) const
+{
+    GLint loc = getUniformLocation(name);
+    return loc != -1;
+}
+
+
+
+// Specialization for int
+template <>
+void Shader::setUniform(const std::string& name, const int& value) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) {
+        glUniform1i(location, value);
+    }
+}
+
+// Specialization for float
+template <>
+void Shader::setUniform(const std::string& name, const float& value) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) {
+        glUniform1f(location, value);
+    }
+}
+
+// Specialization for glm::vec3
+template <>
+void Shader::setUniform(const std::string& name, const glm::vec3& value) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) {
+        glUniform3fv(location, 1, &value[0]);
+    }
+}
+
+// Specialization for glm::mat4
+template <>
+void Shader::setUniform(const std::string& name, const glm::mat4& value) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) {
+        glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
+    }
+}
+
+// Specialization for glm::mat3
+template <>
+void Shader::setUniform(const std::string& name, const glm::mat3& value) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) {
+        glUniformMatrix3fv(location, 1, GL_FALSE, &value[0][0]);
+    }
+}
+// Specialization for glm::vec4
+template <>
+void Shader::setUniform(const std::string& name, const glm::vec4& v) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) glUniform4fv(location, 1, &v[0]);
+}
+
+// Specialization for glm::vec2
+template <>
+void Shader::setUniform(const std::string& name, const glm::vec2& v) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) glUniform2fv(location, 1, &v[0]);
+}
+
+// Specialization for bool
+template <>
+void Shader::setUniform(const std::string& name, const bool& b) {
+    GLint location = getUniformLocation(name);
+    if (location != -1) glUniform1i(location, b ? 1 : 0);
+}
+
+// void Shader::set_mat4_array(const std::string& name, const glm::mat4* values, int count) const {
+//     glUniformMatrix4fv(getUniformLocation(name), count, GL_FALSE, glm::value_ptr(values[0]));
+// }

@@ -1,0 +1,273 @@
+@startuml
+' ---------- Visual style ----------
+skinparam backgroundColor #3c3c3c
+skinparam componentStyle uml2
+skinparam classBackgroundColor #660033
+skinparam classBorderColor #3c3c3c
+skinparam classFontColor #00ff00
+skinparam ArrowColor #9cdcfe
+skinparam packageBackgroundColor #3c3c50
+skinparam packageBorderColor #444444
+skinparam packageFontColor #00ffff
+
+' ---------- Packages (map to folders) ----------
+package "Core / App" as Core {
+  class Engine {
+    +initialize()
+    +shutdown()
+  }
+  class Application {
+    +run()
+    +initializeWindow()
+  }
+  class FrameScheduler {
+    +schedule()
+    +manageDeltaTime()
+  }
+}
+
+package "Platform" as Platform {
+  class Window {
+    +create()
+    +destroy()
+  }
+  class Input {
+    +getState()
+  }
+}
+
+package "ECS" as ECS {
+  class World {
+    +createEntity()
+    +destroyEntity()
+    +registry()
+    +assets()
+    +renderer()
+  }
+  class EntityId {
+    +index
+    +generation
+  }
+  class Registry {
+    +createEntity()
+    +destroyEntity()
+    +emplace()
+    +get()
+    +each()
+  }
+  class ComponentSignature
+  abstract class System {
+    +update()
+  }
+  class SystemManager {
+    +registerSystem()
+    +updateSystems()
+  }
+  class Coordinator {
+    +registry()
+    +systems()
+  }
+}
+
+package "Components" as Components {
+  class Transform {
+    +position
+    +rotation
+    +scale
+  }
+  class MeshRenderer {
+    +mesh
+    +material
+  }
+  class Camera {
+    +fov
+    +nearPlane
+    +farPlane
+  }
+  class Light {
+    +color
+    +type
+    +range
+  }
+  class ScriptingComponent {
+    +script
+  }
+}
+
+package "Assets" as Assets {
+  class AssetManager {
+    +loadAsset()
+    +getAsset()
+  }
+  class ShaderManager {
+    +loadShader()
+    +compileShader()
+  }
+  class MeshLoader {
+    +loadMesh()
+  }
+  class TextureLoader {
+    +loadTexture()
+  }
+  class MaterialManager {
+    +createMaterial()
+  }
+  class PipelineState {
+    +cullMode
+    +depthTest
+  }
+  abstract class Material {
+    +shader
+    +pipelineState
+  }
+  class TintedMaterial {
+    +color
+  }
+  class TexturedMaterial {
+    +texture
+  }
+  class LitMaterial {
+    +albedo
+    +specular
+    +roughness
+  }
+}
+
+package "GL / Rendering" as GL {
+  class GLContext {
+    +initialize()
+  }
+  class Shader {
+    +bind()
+    +unbind()
+  }
+  class Mesh {
+    +draw()
+  }
+  class Texture {
+    +bind()
+  }
+  class Framebuffer {
+    +bind()
+  }
+  class Sampler {
+    +setFilter()
+  }
+}
+
+package "Scene" as Scene {
+  class Scene {
+    +entities
+  }
+  class SceneDeserializer {
+    +deserializeScene()
+  }
+}
+
+package "Systems" as Systems {
+  class RenderSystem {
+    +render()
+  }
+  class PostProcessingPass {
+    +applyEffect()
+  }
+  class TransformSystem {
+    +updateTransform()
+  }
+  class PhysicsSystem {
+    +updatePhysics()
+  }
+  class CameraControlSystem {
+    +updateCamera()
+  }
+  class ScriptSystem {
+    +runScripts()
+  }
+}
+
+package "Scripting" as Scripting {
+  class MonoBehaviour {
+    +start()
+    +update()
+  }
+  class ScriptHost {
+    +initializeScriptRuntime()
+  }
+}
+
+package "Utils" as Utils {
+  class ResourceHandle {
+    +reference()
+  }
+}
+
+' ---------- Relationships ----------
+Engine o-- FrameScheduler : manages
+Engine o-- World : owns
+Engine o-- AssetManager : owns
+Application --> Window : "creates / uses"
+Application --> Engine : controls
+
+Input --> CameraControlSystem : feeds
+Input --> ScriptSystem : feeds
+
+World o-- Registry
+World o-- SystemManager
+
+Registry --> EntityId : "creates / validates"
+Registry --> ComponentSignature : tracks
+SystemManager --> System : "stores / updates"
+Coordinator --> Registry
+Coordinator --> SystemManager
+
+MeshRenderer --> Mesh : renders
+MeshRenderer --> Material : uses
+
+Camera --> RenderSystem : "provides view"
+Light --> RenderSystem : "contributes"
+
+AssetManager --> MeshLoader
+AssetManager --> TextureLoader
+AssetManager --> ShaderManager
+AssetManager --> MaterialManager
+
+ShaderManager --> Shader
+MaterialManager --> Material
+MaterialManager --> PipelineState
+
+Material --> PipelineState
+Material --> Shader
+Material --> Texture
+
+RenderSystem --> Camera : uses
+RenderSystem --> MeshRenderer : draws
+RenderSystem --> PostProcessingPass : applies
+
+Scene --> EntityId : describes
+SceneDeserializer --> AssetManager : "loads assets"
+SceneDeserializer --> World : "creates entities"
+SceneDeserializer --> Scene : populates
+SceneDeserializer --> Transform : "sets transforms"
+
+PhysicsSystem --> Registry : queries
+PhysicsSystem --> Transform : updates
+
+CameraControlSystem --> Input
+CameraControlSystem --> Camera
+CameraControlSystem --> Transform
+
+ScriptSystem --> ScriptingComponent
+ScriptSystem --> MonoBehaviour
+
+ScriptHost --> ScriptSystem : "hosts runtime"
+
+ResourceHandle --> AssetManager : references
+
+note right of PhysicsSystem
+  Integrates with reactphysics3d
+end note
+
+note right of SceneDeserializer
+  Minimal requirement: external scene files (no editor needed)
+end note
+@enduml

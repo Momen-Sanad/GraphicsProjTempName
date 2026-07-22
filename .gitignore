@@ -9,3 +9,8 @@
 .vscode/
 .idea/
 *.DS_Store
+/.vs/
+/out/
+.vs/
+./out
+/out

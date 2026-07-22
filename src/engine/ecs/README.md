@@ -1,19 +1,19 @@
-This collection implements a manager-style ECS (EntityManager, ComponentManager,
-SystemManager) with a Coordinator facade. The World class provides a lightweight
-name-indexed wrapper for convenience.
-Usage summary:
-  ecs::World world;
-  auto id = world.CreateEntity("Player");
-  world.GetCoordinator().RegisterComponent<TransformComponent>();
-  world.GetCoordinator().AddComponent<TransformComponent>(id, { ... });
-  auto renderSys = world.GetCoordinator().RegisterSystem<RenderSystem>();
-  world.GetCoordinator().SetSystemSignature<RenderSystem>( /* bitmask */ );
+The engine ECS uses generation-safe `EntityId` handles, a typed `Registry`,
+plain data components, and systems that query component sets directly.
 
-Notes & choices made:
-- We use a 64-bit Signature type; this limits component types to 64 by default
-  but keeps the code simple. If you need more, replace Signature with std::bitset<N>.
-- ComponentTypeRegistry maps a C++ type to a compact ComponentTypeId (0..N-1).
-- The World class in this variant intentionally avoids strong parent/child
-  ownership to keep lifecycle clear; if you want hierarchical transforms, add a
-  TransformHierarchy component or specialized Parent/Child manager that stores
-  entity relationships explicitly.
+`World` is the owning integration point for registry, assets, render, lights,
+physics, animation, and scheduling services. Game and demo code should create
+entities through `World::createEntity`, `World::createRenderable`, and
+`World::createSkinnedRenderable`, then access component data through
+`World::registry()`.
+
+Lifecycle is handle-based:
+
+- `World::setParent(child, parent)` stores hierarchy in ECS data.
+- `World::destroyEntity(id, DestroyMode::Recursive)` removes an entity and its
+  children while invalidating stale handles through generation bumps.
+- Render components store asset handles/shared ownership for GPU resources and
+  materials; gameplay code does not own raw engine resources.
+
+Behavior belongs in systems. Components should stay plain data unless a small
+method is intrinsic to that data type.

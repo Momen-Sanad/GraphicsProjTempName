@@ -1,34 +1,22 @@
-#pragma once
-#include <string>
-#include <glad/gl.h>
-#include <GLFW/glfw3.h>
-#include <stdexcept>
+#ifndef WINDOW_HPP
+#define WINDOW_HPP
 
-// Simple window wrapper: initializes GLFW, creates window, loads GLAD,
-// computes delta time and exposes a tiny API used by Application.
+#include <GLFW/glfw3.h>
+
 class Window {
+public:
+    Window(int width, int height, const char* title);
+    ~Window();
+
+    bool should_close() const;
+    void poll_events();
+    void swap_buffers();
+
+    GLFWwindow* get_handle() const { return handle; }
+    void get_framebuffer_size(int& w, int& h) const;
 
 private:
-
-    GLFWwindow* handle;
-    GLFWwindow* m_Window = nullptr;
-    double m_lastTime = 0.0;
-
-
-public:
-
-    
-    Window(int width, int height, const std::string& title);
-
-    bool ShouldClose() const;
-    void PollEvents() const;
-    void SwapBuffers() const;
-
-    // Returns delta time (seconds) since last call.
-    float GetDeltaTime();
-
-    ~Window();
-    
-    // Access to the raw GLFW window if needed
-    GLFWwindow* GetNativeWindow() const { return m_Window; }
+    GLFWwindow* handle = nullptr;
 };
+
+#endif

@@ -1,0 +1,214 @@
+#version 330 core
+
+// This will be used to compute the diffuse factor.
+float calculate_lambert(vec3 normal, vec3 light){
+    return max(0.0f, dot(normal, light));
+}
+
+// This will be used to compute the blinn phong specular.
+float calculate_blinn_phong(vec3 normal, vec3 light, vec3 view, float shininess){
+    vec3 half_blinn_phong = normalize(view + light);
+    return pow(max(0.0f, dot(normal, half_blinn_phong)), shininess);
+}
+
+// This contains all the material properties for a single pixel.
+// We have an extra property "emissive" which is used when the pixel itself emits light.
+struct Material {
+    vec3 diffuse;
+    vec3 specular;
+    vec3 ambient;
+    vec3 emissive;
+    float shininess;
+    float alpha;
+};
+
+// This contains all the material properties and texture maps for the object.
+struct TexturedMaterial {
+    sampler2D albedo_map;
+    sampler2D specular_map;
+    sampler2D ambient_occlusion_map;
+    sampler2D roughness_map;
+    sampler2D emissive_map;
+    bool has_albedo_map;
+    bool has_specular_map;
+    bool has_ambient_occlusion_map;
+    bool has_roughness_map;
+    bool has_emissive_map;
+    vec3 albedo_factor;
+    vec3 specular_factor;
+    vec3 emissive_factor;
+    float roughness_factor;
+    float ambient_occlusion_factor;
+};
+
+// This function samples the texture maps from the textured material and calculates the equivalent material at the given texture coordinates.
+Material sample_material(TexturedMaterial tex_mat, vec2 tex_coord){
+    Material mat;
+    vec4 albedo = tex_mat.has_albedo_map
+        ? texture(tex_mat.albedo_map, tex_coord)
+        : vec4(tex_mat.albedo_factor, 1.0);
+    mat.diffuse = albedo.rgb;
+    mat.alpha = albedo.a;
+    mat.specular = tex_mat.has_specular_map
+        ? texture(tex_mat.specular_map, tex_coord).rgb
+        : tex_mat.specular_factor;
+    mat.emissive = tex_mat.has_emissive_map
+        ? texture(tex_mat.emissive_map, tex_coord).rgb
+        : tex_mat.emissive_factor;
+    float ao = tex_mat.has_ambient_occlusion_map
+        ? texture(tex_mat.ambient_occlusion_map, tex_coord).r
+        : tex_mat.ambient_occlusion_factor;
+    mat.ambient = mat.diffuse * ao;
+
+    float roughness = tex_mat.has_roughness_map
+        ? texture(tex_mat.roughness_map, tex_coord).r
+        : tex_mat.roughness_factor;
+    // We are using a formula designed the Blinn-Phong model which is a popular approximation of the Phong model.
+    // The source of the formula is http://graphicrants.blogspot.com/2013/08/specular-brdf-reference.html
+    // It is noteworthy that we clamp the roughness to prevent its value from ever becoming 0 or 1 to prevent lighting artifacts.
+    mat.shininess = 2.0f/pow(clamp(roughness, 0.001f, 0.999f), 4.0f) - 2.0f;
+
+    return mat;
+}
+
+// These type constants match their peers in the C++ code.
+#define TYPE_DIRECTIONAL    0
+#define TYPE_POINT          1
+#define TYPE_SPOT           2
+
+// Now we will use a single struct for all light types.
+struct Light {
+    // This will hold the light type.
+    int type;
+    // This defines the color and intensity of the light.
+    vec3 color;
+    // Position is used for point and spot lights. Direction is used for directional and spot lights.
+    vec3 position, direction;
+    // Cone angles are used for spot lights.
+    float cos_inner_angle, cos_outer_angle;
+
+    float intensity;
+};
+
+in Varyings {
+    vec4 color;
+    vec2 tex_coord;
+    vec3 world;
+    vec3 normal;
+} fs_in;
+
+out vec4 frag_color;
+
+uniform vec3 camera_pos;
+uniform vec3 ambient;
+uniform int u_debugMode;
+
+// This will define the maximum number of lights we can receive.
+#define MAX_LIGHT_COUNT 8
+
+// Now we recieve the material, light array, the actual number of lights sent from the cpu and the sky light.
+uniform TexturedMaterial material;
+uniform Light lights[MAX_LIGHT_COUNT];
+uniform int light_count;
+uniform bool u_useLightBlock;
+
+layout(std140) uniform LightBlock {
+    vec4 lb_header;
+    vec4 lb_data[MAX_LIGHT_COUNT * 4];
+};
+
+Light light_from_block(int index) {
+    int base = index * 4;
+    vec4 color = lb_data[base + 0];
+    vec4 posType = lb_data[base + 1];
+    vec4 dir = lb_data[base + 2];
+    vec4 angles = lb_data[base + 3];
+
+    Light light;
+    light.type = int(posType.w + 0.5);
+    light.color = color.rgb;
+    light.position = posType.xyz;
+    light.direction = dir.xyz;
+    light.cos_inner_angle = angles.x;
+    light.cos_outer_angle = angles.y;
+    light.intensity = color.w;
+    return light;
+}
+
+void main() {
+    // First, we sample the material color from the material textures.
+    Material sampled = sample_material(material, fs_in.tex_coord);
+    vec3 normal = normalize(fs_in.normal); // Although the normal was already normalized, it may become shorter during interpolation.
+    vec3 view = normalize(camera_pos - fs_in.world);
+
+    if (u_debugMode == 1) {
+        frag_color = fs_in.color * vec4(sampled.diffuse, sampled.alpha);
+        return;
+    }
+    if (u_debugMode == 2) {
+        frag_color = vec4(normal * 0.5 + 0.5, sampled.alpha);
+        return;
+    }
+    if (u_debugMode == 5) {
+        float roughness = texture(material.roughness_map, fs_in.tex_coord).r;
+        float ao = texture(material.ambient_occlusion_map, fs_in.tex_coord).r;
+        frag_color = vec4(roughness, ao, length(sampled.emissive), sampled.alpha);
+        return;
+    }
+
+    // Initially the accumulated light will hold the ambient light and the emissive light (light coming out of the object).
+    vec3 accumulated_light = sampled.emissive + sampled.ambient * ambient;
+
+    // Make sure that the actual light count never exceeds the maximum light count.
+    int count = u_useLightBlock
+        ? min(int(lb_header.x + 0.5), MAX_LIGHT_COUNT)
+        : min(light_count, MAX_LIGHT_COUNT);
+    // Now we will loop over all the lights.
+    for(int index = 0; index < count; index++){
+        Light light = u_useLightBlock ? light_from_block(index) : lights[index];
+        vec3 Ldir;
+        float attenuation = 1.0;
+        float intensity = light.intensity;
+
+        if(light.type == TYPE_DIRECTIONAL) {
+            // For directional lights, we treat light.direction as the direction the light is pointing.
+            // We want the vector *from surface to light*, so negate it.
+            Ldir = normalize(-light.direction);
+        } else {
+            // If not directional, compute the direction from the light position to the surface.
+            vec3 ld = light.position - fs_in.world;
+            float distance = length(ld);
+            if (distance > 1e-6) {
+                Ldir = ld / distance;
+                // inverse square attenuation
+                attenuation *= 1.0 / (distance * distance);
+            } else {
+                // fallback direction if we're exactly at light position (rare)
+                Ldir = normalize(ld + vec3(1e-6));
+            }
+
+            if(light.type == TYPE_SPOT){
+                // ensure light.direction is normalized
+                vec3 spotDir = normalize(light.direction);
+                float cos_angle = dot(spotDir, -Ldir);
+                attenuation *= smoothstep(light.cos_outer_angle, light.cos_inner_angle, cos_angle);
+            }
+        }
+
+        // Now we compute the 2 components of the light separately.
+        float NdotL = calculate_lambert(normal, Ldir);
+        vec3 diffuse = sampled.diffuse * light.color * NdotL;
+        vec3 specular = sampled.specular * light.color * calculate_blinn_phong(normal, Ldir, view, sampled.shininess);
+
+        // Apply intensity and attenuation
+        accumulated_light += (diffuse + specular) * attenuation * intensity;
+    }
+
+    if (u_debugMode == 3) {
+        frag_color = vec4(accumulated_light, sampled.alpha);
+        return;
+    }
+
+    // frag_color = vec4(1, 0, 1, 1);
+    frag_color = fs_in.color * vec4(accumulated_light, sampled.alpha);
+}
